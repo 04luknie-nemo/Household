@@ -14,7 +14,6 @@ app.use(
   }),
 );
 
-// endpoint hämtar posts i version 1
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 serve(
