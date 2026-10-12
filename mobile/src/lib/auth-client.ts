@@ -8,10 +8,16 @@ import { Platform } from "react-native";
 // så adressen följer med när du byter nätverk
 const devHost = Constants.expoConfig?.hostUri?.split(":")[0] ?? "localhost";
 
+// Sätt EXPO_PUBLIC_API_URL i mobile/.env.local för att använda en https-tunnel
+// (krävs för GitHub-inloggning på iPhone)
+const tunnelUrl = process.env.EXPO_PUBLIC_API_URL;
+
 export const authClient = createAuthClient({
   // Webben når servern via localhost, telefon/emulator behöver datorns IP
   baseURL:
-    Platform.OS === "web" ? "http://localhost:3000" : `http://${devHost}:3000`,
+    Platform.OS === "web"
+      ? "http://localhost:3000"
+      : (tunnelUrl ?? `http://${devHost}:3000`),
   plugins: [
     expoClient({
       scheme: "mobile",
