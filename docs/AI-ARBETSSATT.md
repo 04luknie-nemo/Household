@@ -68,5 +68,5 @@ Här loggas varje gång Claude skriver kod som hamnar i repot.
 | Datum | Etapp | Nivå | Vad Claude gjorde | Granskad av |
 | --- | --- | --- | --- | --- |
 | 2026-10-09 | Projektstart | Ta över | Skrev README, CLAUDE.md, AGENTS.md och det här dokumentet | |
-| 2026-10-12 | Backend och inloggning | Ta över | Claude i VS Code skrev auth-client.ts, CORS och dotenv-ordningen i server/src/index.ts, setup/README.md och env-mallarna | |
+| 2026-10-12 | Backend och inloggning (PR #4) | Ta över | Claude i VS Code skrev auth-client.ts, CORS och dotenv-ordningen i server/src/index.ts, setup/README.md och env-mallarna | |
 | 2026-10-12 | Granskning av PR #4 | Granska | Granskade PR #4, tog bort dubbel rubrik i README och lade till loggrader | |
