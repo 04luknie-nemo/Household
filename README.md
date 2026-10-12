@@ -8,11 +8,15 @@ Byggd med React Native, Expo och TypeScript.
 
 ## Kom igång
 
-Fylls i när Expo-projektet och backend är på plats.
+    cd mobile
+    npm install
+    npx expo start
+
+Backend fylls i när den är vald.
 
 ## Arbetssätt med AI
 
-Projektet byggs med Claude som assistent. Se [docs/AI-ARBETSSATT.md](docs/AI-ARBETSSATT.md) för hur vi delar upp arbetet och granskar kod.
+Gruppen använder AI-assistenter i projektet. Se [docs/AI-ARBETSSATT.md](docs/AI-ARBETSSATT.md) för hur vi delar upp arbetet och granskar kod.
 
 ## Krav
 
