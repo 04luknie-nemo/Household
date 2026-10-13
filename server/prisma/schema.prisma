@@ -13,15 +13,16 @@ datasource db {
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  id               String            @id
+  name             String
+  email            String
+  emailVerified    Boolean           @default(false)
+  image            String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  sessions         Session[]
+  accounts         Account[]
+  householdMembers HouseholdMember[]
 
   @@unique([email])
   @@map("user")
@@ -73,4 +74,83 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Household {
+  id         String            @id @default(uuid())
+  name       String
+  inviteCode String            @unique
+  members    HouseholdMember[]
+  tasks      Task[]
+}
+
+model HouseholdMember {
+  id          String     @id @default(uuid())
+  userId      String
+  householdId String
+  nickname    String
+  roleId      String
+  statusId    String
+  emojiId     String
+  isPaused    Boolean    @default(false)
+  user        User       @relation(fields: [userId], references: [id])
+  household   Household  @relation(fields: [householdId], references: [id])
+  role        Role       @relation(fields: [roleId], references: [id])
+  status      Status     @relation(fields: [statusId], references: [id])
+  emoji       Emoji      @relation(fields: [emojiId], references: [id])
+  todoExecs   TodoExec[]
+
+  @@unique([userId, householdId])
+  @@unique([householdId, emojiId])
+}
+
+model Role {
+  id      String            @id @default(uuid())
+  name    String
+  members HouseholdMember[]
+}
+
+model Status {
+  id      String            @id @default(uuid())
+  /// pending, active, left
+  name    String
+  members HouseholdMember[]
+}
+
+model Emoji {
+  id      String            @id @default(uuid())
+  emoji   String
+  color   String
+  members HouseholdMember[]
+}
+
+model Task {
+  id            String    @id @default(uuid())
+  householdId   String
+  title         String
+  description   String
+  reoccurInDays Int
+  worth         Int
+  isArchived    Boolean   @default(false)
+  household     Household @relation(fields: [householdId], references: [id])
+  todos         Todo[]
+}
+
+model Todo {
+  id          String     @id @default(uuid())
+  taskId      String
+  deadline    DateTime
+  createdAt   DateTime   @default(now())
+  completedAt DateTime?
+  task        Task       @relation(fields: [taskId], references: [id])
+  todoExecs   TodoExec[]
+}
+
+model TodoExec {
+  todoId   String
+  memberId String
+  todo     Todo            @relation(fields: [todoId], references: [id])
+  member   HouseholdMember @relation(fields: [memberId], references: [id])
+
+  @@id([todoId, memberId])
 }
