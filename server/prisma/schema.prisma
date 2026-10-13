@@ -100,6 +100,7 @@ model HouseholdMember {
   emoji       Emoji      @relation(fields: [emojiId], references: [id])
   todoExecs   TodoExec[]
 
+  @@unique([userId, householdId])
   @@unique([householdId, emojiId])
 }
 
