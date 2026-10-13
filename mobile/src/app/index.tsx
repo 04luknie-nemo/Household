@@ -19,29 +19,11 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <View style={{ flexDirection: "row", gap: 32, alignItems: "center" }}>
-        <Pressable
-          onPress={handleBack}
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            borderWidth: 1,
-            width: 32,
-            height: 32,
-          }}
-        >
+        <Pressable onPress={handleBack} style={styles.arrowbtn}>
           <Text>{"<"}</Text>
         </Pressable>
         <Text>{periods[period]}</Text>
-        <Pressable
-          onPress={handleForward}
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            borderWidth: 1,
-            width: 32,
-            height: 32,
-          }}
-        >
+        <Pressable onPress={handleForward} style={styles.arrowbtn}>
           <Text>{">"}</Text>
         </Pressable>
       </View>
@@ -61,10 +43,10 @@ export default function Index() {
       <Link href="/task-modal">
         <Text>Lägg Till</Text>
       </Link>
+      {/* Tillfälligt: tas bort i #7 */}
       <Link href="/select-household">
         <Text>Välj hushåll</Text>
       </Link>
-      // Ska försvinna sen med issue #7
       <Link href="/login">
         <Text>Logga in</Text>
       </Link>
@@ -77,5 +59,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 16,
+  },
+  arrowbtn: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    width: 44,
+    height: 44,
   },
 });

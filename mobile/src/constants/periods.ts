@@ -1,1 +1,1 @@
-export const periods: string[] = ["Idag", "Denna Veckan", "Förra Veckan", "Förra Månaden"];
+export const periods: string[] = ["Idag", "Denna vecka", "Förra veckan", "Förra månaden"];

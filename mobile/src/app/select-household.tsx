@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { Text, View } from "react-native";
 
-export default function TaskModal() {
+export default function SelectHousehold() {
   return (
     <View style={{ gap: 32 }}>
       <Link href="/create-household">
