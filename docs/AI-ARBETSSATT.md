@@ -87,3 +87,4 @@ Här loggas varje gång en AI-assistent skriver kod som hamnar i repot.
 | 2026-10-12 | Backend och inloggning (PR #4) | Claude i VS Code | Ta över | Skrev auth-client.ts, CORS och dotenv-ordningen i server/src/index.ts, setup/README.md och env-mallarna | |
 | 2026-10-12 | Granskning av PR #4 | Claude Code | Granska | Granskade PR #4, tog bort dubbel rubrik i README och lade till loggrader | |
 | 2026-10-13 | Arbetssätt (PR #3) | Claude Code | Ta över | Mergade main in i PR #3 och flyttade loggraderna till formatet med kolumnen Verktyg | |
+| 2026-10-13 | Prisma-modeller | Codex | Ta över | Lade till Household, HouseholdMember, Role, Status, Emoji, Task, Todo och TodoExec med relationer i schema.prisma | |
