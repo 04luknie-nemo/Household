@@ -89,4 +89,4 @@ Här loggas varje gång en AI-assistent skriver kod som hamnar i repot.
 | 2026-10-13 | Arbetssätt (PR #3) | Claude Code | Ta över | Mergade main in i PR #3 och flyttade loggraderna till formatet med kolumnen Verktyg | |
 | 2026-10-13 | Prisma-modeller | Codex | Ta över | Lade till Household, HouseholdMember, Role, Status, Emoji, Task, Todo och TodoExec med relationer i schema.prisma | |
 | 2026-10-13 | CI (PR #12) | Claude Code | Ta över | Skrev mobile.yml, server.yml och eslint.config.js efter Expos mall. Testade server-stegen lokalt | |
-| 2026-10-13 | Grundskal (#13) | Claude Code | Förklara och granska | Förklarade Stack, modal, Link och periodväljaren med korta mönsterexempel. Granskade koden och körde lint och tsc. Koden skrevs av Lukas | |
+| 2026-10-13 | Grundskal (#13) | Claude Code | Förklara och granska | Förklarade Stack, modal, Link och periodväljaren med korta mönsterexempel. Granskade koden och körde lint och tsc. Koden skrevs av Lukas | Martin |
