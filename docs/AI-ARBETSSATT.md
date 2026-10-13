@@ -40,7 +40,7 @@ En etapp ska gå att granska på cirka 15 minuter. Blir den större delar vi upp
 - Koden hamnar på en egen gren, aldrig direkt mot main.
 - Pull requesten beskriver vad som ändrats och varför, och att AI skrev koden.
 - Någon i gruppen granskar varje fil innan merge.
-- En rad läggs till i AI-loggen nedan. Kan verktyget inte skriva i repot, lägger personen till raden själv.
+- En rad läggs till i AI-loggen nedan, med PR-numret. Kan verktyget inte skriva i repot, lägger personen till raden själv.
 
 ## Verktyg och instruktionsfiler
 
@@ -78,15 +78,16 @@ Om en punkt inte stämmer frågar vi AI:n tills den gör det, eller skriver om k
 
 ## AI-logg
 
-Här loggas varje gång en AI-assistent skriver kod som hamnar i repot.
+Här loggas varje gång en AI-assistent skriver kod som hamnar i repot. Kolumnen PR länkar till pull requesten där koden granskades. Vem som granskade syns i PR:en på GitHub.
 
-| Datum | Etapp | Verktyg | Nivå | Vad AI:n gjorde | Granskad av |
+| Datum | Etapp | Verktyg | Nivå | Vad AI:n gjorde | PR |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-09 | Projektstart | Claude Code | Ta över | Skrev README, CLAUDE.md, AGENTS.md och det här dokumentet | |
-| 2026-10-12 | Arbetssätt (PR #3) | Claude Code | Ta över | Gjorde AGENTS.md och arbetssättet oberoende av AI-verktyg | |
-| 2026-10-12 | Backend och inloggning (PR #4) | Claude i VS Code | Ta över | Skrev auth-client.ts, CORS och dotenv-ordningen i server/src/index.ts, setup/README.md och env-mallarna | |
-| 2026-10-12 | Granskning av PR #4 | Claude Code | Granska | Granskade PR #4, tog bort dubbel rubrik i README och lade till loggrader | |
-| 2026-10-13 | Arbetssätt (PR #3) | Claude Code | Ta över | Mergade main in i PR #3 och flyttade loggraderna till formatet med kolumnen Verktyg | |
-| 2026-10-13 | Prisma-modeller | Codex | Ta över | Lade till Household, HouseholdMember, Role, Status, Emoji, Task, Todo och TodoExec med relationer i schema.prisma | |
-| 2026-10-13 | CI (PR #12) | Claude Code | Ta över | Skrev mobile.yml, server.yml och eslint.config.js efter Expos mall. Testade server-stegen lokalt | |
-| 2026-10-13 | Grundskal (#13) | Claude Code | Förklara och granska | Förklarade Stack, modal, Link och periodväljaren med korta mönsterexempel. Granskade koden och körde lint och tsc. Koden skrevs av Lukas | Martin |
+| 2026-10-09 | Projektstart | Claude Code | Ta över | Skrev README, CLAUDE.md, AGENTS.md och det här dokumentet | #1 |
+| 2026-10-12 | Arbetssätt | Claude Code | Ta över | Gjorde AGENTS.md och arbetssättet oberoende av AI-verktyg | #3 |
+| 2026-10-12 | Backend och inloggning | Claude i VS Code | Ta över | Skrev auth-client.ts, CORS och dotenv-ordningen i server/src/index.ts, setup/README.md och env-mallarna | #4 |
+| 2026-10-12 | Granskning av backend | Claude Code | Granska | Granskade PR #4, tog bort dubbel rubrik i README och lade till loggrader | #4 |
+| 2026-10-13 | Arbetssätt | Claude Code | Ta över | Mergade main in i PR #3 och flyttade loggraderna till formatet med kolumnen Verktyg | #3 |
+| 2026-10-13 | Prisma-modeller | Codex | Ta över | Lade till Household, HouseholdMember, Role, Status, Emoji, Task, Todo och TodoExec med relationer i schema.prisma | #11 |
+| 2026-10-13 | CI | Claude Code | Ta över | Skrev mobile.yml, server.yml och eslint.config.js efter Expos mall. Testade server-stegen lokalt | #12 |
+| 2026-10-13 | Grundskal | Claude Code | Förklara och granska | Förklarade Stack, modal, Link och periodväljaren med korta mönsterexempel. Granskade koden och körde lint och tsc. Koden skrevs av Lukas | #15 |
+| 2026-10-13 | AI-logg | Claude Code | Ta över | Bytte kolumnen Granskad av mot PR och fyllde i PR-nummer för alla rader | #15 |
