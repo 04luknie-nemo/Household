@@ -12,7 +12,7 @@ Se [setup/README.md](setup/README.md) för installation, miljövariabler och Git
 
 ## Arbetssätt med AI
 
-Projektet byggs med Claude som assistent. Se [docs/AI-ARBETSSATT.md](docs/AI-ARBETSSATT.md) för hur vi delar upp arbetet och granskar kod.
+Gruppen använder AI-assistenter i projektet. Se [docs/AI-ARBETSSATT.md](docs/AI-ARBETSSATT.md) för hur vi delar upp arbetet och granskar kod.
 
 ## Krav
 
