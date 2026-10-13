@@ -8,7 +8,7 @@ Byggd med React Native, Expo och TypeScript.
 
 ## Kom igång
 
-Fylls i när Expo-projektet och backend är på plats.
+Se [setup/README.md](setup/README.md) för installation, miljövariabler och GitHub-inloggning.
 
 ## Arbetssätt med AI
 
