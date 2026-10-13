@@ -83,4 +83,7 @@ Här loggas varje gång en AI-assistent skriver kod som hamnar i repot.
 | Datum | Etapp | Verktyg | Nivå | Vad AI:n gjorde | Granskad av |
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-09 | Projektstart | Claude Code | Ta över | Skrev README, CLAUDE.md, AGENTS.md och det här dokumentet | |
-| 2026-10-12 | Arbetssätt | Claude Code | Ta över | Gjorde AGENTS.md och arbetssättet oberoende av AI-verktyg | |
+| 2026-10-12 | Arbetssätt (PR #3) | Claude Code | Ta över | Gjorde AGENTS.md och arbetssättet oberoende av AI-verktyg | |
+| 2026-10-12 | Backend och inloggning (PR #4) | Claude i VS Code | Ta över | Skrev auth-client.ts, CORS och dotenv-ordningen i server/src/index.ts, setup/README.md och env-mallarna | |
+| 2026-10-12 | Granskning av PR #4 | Claude Code | Granska | Granskade PR #4, tog bort dubbel rubrik i README och lade till loggrader | |
+| 2026-10-13 | Arbetssätt (PR #3) | Claude Code | Ta över | Mergade main in i PR #3 och flyttade loggraderna till formatet med kolumnen Verktyg | |

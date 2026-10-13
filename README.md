@@ -8,11 +8,7 @@ Byggd med React Native, Expo och TypeScript.
 
 ## Kom igång
 
-    cd mobile
-    npm install
-    npx expo start
-
-Backend fylls i när den är vald.
+Se [setup/README.md](setup/README.md) för installation, miljövariabler och GitHub-inloggning.
 
 ## Arbetssätt med AI
 
