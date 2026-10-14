@@ -42,7 +42,7 @@ export default function RootStack() {
             ),
           }}
         />
-        <Stack.Screen name="household" options={{ title: "Household" }} />
+        <Stack.Screen name="household" options={{ title: "Hushåll" }} />
         <Stack.Screen name="profile" options={{ title: "Profil" }} />
         <Stack.Screen
           name="task-modal"
