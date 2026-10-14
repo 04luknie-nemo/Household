@@ -6,7 +6,7 @@ export default function SelectHousehold() {
     <View style={{ gap: 32 }}>
       <View style={{ gap: 16, borderWidth: 1, padding: 16 }}>
         <Text>Här kommer listan på dina hushåll</Text>
-        <Text>Klicka på hus håll för att "Välja de"</Text>
+        <Text>Klicka på hushåll för att välja det</Text>
         <Link
           href="/"
           dismissTo

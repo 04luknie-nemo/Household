@@ -26,7 +26,11 @@ export default function RootStack() {
         <Stack.Screen
           name="index"
           options={{
-            title: "Hushållet",
+            headerTitle: () => (
+              <Link href="/household">
+                <Text style={{ padding: 16 }}>Hushållet</Text>
+              </Link>
+            ),
             headerLeft: () => (
               <View>
                 <Link href="/profile" asChild>
@@ -38,6 +42,7 @@ export default function RootStack() {
             ),
           }}
         />
+        <Stack.Screen name="household" options={{ title: "Household" }} />
         <Stack.Screen name="profile" options={{ title: "Profil" }} />
         <Stack.Screen
           name="task-modal"
