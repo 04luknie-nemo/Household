@@ -12,7 +12,6 @@ export default function AuthProvider({
 }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  console.log(isLoggedIn);
   // Login och register ändrar värdet
   return (
     <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>

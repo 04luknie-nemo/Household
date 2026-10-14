@@ -4,12 +4,12 @@ import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
 
 export default function Register() {
-  const { setIsLoggedIn, isLoggedIn } = useContext(AuthContext);
+  const { setIsLoggedIn } = useContext(AuthContext);
   return (
     <View>
       <Text>Registrering</Text>
       {/* Detta byts senare ut  */}
-      <Pressable onPress={() => setIsLoggedIn(!isLoggedIn)}>
+      <Pressable onPress={() => setIsLoggedIn(true)}>
         <Text>Tryck här för att skapa konto!</Text>
       </Pressable>
       <Link href="/login">
