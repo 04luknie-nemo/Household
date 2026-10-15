@@ -35,6 +35,15 @@ En etapp är en sak, till exempel "ägare kan godkänna en förfrågan". Varje e
 
 En etapp ska gå att granska på cirka 15 minuter. Blir den större delar vi upp den.
 
+### Föräldrar och sub-issues
+
+När en issue blir för stor delar vi upp den i sub-issues, oftast en för servern och en för appen. Issuen som delas upp blir en förälder.
+
+- En förälder är bara en platshållare. Den innehåller kraven och en lista över delarna, men ingen egen kod att skriva.
+- Ingen jobbar direkt på en förälder. Den får ingen egen gren och ingen egen pull request.
+- Grenen skapas från sub-issuen, och pull requesten skriver Closes för sub-issuen och "Del av" för föräldern.
+- Föräldern stängs när alla delar är stängda.
+
 ## När AI:n tar över
 
 - Koden hamnar på en egen gren, aldrig direkt mot main.
@@ -95,3 +104,4 @@ Här loggas varje gång en AI-assistent skriver kod som hamnar i repot. Kolumnen
 | 2026-10-15 | Datamodell | Gemini CLI | Förklara och granska | Gick igenom förändringarna från ER-diagrammet och kontrollerade Prisma-schemat | #17 |
 | 2026-10-15 | Seed och statusenum | Claude Code i VS Code | Förklara och granska | Förklarade varför db:push kräver server/.env, Prisma-enum och konstanter för statusar och avatarer. Granskade schema och seed, körde validate och tsc. Koden skrevs av Lukas | – |
 | 2026-10-15 | Seed och avatarer | Claude Code | Ta över | Granskade grenen för #23, körde db:push, db:seed och tsc. Lade till en rad i setup/README.md om att db:seed inte gör något än, och kommentarer i båda avatars.ts om att hålla dem lika | – |
+| 2026-10-15 | Föräldraissues | Claude Code | Ta över | Skrev regeln om föräldrar och sub-issues i det här dokumentet och i AGENTS.md, på Lukas begäran | – |
