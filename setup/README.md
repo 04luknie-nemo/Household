@@ -7,12 +7,13 @@ Projektet består av två delar som installeras var för sig. Kör aldrig `npm i
 
 Den här mappen innehåller mallar för miljövariablerna. De riktiga `.env`-filerna innehåller hemligheter och skickas aldrig till GitHub, så varje person skapar sina egna utifrån mallarna.
 
-| Mall | Kopieras till | Krävs |
-|---|---|---|
-| `server.env.example` | `server/.env` | Ja |
+| Mall                 | Kopieras till       | Krävs                                |
+| -------------------- | ------------------- | ------------------------------------ |
+| `server.env.example` | `server/.env`       | Ja                                   |
 | `mobile.env.example` | `mobile/.env.local` | Bara för GitHub-inloggning på iPhone |
 
 Auth-delen följer Better Auths dokumentation:
+
 - [Installation](https://better-auth.com/docs/installation) – miljövariabler, databas och serveruppsättning
 - [Expo-integration](https://better-auth.com/docs/integrations/expo) – klient, `trustedOrigins` och Expo-pluginet
 
@@ -36,8 +37,11 @@ Skapa databasen och starta:
 ```bash
 npm run db:generate
 npm run db:push
+npm run db:seed
 npm run dev
 ```
+
+`npm run db:seed` behöver inte köras än. Skriptet lägger inte in något förrän vi lägger till testdata i `server/prisma/seed.ts`.
 
 Servern kör på `http://localhost:3000`. Testa med `http://localhost:3000/api/auth/ok`.
 
@@ -68,12 +72,12 @@ Lägg till nya paket med `npx expo install <paket>`, inte `npm install`.
 
 `BETTER_AUTH_URL` (server) och callback-adressen i GitHub måste vara samma.
 
-| Testar på | `BETTER_AUTH_URL` | `mobile/.env.local` |
-|---|---|---|
-| Webb | `http://localhost:3000` | behövs inte |
-| Android (emulator/telefon) | `http://<din-ip>:3000` | behövs inte |
-| iPhone, e-post/lösenord | valfri | behövs inte |
-| iPhone, GitHub-inloggning | tunneladressen | `EXPO_PUBLIC_API_URL=<tunneladressen>` |
+| Testar på                  | `BETTER_AUTH_URL`       | `mobile/.env.local`                    |
+| -------------------------- | ----------------------- | -------------------------------------- |
+| Webb                       | `http://localhost:3000` | behövs inte                            |
+| Android (emulator/telefon) | `http://<din-ip>:3000`  | behövs inte                            |
+| iPhone, e-post/lösenord    | valfri                  | behövs inte                            |
+| iPhone, GitHub-inloggning  | tunneladressen          | `EXPO_PUBLIC_API_URL=<tunneladressen>` |
 
 ### Tunnel för iPhone
 
