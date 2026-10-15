@@ -3,6 +3,7 @@ import { validator } from "hono/validator";
 import { createInviteCode } from "../lib/invite-code.ts";
 import { db } from "../../prisma/db.ts";
 import { Prisma } from "../../generated/prisma/client.ts";
+import { auth } from "../lib/auth.ts";
 
 const households = new Hono();
 
@@ -11,15 +12,20 @@ households.post(
   validator("json", (value, c) => {
     let householdName = value["name"];
     if (!householdName || typeof householdName !== "string") {
-      return c.text("Invalid", 400);
+      return c.text("Otillåten input", 400);
     }
     householdName = householdName.trim();
     if (householdName === "") {
-      return c.text("Invalid", 400);
+      return c.text("Otillåten input", 400);
     }
     return { householdName };
   }),
   async (c) => {
+    const session = await auth.api.getSession({ headers: c.req.raw.headers });
+    if (!session) {
+      return c.text("Inte inloggad", 401);
+    }
+
     const { householdName } = await c.req.valid("json");
 
     for (let i = 0; i < 10; i++) {
@@ -30,8 +36,22 @@ households.post(
         inviteCode: inviteCode,
       };
       try {
-        const data = await db.household.create({ data: newHousehold });
-        return c.json(data, 201);
+        const householdData = await db.household.create({
+          data: {
+            ...newHousehold,
+            members: {
+              create: {
+                nickname: session.user.name,
+                avatarId: 1,
+                isOwner: true,
+                status: "active",
+                userId: session.user.id,
+              },
+            },
+          },
+        });
+
+        return c.json(householdData, 201);
       } catch (error) {
         if (
           error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -43,7 +63,7 @@ households.post(
         }
       }
     }
-    return c.text("Failed to create household", 500);
+    return c.text("Misslyckades att skapa hushåll", 500);
   },
 );
 export default households;
