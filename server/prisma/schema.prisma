@@ -91,24 +91,22 @@ model HouseholdMember {
   householdId    String
   nickname       String
   isOwner        Boolean         @default(false)
-  statusId       String
   isPaused       Boolean         @default(false)
-  emojiId        Int
+  avatarId       Int
   createdAt      DateTime        @default(now())
   user           User            @relation(fields: [userId], references: [id])
   household      Household       @relation(fields: [householdId], references: [id])
-  status         Status          @relation(fields: [statusId], references: [id])
+  status         MemberStatus    @default(pending)
   completedTasks CompletedTask[]
 
   @@unique([userId, householdId])
-  @@unique([householdId, emojiId])
+  @@unique([householdId, avatarId])
 }
 
-model Status {
-  id      String            @id @default(uuid())
-  /// pending, active, left
-  name    String
-  members HouseholdMember[]
+enum MemberStatus {
+  pending
+  active
+  left
 }
 
 model Task {
@@ -132,4 +130,3 @@ model CompletedTask {
   member    HouseholdMember @relation(fields: [memberId], references: [id])
   task      Task            @relation(fields: [taskId], references: [id])
 }
-
