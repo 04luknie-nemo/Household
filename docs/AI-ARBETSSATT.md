@@ -92,3 +92,4 @@ Här loggas varje gång en AI-assistent skriver kod som hamnar i repot. Kolumnen
 | 2026-10-13 | Grundskal | Claude Code | Förklara och granska | Förklarade Stack, modal, Link och periodväljaren med korta mönsterexempel. Granskade koden och körde lint och tsc. Koden skrevs av Lukas | #15 |
 | 2026-10-13 | AI-logg | Claude Code | Ta över | Bytte kolumnen Granskad av mot PR och fyllde i PR-nummer för alla rader | #15 |
 | 2026-10-14 | Navigering till login och register | Claude Code | Förklara och granska | Förklarade AuthProvider, Stack.Protected, headerRight, dismissTo och sidstrukturen för sysslor och hushåll med korta mönsterexempel. Granskade koden och körde lint och tsc. Föreslog household.tsx och navigeringen dit via rubriken i headern. Uppdaterade sidlistan i #14. Koden skrevs av Lukas | #19 |
+| 2026-10-15 | Datamodell | Gemini CLI | Förklara och granska | Gick igenom förändringarna från ER-diagrammet och kontrollerade Prisma-schemat | #17 |
