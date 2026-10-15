@@ -2,7 +2,7 @@ import StatisticsView from "@/components/statistics";
 import { periods } from "@/constants/periods";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Text, View, StyleSheet, Pressable } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
   const [period, setPeriod] = useState<number>(0);
@@ -30,8 +30,23 @@ export default function Index() {
       <View>
         {period === 0 ? (
           // Blir en daily komponent
-          <View>
+          <View style={{ alignItems: "center" }}>
             <Text>Dags View</Text>
+            <View
+              style={{
+                borderWidth: 1,
+                gap: 16,
+                padding: 16,
+                alignItems: "center",
+              }}
+            >
+              <Text>Task 1</Text>
+              <View style={{ flexDirection: "row", gap: 16 }}>
+                <Link href="/task-modal">Ändra</Link> {/* + id*/}
+                <Link href="/task">Detalj för denna task</Link>
+                <Link href="/task-modal">Skapa</Link>
+              </View>
+            </View>
           </View>
         ) : (
           // Statistik komponent
@@ -40,16 +55,6 @@ export default function Index() {
           </View>
         )}
       </View>
-      <Link href="/task-modal">
-        <Text>Lägg Till</Text>
-      </Link>
-      {/* Tillfälligt: tas bort i #7 */}
-      <Link href="/select-household">
-        <Text>Välj hushåll</Text>
-      </Link>
-      <Link href="/login">
-        <Text>Logga in</Text>
-      </Link>
     </View>
   );
 }
