@@ -41,6 +41,8 @@ npm run db:seed
 npm run dev
 ```
 
+`npm run db:seed` behöver inte köras än. Skriptet lägger inte in något förrän vi lägger till testdata i `server/prisma/seed.ts`.
+
 Servern kör på `http://localhost:3000`. Testa med `http://localhost:3000/api/auth/ok`.
 
 ## 2. GitHub OAuth App

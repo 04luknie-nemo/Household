@@ -1,3 +1,4 @@
+// Samma lista finns i mobile/src/constants/avatars.ts. Ändra båda filerna samtidigt.
 export const avatars = [
   { id: 1, name: "🦊", color: "#F28C28" },
   { id: 2, name: "🐷", color: "#F4A7B9" },
