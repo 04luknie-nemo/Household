@@ -91,3 +91,4 @@ Här loggas varje gång en AI-assistent skriver kod som hamnar i repot. Kolumnen
 | 2026-10-13 | CI | Claude Code | Ta över | Skrev mobile.yml, server.yml och eslint.config.js efter Expos mall. Testade server-stegen lokalt | #12 |
 | 2026-10-13 | Grundskal | Claude Code | Förklara och granska | Förklarade Stack, modal, Link och periodväljaren med korta mönsterexempel. Granskade koden och körde lint och tsc. Koden skrevs av Lukas | #15 |
 | 2026-10-13 | AI-logg | Claude Code | Ta över | Bytte kolumnen Granskad av mot PR och fyllde i PR-nummer för alla rader | #15 |
+| 2026-10-15 | Datamodell | Gemini CLI | Förklara och granska | Gick igenom förändringarna från ER-diagrammet och kontrollerade Prisma-schemat | #17 |
