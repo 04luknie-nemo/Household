@@ -12,69 +12,67 @@ export default function Register() {
   const [error, setError] = useState<string | null>(null);
 
   const handleRegister = async () => {
-        setError(null); 
+    setError(null);
 
-        
-        if (!name || !email || !password) {
-          setError("Alla fält måste fyllas i");
-          return;
-        }
+    if (!name || !email || !password) {
+      setError("Alla fält måste fyllas i");
+      return;
+    }
 
-        
-        const response = await authClient.signUp.email({
-          name,
-          email,
-          password,
-        });
+    const response = await authClient.signUp.email({
+      name,
+      email,
+      password,
+    });
 
-        
-        if (response.error) {
-          setError(response.error.message || "Kunde inte skapa konto");
-          return;
-        }
+    if (response.error) {
+      setError(response.error.message || "Kunde inte skapa konto");
+      return;
+    }
 
-        
-        setIsLoggedIn(true);
-      };
+    setIsLoggedIn(true);
+  };
 
   return (
     <View style={{ padding: 16, gap: 10 }}>
-          <Text>Skapa konto</Text>
-    
-          
-          {error && <Text style={{ color: "red" }}>{error}</Text>}
-    
-          <TextInput
-            placeholder="Namn"
-            value={name}
-            onChangeText={setName}
-            style={{ borderWidth: 1, padding: 8 }}
-          />
-    
-          <TextInput
-            placeholder="E-post"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            style={{ borderWidth: 1, padding: 8 }}
-          />
-    
-          <TextInput
-            placeholder="Lösenord"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            style={{ borderWidth: 1, padding: 8 }}
-          />
-    
-          <Pressable onPress={handleRegister} style={{ borderWidth: 1, padding: 10 }}>
-            <Text>Skapa konto</Text>
-          </Pressable>
-    
-          <Link href="/login">
-            <Text>Har du redan ett konto? Logga in</Text>
-          </Link>
-        </View>
+      <Text>Skapa konto</Text>
+
+      {error && <Text style={{ color: "red" }}>{error}</Text>}
+
+      <TextInput
+        placeholder="Namn"
+        value={name}
+        onChangeText={setName}
+        style={{ borderWidth: 1, padding: 8 }}
+      />
+
+      <TextInput
+        placeholder="E-post"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        style={{ borderWidth: 1, padding: 8 }}
+      />
+
+      <TextInput
+        placeholder="Lösenord"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        style={{ borderWidth: 1, padding: 8 }}
+      />
+
+      <Pressable
+        onPress={handleRegister}
+        style={{ borderWidth: 1, padding: 10 }}
+      >
+        <Text>Skapa konto</Text>
+      </Pressable>
+
+      <Link href="/login">
+        <Text>Har du redan ett konto? Logga in</Text>
+      </Link>
+    </View>
   );
 }
