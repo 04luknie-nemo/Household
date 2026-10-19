@@ -54,7 +54,7 @@ join.post("/join", async (c) => {
 
   // 4. Hitta hushållet med inbjudningskoden
   const household = await db.household.findUnique({
-    where: { inviteCode: inviteCode.trim() },
+    where: { inviteCode: inviteCode.toUpperCase().trim() },
   });
 
   if (!household) {
