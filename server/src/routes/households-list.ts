@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { auth } from "../lib/auth.ts";
+import { db } from "../../prisma/db.ts";
 
 const list = new Hono();
 
@@ -8,7 +9,18 @@ list.get("/", async (c) => {
   if (!session) {
     return c.text("Inte inloggad", 401);
   }
-  return c.text("Inloggad!");
+
+  const myHouseholds = await db.household.findMany({
+    where: {
+      members: {
+        some: {
+          userId: session.user.id,
+          status: "active",
+        },
+      },
+    },
+  });
+  return c.json(myHouseholds);
 });
 
-export default list;
+export default list;
