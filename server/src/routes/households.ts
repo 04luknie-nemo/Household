@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 import { validator } from "hono/validator";
-import { createInviteCode } from "../lib/invite-code.ts";
-import { db } from "../../prisma/db.ts";
 import { Prisma } from "../../generated/prisma/client.ts";
+import { db } from "../../prisma/db.ts";
 import { auth } from "../lib/auth.ts";
+import { createInviteCode } from "../lib/invite-code.ts";
+import join from "./households-join.ts";
 
 const households = new Hono();
 
@@ -66,4 +67,7 @@ households.post(
     return c.text("Misslyckades att skapa hushåll", 500);
   },
 );
+
+households.route("/", join);
+
 export default households;
