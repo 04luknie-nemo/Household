@@ -1,22 +1,17 @@
-# Test: Gå med i ett hushåll med inbjudningskod
+# Test: Gå med i ett hushåll med inbjudningskod (#22)
+
+Testar `POST /api/households/join`. Fallet utan session finns i de generella testfallen i [README.md](README.md).
 
 ## Förutsättningar
 
 - Servern körs lokalt på port 3000.
-- Följ avsnitt 1 och 2 i [README.md](README.md): användare A och B finns och A har skapat ett hushåll. Byt `<kod>` nedan mot hushållets `inviteCode`.
-- Fall 5 och 7 behöver en tredje användare, C:
-
-```bash
-curl -c cookies-c.txt -X POST localhost:3000/api/auth/sign-up/email \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Cia","email":"cia@example.com","password":"hemligt123"}'
-```
+- Följ avsnitt 1 och 2 i [README.md](README.md): användare A, B och C finns och A har skapat ett hushåll. Byt `<kod>` nedan mot hushållets `inviteCode`.
 
 Kör fallen i ordning. A har avatar 1 som ägare.
 
 ## 1. Giltig inbjudningskod
 
-Skicka `POST /api/households/join` med en giltig `inviteCode` och ett ledigt `avatarId` mellan 1 och 8.
+Skicka en giltig `inviteCode` och ett ledigt `avatarId` mellan 1 och 8.
 
 ```bash
 curl -b cookies-b.txt -X POST localhost:3000/api/households/join \
@@ -47,19 +42,20 @@ Förväntat resultat:
 - HTTP 404 Not Found.
 - Ett tydligt felmeddelande returneras.
 
-## 3. Ingen session
+## 3. Fält saknas
 
-Skicka förfrågan utan giltig session.
+Skicka utan `avatarId`.
 
 ```bash
-curl -i -X POST localhost:3000/api/households/join \
+curl -i -b cookies-c.txt -X POST localhost:3000/api/households/join \
   -H "Content-Type: application/json" \
-  -d '{"inviteCode":"<kod>","avatarId":2}'
+  -d '{"inviteCode":"<kod>"}'
 ```
 
 Förväntat resultat:
 
-- HTTP 401 Unauthorized.
+- HTTP 400 Bad Request.
+- Inget medlemskap skapas.
 
 ## 4. Ogiltigt avatarId
 
