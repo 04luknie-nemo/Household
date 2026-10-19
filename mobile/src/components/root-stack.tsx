@@ -1,6 +1,7 @@
 import { Link, router, Stack } from "expo-router";
 import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
+import { colors } from "@/constants/theme";
 import { AuthContext } from "./auth-provider";
 
 export default function RootStack() {
@@ -10,6 +11,10 @@ export default function RootStack() {
     <Stack
       screenOptions={{
         headerBackButtonDisplayMode: "minimal",
+        headerStyle: { backgroundColor: colors.card },
+        headerTintColor: colors.primary,
+        headerTitleStyle: { color: colors.text },
+        contentStyle: { backgroundColor: colors.background },
         headerRight: () =>
           isLoggedIn ? (
             <View style={{ flexDirection: "row", gap: 8 }}>
