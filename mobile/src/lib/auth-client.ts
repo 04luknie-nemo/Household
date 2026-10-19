@@ -12,12 +12,14 @@ const devHost = Constants.expoConfig?.hostUri?.split(":")[0] ?? "localhost";
 // (krävs för GitHub-inloggning på iPhone)
 const tunnelUrl = process.env.EXPO_PUBLIC_API_URL;
 
+export const apiUrl =
+  Platform.OS === "web"
+    ? "http://localhost:3000"
+    : (tunnelUrl ?? "http://" + devHost + ":3000");
+
 export const authClient = createAuthClient({
   // Webben når servern via localhost, telefon/emulator behöver datorns IP
-  baseURL:
-    Platform.OS === "web"
-      ? "http://localhost:3000"
-      : (tunnelUrl ?? `http://${devHost}:3000`),
+  baseURL: apiUrl,
   plugins: [
     expoClient({
       scheme: "mobile",
