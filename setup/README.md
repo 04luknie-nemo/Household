@@ -41,7 +41,29 @@ npm run db:seed
 npm run dev
 ```
 
-`npm run db:seed` behöver inte köras än. Skriptet lägger inte in något förrän vi lägger till testdata i `server/prisma/seed.ts`.
+`npm run db:seed` skapar testanvändare, hushåll och medlemskap. Skriptet kan köras flera gånger utan att skapa dubbletter.
+
+### Testkonton
+
+Alla testkonton har lösenordet `test1234`.
+
+| Namn  | E-post        | Lösenord |
+| ----- | ------------- | -------- |
+| Anna  | anna@test.se  | test1234 |
+| Erik  | erik@test.se  | test1234 |
+| Sara  | sara@test.se  | test1234 |
+| Johan | johan@test.se | test1234 |
+| Maja  | maja@test.se  | test1234 |
+
+### Testhushåll
+
+| Hushåll     | Inbjudningskod | Ägare |
+| ----------- | -------------- | ----- |
+| Familjen    | `ABC234`       | Anna  |
+| Kompisar    | `DEF567`       | Erik  |
+| Kollektivet | `ACE247`       | Sara  |
+
+Testdatan innehåller även användare som tillhör flera hushåll och en medlem med status `pending`.
 
 Servern kör på `http://localhost:3000`. Testa med `http://localhost:3000/api/auth/ok`.
 

@@ -5,5 +5,4 @@ node_modules
 /generated/prisma
 data
 # Cookies från manuella curl-tester
-cookies.txt
-cookies2.txt
+cookies*.txt
