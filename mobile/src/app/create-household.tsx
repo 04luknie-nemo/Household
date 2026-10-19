@@ -1,36 +1,28 @@
 import { colors, spacing, typography, ui } from "@/constants/theme";
-import { apiUrl, authClient } from "@/lib/auth-client";
+import { apiFetch } from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Platform, Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
+
+type Household = {
+  id: string;
+  name: string;
+  inviteCode: string;
+};
 
 export default function CreateHousehold() {
   const [name, setName] = useState("");
   const [isCreated, setIsCreated] = useState(false);
   const [code, setCode] = useState("");
 
-  const makeAuthenticationReq = async () => {
-    const cookies = await authClient.getCookie();
-    const headers = {
-      Cookie: cookies,
-    };
-    const res = await fetch(apiUrl + "/api/households", {
-      method: "Post",
-      headers: { ...headers, "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-      credentials: Platform.OS === "web" ? "include" : "omit",
-    });
-    if (!res.ok) {
-      throw new Error(await res.text());
-    }
-    const data = await res.json();
-    return data;
-  };
-
   const createMutation = useMutation({
-    mutationFn: makeAuthenticationReq,
+    mutationFn: () =>
+      apiFetch<Household>("/api/households", {
+        method: "POST",
+        body: JSON.stringify({ name }),
+      }),
     onSuccess: (data) => {
       setCode(data.inviteCode);
       setIsCreated(true);
