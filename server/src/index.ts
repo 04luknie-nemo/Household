@@ -15,6 +15,14 @@ app.use(
   }),
 );
 
+app.use(
+  "/api/households/*",
+  cors({
+    origin: ["http://localhost:3001", "http://localhost:8081"],
+    credentials: true,
+  }),
+);
+
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 app.route("/api/households", households);

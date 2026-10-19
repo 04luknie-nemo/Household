@@ -6,3 +6,4 @@ node_modules
 data
 # Cookies från manuella curl-tester
 cookies.txt
+cookies2.txt
