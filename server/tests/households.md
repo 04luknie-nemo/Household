@@ -1,24 +1,10 @@
 # Manuella tester: hushåll
 
-Testar `POST /api/households` med curl. Kör från `server/` medan servern är igång (`npm run dev`).
+Testar `POST /api/households` med curl. Kör från `server/` medan servern är igång (`npm run dev`). Flaggorna förklaras i [README.md](README.md).
 
-`-c cookies.txt` sparar inloggningscookien i en fil och `-b cookies.txt` skickar med den. Filen ignoreras av git.
+## 1. Logga in
 
-## 1. Registrera en testanvändare
-
-```bash
-curl -c cookies.txt -X POST localhost:3000/api/auth/sign-up/email \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Testare","email":"test@example.com","password":"hemligt123"}'
-```
-
-Finns användaren redan, logga in i stället:
-
-```bash
-curl -c cookies.txt -X POST localhost:3000/api/auth/sign-in/email \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"hemligt123"}'
-```
+Följ avsnitt 1 i [README.md](README.md). Användare A räcker för de här testerna.
 
 ## 2. Testfall
 
