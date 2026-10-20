@@ -1,9 +1,8 @@
-import { AuthContext } from "@/components/auth-provider";
 import { colors, spacing, typography, ui } from "@/constants/theme";
 import { authClient } from "@/lib/auth-client";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function Register() {
@@ -37,8 +36,6 @@ export default function Register() {
         setError(response.error.message || "Kunde inte skapa konto");
         return;
       }
-
-      setIsLoggedIn(true);
     } catch {
       setError("Kunde inte skapa konto. Försök igen.");
     }
