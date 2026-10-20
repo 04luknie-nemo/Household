@@ -1,11 +1,9 @@
-import { AuthContext } from "@/components/auth-provider";
 import { Link } from "expo-router";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Pressable, Text, View, TextInput } from "react-native";
 import { authClient } from "@/lib/auth-client";
 
 export default function Register() {
-  const { setIsLoggedIn } = useContext(AuthContext);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,8 +27,6 @@ export default function Register() {
       setError(response.error.message || "Kunde inte skapa konto");
       return;
     }
-
-    setIsLoggedIn(true);
   };
 
   return (
