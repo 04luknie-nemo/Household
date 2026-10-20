@@ -42,7 +42,7 @@ export default function Index() {
             >
               <Text>Task 1</Text>
               <View style={{ flexDirection: "row", gap: 16 }}>
-                <Link href="/task-modal">Ändra</Link> {/* + id*/}
+                <Link href="/task-modal">Ändra</Link>
                 <Link href="/task">Detalj för denna task</Link>
                 <Link href="/task-modal">Skapa</Link>
               </View>

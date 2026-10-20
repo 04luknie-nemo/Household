@@ -1,4 +1,5 @@
 import AuthProvider from "@/components/auth-provider";
+import HouseholdProvider from "@/components/household-provider";
 import RootStack from "@/components/root-stack";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -8,7 +9,9 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={client}>
       <AuthProvider>
-        <RootStack />
+        <HouseholdProvider>
+          <RootStack />
+        </HouseholdProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
