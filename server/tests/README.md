@@ -8,6 +8,7 @@ Gemensam guide för testfilerna i den här mappen. Här finns inloggning, testda
 | [households-join.md](households-join.md) | #22 | `POST /api/households/join` |
 | [households-detail.md](households-detail.md) | #28 | `GET` och `PATCH /api/households/:id` |
 | [households-list.md](households-list.md) | #31 | `GET /api/households` |
+| [households-tasks.md](households-tasks.md) | #53 | `POST /api/households/:id/tasks` |
 
 ## Starta servern
 
@@ -115,6 +116,7 @@ Gäller alla routes under `/api/households`. Utan cookie ska varje route svara `
 | `GET /api/households` (#31) | `401` |
 | `GET /api/households/<id>` (#28) | `401` |
 | `PATCH /api/households/<id>` (#28) | `401` |
+| `POST /api/households/<id>/tasks` (#53) | `401` |
 
 ```bash
 curl -i -X POST localhost:3000/api/households \
@@ -129,6 +131,12 @@ curl -i localhost:3000/api/households/<id>
 
 curl -i -X PATCH localhost:3000/api/households/<id> \
   -H "Content-Type: application/json" -d '{"name":"Nytt namn"}'
+
+curl -i -X POST localhost:3000/api/households/<id>/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Damma","description":"","reoccurInDays":7,"worth":2}'
 ```
+
+Bodyn till sysslor måste vara giltig. Annars svarar valideringen `400` innan sessionen kontrolleras.
 
 En ny route under `/api/households` läggs till i tabellen.
