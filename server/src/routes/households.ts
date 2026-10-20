@@ -7,6 +7,7 @@ import { createInviteCode } from "../lib/invite-code.ts";
 import join from "./households-join.ts";
 import list from "./households-list.ts";
 import createTask from "./households-tasks.ts";
+import detail from "./households-detail.ts";
 
 const households = new Hono();
 
@@ -70,6 +71,7 @@ households.post(
   },
 );
 
+households.route("/", detail)
 households.route("/", join);
 households.route("/", list);
 households.route("/", createTask);
