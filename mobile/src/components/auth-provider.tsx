@@ -1,8 +1,11 @@
-import { createContext, useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import { createContext } from "react";
 
 export const AuthContext = createContext({
   isLoggedIn: false,
-  setIsLoggedIn: (value: boolean) => {},
+  isPending: true,
+  userId: null as string | null,
+  sessionId: null as string | null,
 });
 
 export default function AuthProvider({
@@ -10,11 +13,15 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { data: session, isPending } = authClient.useSession();
+  const userId = session?.user.id ?? null;
+  const sessionId = session?.session.id ?? null;
 
-  // Login och register ändrar värdet
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+    <AuthContext.Provider
+      key={sessionId ?? "signed-out"}
+      value={{ isLoggedIn: !!session, isPending, userId, sessionId }}
+    >
       {children}
     </AuthContext.Provider>
   );

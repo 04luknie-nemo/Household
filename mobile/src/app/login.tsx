@@ -1,20 +1,12 @@
-import { AuthContext } from "@/components/auth-provider";
 import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { authClient } from "@/lib/auth-client";
 import { Ionicons } from "@expo/vector-icons";
-import { Link, router, Stack } from "expo-router";
-import { useContext, useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Link, Stack } from "expo-router";
+import { useState } from "react";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Login() {
-  const { setIsLoggedIn } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +27,6 @@ export default function Login() {
       setError(response.error.message || "Fel e-post eller lösenord");
       return;
     }
-    setIsLoggedIn(true);
   };
 
   const handleGitHubLogin = async () => {
@@ -49,8 +40,6 @@ export default function Login() {
       setError(signInError.message || "Kunde inte logga in med GitHub");
       return;
     }
-    setIsLoggedIn(true);
-    router.replace("/");
   };
 
   return (
@@ -81,12 +70,7 @@ export default function Login() {
           >
             <Ionicons name="home-outline" size={36} color={colors.onPrimary} />
           </View>
-          <Text
-            style={[
-              typography.title,
-              { fontSize: 24, fontWeight: "700" },
-            ]}
-          >
+          <Text style={[typography.title, { fontSize: 24, fontWeight: "700" }]}>
             Hushållet
           </Text>
         </View>
@@ -177,7 +161,9 @@ export default function Login() {
             marginVertical: spacing.xs,
           }}
         >
-          <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
+          <View
+            style={{ flex: 1, height: 1, backgroundColor: colors.border }}
+          />
           <Text
             style={[
               typography.caption,
@@ -186,7 +172,9 @@ export default function Login() {
           >
             eller
           </Text>
-          <View style={{ flex: 1, height: 1, backgroundColor: colors.border }} />
+          <View
+            style={{ flex: 1, height: 1, backgroundColor: colors.border }}
+          />
         </View>
 
         <View style={{ gap: spacing.xs }}>
@@ -222,7 +210,10 @@ export default function Login() {
           </Pressable>
         </View>
 
-        <Link href="/register" style={{ alignSelf: "center", marginTop: spacing.sm }}>
+        <Link
+          href="/register"
+          style={{ alignSelf: "center", marginTop: spacing.sm }}
+        >
           <Text style={typography.body}>
             Har du inget konto?{" "}
             <Text style={{ fontWeight: "700", color: colors.text }}>
