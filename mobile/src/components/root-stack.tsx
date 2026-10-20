@@ -1,7 +1,7 @@
+import { colors } from "@/constants/theme";
 import { Link, router, Stack } from "expo-router";
 import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
-import { colors } from "@/constants/theme";
 import { AuthContext } from "./auth-provider";
 
 export default function RootStack() {
@@ -77,7 +77,12 @@ export default function RootStack() {
       </Stack.Protected>
       <Stack.Protected guard={!isLoggedIn}>
         <Stack.Screen name="login" />
-        <Stack.Screen name="register" />
+        <Stack.Screen
+          name="register"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack.Protected>
     </Stack>
   );
