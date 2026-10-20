@@ -1,11 +1,9 @@
-import { AuthContext } from "@/components/auth-provider";
 import { authClient } from "@/lib/auth-client";
 import { Link } from "expo-router";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 
 export default function Login() {
-  const { setIsLoggedIn } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +24,6 @@ export default function Login() {
       setError(response.error.message || "Fel e-post eller lösenord");
       return;
     }
-    setIsLoggedIn(true);
   };
   return (
     <View>
