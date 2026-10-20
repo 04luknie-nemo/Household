@@ -76,7 +76,7 @@ export default function RootStack() {
         />
       </Stack.Protected>
       <Stack.Protected guard={!isLoggedIn}>
-        <Stack.Screen name="login" />
+        <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" />
       </Stack.Protected>
     </Stack>
