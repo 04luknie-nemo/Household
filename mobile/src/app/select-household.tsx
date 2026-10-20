@@ -1,3 +1,4 @@
+import { AuthContext } from "@/components/auth-provider";
 import { HouseholdContext } from "@/components/household-provider";
 import { ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
@@ -19,14 +20,16 @@ export default function SelectHousehold() {
     >(null);
 
     const { setActiveHouseholdId } = useContext(HouseholdContext);
+    const { userId, sessionId } = useContext(AuthContext);
 
     const {
         data: households,
         isPending,
         error,
     } = useQuery<Household[]>({
-        queryKey: ["households"],
-        queryFn: () => apiFetch<Household[]>("/api/households"),
+        queryKey: ["households", userId, sessionId],
+        queryFn: ({ signal }) =>
+            apiFetch<Household[]>("/api/households", { signal }),
     });
 
     if (isPending) {
