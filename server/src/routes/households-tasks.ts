@@ -43,6 +43,45 @@ createTask.post(
     }
     return { taskTitle, taskDescription, taskReoccurInDays, taskWorth };
   }),
+  async (c) => {
+    const session = await auth.api.getSession({ headers: c.req.raw.headers });
+    if (!session) {
+      return c.text("Inte inloggad", 401);
+    }
+    const { taskTitle, taskDescription, taskReoccurInDays, taskWorth } =
+      await c.req.valid("json");
+
+    const task = {
+      title: taskTitle,
+      description: taskDescription,
+      reoccurInDays: taskReoccurInDays,
+      worth: taskWorth,
+    };
+    const household = await db.household.findUnique({
+      where: { id: c.req.param("id") },
+      select: {
+        id: true,
+        members: {
+          where: { userId: session.user.id },
+          select: { isOwner: true, status: true },
+        },
+      },
+    });
+
+    if (!household) return c.text("Hushållet finns inte", 404);
+
+    const me = household.members[0];
+    if (!me || me.status !== "active") {
+      return c.text("Inte medlem", 403);
+    }
+    if (!me.isOwner) {
+      return c.text("Endast ägaren får skapa", 403);
+    }
+    const taskData = await db.task.create({
+      data: { ...task, householdId: household.id },
+    });
+    return c.json(taskData, 201);
+  },
 );
 
 export default createTask;
