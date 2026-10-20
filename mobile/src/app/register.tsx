@@ -1,5 +1,5 @@
 import { AuthContext } from "@/components/auth-provider";
-import { colors, radius, spacing, typography, ui } from "@/constants/theme";
+import { colors, spacing, typography, ui } from "@/constants/theme";
 import { authClient } from "@/lib/auth-client";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
@@ -47,7 +47,7 @@ export default function Register() {
 
   return (
     <View style={styles.container}>
-      <Text style={[typography.title, { textAlign: "center", fontSize: 22 }]}>
+      <Text style={[typography.title, { textAlign: "center" }]}>
         Skapa konto
       </Text>
 
@@ -61,7 +61,7 @@ export default function Register() {
       </Text>
 
       <View style={styles.form}>
-        <View style={styles.inputContainer}>
+        <View style={[ui.card, styles.inputContainer]}>
           <Ionicons name="person-outline" size={18} color={colors.textMuted} />
           <TextInput
             style={styles.input}
@@ -73,8 +73,8 @@ export default function Register() {
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Ionicons name="mail" size={18} color={colors.textMuted} />
+        <View style={[ui.card, styles.inputContainer]}>
+          <Ionicons name="mail-outline" size={18} color={colors.textMuted} />
           <TextInput
             style={styles.input}
             placeholder="E-post"
@@ -87,7 +87,7 @@ export default function Register() {
           />
         </View>
 
-        <View style={styles.inputContainer}>
+        <View style={[ui.card, styles.inputContainer]}>
           <Ionicons
             name="lock-closed-outline"
             size={18}
@@ -104,7 +104,7 @@ export default function Register() {
           />
         </View>
 
-        <View style={styles.inputContainer}>
+        <View style={[ui.card, styles.inputContainer]}>
           <Ionicons
             name="lock-closed-outline"
             size={18}
@@ -129,7 +129,7 @@ export default function Register() {
 
         <Pressable
           onPress={handleRegister}
-          style={ui.button}
+          style={[ui.button, styles.button]}
           accessibilityRole="button"
         >
           <Text style={ui.buttonText}>Skapa konto</Text>
@@ -155,9 +155,8 @@ export default function Register() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     paddingHorizontal: spacing.md,
-    paddingTop: 100,
+    justifyContent: "center",
   },
   form: {
     gap: spacing.sm,
@@ -165,23 +164,22 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.sm,
-    backgroundColor: colors.card,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     minHeight: 48,
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12)",
   },
   input: {
     flex: 1,
     paddingVertical: spacing.sm,
-    fontSize: 14,
+    fontSize: ui.input.fontSize,
     color: colors.text,
   },
   loginLink: {
     flexDirection: "row",
     justifyContent: "center",
     flexWrap: "wrap",
+    marginTop: spacing.sm,
+  },
+  button: {
     marginTop: spacing.sm,
   },
 });
