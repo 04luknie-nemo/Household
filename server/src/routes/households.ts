@@ -6,6 +6,7 @@ import { auth } from "../lib/auth.ts";
 import { createInviteCode } from "../lib/invite-code.ts";
 import join from "./households-join.ts";
 import list from "./households-list.ts";
+import createTask from "./households-tasks.ts";
 
 const households = new Hono();
 
@@ -71,5 +72,5 @@ households.post(
 
 households.route("/", join);
 households.route("/", list);
-
+households.route("/", createTask);
 export default households;
