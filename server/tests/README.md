@@ -9,7 +9,7 @@ Gemensam guide för testfilerna i den här mappen. Här finns inloggning, testda
 | [households-detail.md](households-detail.md)         | #28   | `GET` och `PATCH /api/households/:id` |
 | [households-list.md](households-list.md)             | #31   | `GET /api/households`                 |
 | [households-tasks.md](households-tasks.md)           | #53   | `POST /api/households/:id/tasks`      |
-| [households-tasks-list.md](households-tasks-list.md) | #56   | GET /api/households/:id/tasks         |
+| [households-tasks-list.md](households-tasks-list.md) | #56   | `GET /api/households/:id/tasks`       |
 
 ## Starta servern
 
@@ -111,14 +111,14 @@ npx prisma db push --force-reset
 Gäller alla routes under `/api/households`. Utan cookie ska varje route svara `401`.
 
 | Route                                   | Förväntat svar |
-| --------------------------------------- | -------------- | --- |
+| --------------------------------------- | -------------- |
 | `POST /api/households`                  | `401`          |
 | `POST /api/households/join`             | `401`          |
 | `GET /api/households` (#31)             | `401`          |
 | `GET /api/households/<id>` (#28)        | `401`          |
 | `PATCH /api/households/<id>` (#28)      | `401`          |
 | `POST /api/households/<id>/tasks` (#53) | `401`          |
-| GET /api/households/<id>/tasks (#56)    | 401            |     |
+| `GET /api/households/<id>/tasks` (#56)  | `401`          |
 
 ```bash
 curl -i -X POST localhost:3000/api/households \
