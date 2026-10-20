@@ -47,8 +47,18 @@ export default function Register() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Skapa konto</Text>
-      <Text style={styles.subtitle}>Bli en del av hushållet</Text>
+      <Text style={[typography.title, { textAlign: "center", fontSize: 22 }]}>
+        Skapa konto
+      </Text>
+
+      <Text
+        style={[
+          typography.caption,
+          { textAlign: "center", marginBottom: spacing.lg },
+        ]}
+      >
+        Bli en del av hushållet
+      </Text>
 
       <View style={styles.form}>
         <View style={styles.inputContainer}>
@@ -111,7 +121,11 @@ export default function Register() {
           />
         </View>
 
-        {error && <Text style={styles.error}>{error}</Text>}
+        {error && (
+          <Text style={[typography.caption, { color: colors.primary }]}>
+            {error}
+          </Text>
+        )}
 
         <Pressable
           onPress={handleRegister}
@@ -122,8 +136,14 @@ export default function Register() {
         </Pressable>
 
         <View style={styles.loginLink}>
-          <Text style={styles.loginText}>Har du redan ett konto? </Text>
-          <Link href="/login" style={styles.link}>
+          <Text style={typography.caption}>Har du redan ett konto? </Text>
+          <Link
+            href="/login"
+            style={[
+              typography.caption,
+              { color: colors.text, fontWeight: "600" },
+            ]}
+          >
             Logga in
           </Link>
         </View>
@@ -137,18 +157,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     paddingHorizontal: spacing.md,
-    justifyContent: "flex-start",
     paddingTop: 100,
-  },
-  title: {
-    ...typography.title,
-    textAlign: "center",
-    fontSize: 22,
-  },
-  subtitle: {
-    ...typography.caption,
-    textAlign: "center",
-    marginBottom: spacing.lg,
   },
   form: {
     gap: spacing.sm,
@@ -169,22 +178,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.text,
   },
-  error: {
-    ...typography.caption,
-    color: colors.primary,
-  },
   loginLink: {
     flexDirection: "row",
     justifyContent: "center",
     flexWrap: "wrap",
     marginTop: spacing.sm,
-  },
-  loginText: {
-    ...typography.caption,
-  },
-  link: {
-    ...typography.caption,
-    color: colors.text,
-    fontWeight: "600",
   },
 });
