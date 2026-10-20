@@ -33,7 +33,7 @@ export const radius = {
 };
 
 export const typography = {
-  title: { fontSize: 20, fontWeight: "600", color: colors.text },
+  title: { fontSize: 24, fontWeight: "600", color: colors.text },
   body: { fontSize: 16, color: colors.text },
   label: { fontSize: 14, fontWeight: "600", color: colors.text },
   caption: { fontSize: 12, color: colors.textMuted },
