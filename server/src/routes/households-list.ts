@@ -15,12 +15,32 @@ list.get("/", async (c) => {
       members: {
         some: {
           userId: session.user.id,
-          status: "active",
+          status: { not: "left" },
+        },
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      members: {
+        where: {
+          userId: session.user.id,
+        },
+        select: {
+          isOwner: true,
+          status: true,
         },
       },
     },
   });
-  return c.json(myHouseholds);
+
+  const response = myHouseholds.map((h) => ({
+        id: h.id,
+        name: h.name,
+        status: h.members[0]?.status,
+        isOwner: h.members[0]?.isOwner,
+      }));
+  return c.json(response);
 });
 
 export default list;
