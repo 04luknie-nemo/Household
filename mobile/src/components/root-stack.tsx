@@ -1,14 +1,47 @@
 import { colors } from "@/constants/theme";
+import { apiFetch } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 import { Link, router, Stack } from "expo-router";
 import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
 import { AuthContext } from "./auth-provider";
 import { HouseholdContext } from "./household-provider";
 
+type Household = {
+    id: string;
+    name: string;
+};
+
 export default function RootStack() {
-    const { isLoggedIn } = useContext(AuthContext);
-    const { activeHouseholdId } = useContext(HouseholdContext);
+    const { isLoggedIn, isPending, userId, sessionId } = useContext(AuthContext);
+    const { activeHouseholdId, isLoading, error, retry } =
+        useContext(HouseholdContext);
     const hasActiveHousehold = activeHouseholdId !== null;
+
+    const { data: households } = useQuery<Household[]>({
+        queryKey: ["households", userId, sessionId],
+        queryFn: ({ signal }) =>
+            apiFetch<Household[]>("/api/households", { signal }),
+        enabled:
+            isLoggedIn && !isPending && !isLoading && !error && hasActiveHousehold,
+    });
+
+    const activeHouseholdName = households?.find(
+        (household) => household.id === activeHouseholdId,
+    )?.name;
+
+    if (isPending || isLoading) return <Text>Laddar...</Text>;
+
+    if (isLoggedIn && error) {
+        return (
+            <View>
+                <Text>{error}</Text>
+                <Pressable onPress={retry}>
+                    <Text>Försök igen</Text>
+                </Pressable>
+            </View>
+        );
+    }
 
     return (
         <Stack
@@ -36,7 +69,9 @@ export default function RootStack() {
                     options={{
                         headerTitle: () => (
                             <Link href="/household">
-                                <Text style={{ padding: 16 }}>Hushållet</Text>
+                                <Text style={{ padding: 16 }}>
+                                    {activeHouseholdName ?? "Hushållet"}
+                                </Text>
                             </Link>
                         ),
                         headerLeft: () => (
