@@ -1,8 +1,9 @@
+import { HouseholdContext } from "@/components/household-provider";
 import { ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "expo-router";
-import { useState } from "react";
+import { Link, router } from "expo-router";
+import { useContext, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 type Household = {
@@ -16,6 +17,8 @@ export default function SelectHousehold() {
     const [selectedHouseholdId, setSelectedHouseholdId] = useState<
         string | null
     >(null);
+
+    const { setActiveHouseholdId } = useContext(HouseholdContext);
 
     const {
         data: households,
@@ -59,6 +62,18 @@ export default function SelectHousehold() {
                         </Text>
                     </Pressable>
                 ))}
+                <Pressable
+                    disabled={selectedHouseholdId === null}
+                    onPress={() => {
+                        if (selectedHouseholdId !== null) {
+                            setActiveHouseholdId(selectedHouseholdId);
+                            router.replace("/");
+                        }
+                    }}
+                    style={ui.button}
+                >
+                    <Text style={ui.buttonText}>Fortsätt</Text>
+                </Pressable>
             </View>
 
             <Link
