@@ -24,21 +24,24 @@ createTask.post(
     }
 
     const taskReoccurInDays = value["reoccurInDays"];
-    if (!taskReoccurInDays || typeof taskReoccurInDays !== "number") {
-      return c.text("Otillåten input", 400);
+    if (
+      typeof taskReoccurInDays !== "number" ||
+      !Number.isInteger(taskReoccurInDays)
+    ) {
+      return c.text("Återkommer måste vara ett heltal", 400);
     }
-    if (taskReoccurInDays <= 0 || taskReoccurInDays > 31) {
+    if (taskReoccurInDays === 0) {
+      return c.text("Antal återkommande dagar får inte vara noll", 400);
+    }
+    if (taskReoccurInDays < 1 || taskReoccurInDays > 31) {
       return c.text("Nummer måste vara mellan 1-31", 400);
-    }
-    if (!Number.isInteger(taskReoccurInDays)) {
-      return c.text("Endast hela dagar kan väljas", 400);
     }
 
     const taskWorth = value["worth"];
-    if (!taskWorth || typeof taskWorth !== "number") {
-      return c.text("Otillåten input", 400);
-    }
-    if (!acceptedWorthNums.includes(taskWorth)) {
+    if (
+      typeof taskWorth !== "number" ||
+      !acceptedWorthNums.includes(taskWorth)
+    ) {
       return c.text("Endast 1,2,4,6,8 går att välja", 400);
     }
     return { taskTitle, taskDescription, taskReoccurInDays, taskWorth };
