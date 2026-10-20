@@ -35,11 +35,11 @@ list.get("/", async (c) => {
   });
 
   const response = myHouseholds.map((h) => ({
-        id: h.id,
-        name: h.name,
-        status: h.members[0]?.status,
-        isOwner: h.members[0]?.isOwner,
-      }));
+    id: h.id,
+    name: h.name,
+    status: h.members[0]?.status,
+    isOwner: h.members[0]?.isOwner,
+  }));
   return c.json(response);
 });
 

@@ -71,7 +71,7 @@ households.post(
   },
 );
 
-households.route("/", detail)
+households.route("/", detail);
 households.route("/", join);
 households.route("/", list);
 households.route("/", createTask);
