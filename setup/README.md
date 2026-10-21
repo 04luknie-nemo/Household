@@ -90,6 +90,18 @@ Tryck `w` för webb, eller skanna QR-koden med Expo Go. Appen hittar serverns ad
 
 Lägg till nya paket med `npx expo install <paket>`, inte `npm install`.
 
+## Formatering
+
+Koden formateras med Prettier och 2 mellanslags indrag. CI stoppar en PR där formateringen är fel.
+
+I VS Code: installera tillägget Prettier när VS Code föreslår det. Filen formateras då när du sparar.
+
+Formatera för hand, från `mobile/` eller `server/`:
+
+```bash
+npx prettier@3.8.1 --write src
+```
+
 ## Vilken adress ska användas?
 
 `BETTER_AUTH_URL` (server) och callback-adressen i GitHub måste vara samma.
