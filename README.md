@@ -10,6 +10,16 @@ Byggd med React Native, Expo och TypeScript.
 
 Se [setup/README.md](setup/README.md) för installation, miljövariabler och GitHub-inloggning.
 
+## Inlämning
+
+1. Starta servern och appen enligt [setup/README.md](setup/README.md). `npm run db:seed` fyller databasen med testdata.
+2. Logga in med ett testkonto från [Testkonton](setup/README.md#testkonton). Alla har lösenordet `test1234`.
+3. Anna, Erik, Sara och Johan är aktiva i två hushåll var och väljer hushåll vid första inloggningen. Maja väntar på godkännande i Kompisar.
+
+Kryssrutorna i kravlistan nedan visar vad som är klart i main. Avvikelser från skisserna dokumenteras i [#73](https://github.com/04luknie-nemo/Household/issues/73).
+
+Appikonen och splashen syns bara i en dev build (`npx expo run:android`), inte i Expo Go.
+
 ## Arbetssätt med AI
 
 Gruppen använder AI-assistenter i projektet. Se [docs/AI-ARBETSSATT.md](docs/AI-ARBETSSATT.md) för hur vi delar upp arbetet och granskar kod.
@@ -20,7 +30,7 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 
 ### Kravlista
 
-- [ ] En logga, splashscreen och appikon ska designas och användas. \*
+- [x] En logga, splashscreen och appikon ska designas och användas. \*
 - [x] Applikationen ska byggas med RN, Expo och TS. \*
 - [x] Designen av appen ska utgå ifrån befintliga skisser. Undantag diskuteras med produktägaren, godkänns och dokumenteras. \*
 - [x] Information ska kommuniceras till och från en server.
@@ -38,7 +48,7 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 ### Konto
 
 - [x] En användare ska kunna registrera och logga in sig. \*
-- [ ] En användare ska kunna skapa ett nytt hushåll. \*
+- [x] En användare ska kunna skapa ett nytt hushåll. \*
 - [ ] En användare ska kunna gå med i ett hushåll genom att ange hushållets kod. \*
 - [ ] När en användare har valt att gå med i ett hushåll behöver en ägare först godkänna användaren.
 - [ ] En användare ska kunna lämna ett hushåll.
@@ -50,7 +60,7 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 - [ ] Valda avatarer ska inte kunna väljas av andra användare i hushållet. \*
 - [ ] Avataren ska användas i appen för att visa vad användaren har gjort. \*
 - [ ] En användare ska kunna ställa in appens utseende (mörkt, ljust, auto).
-- [ ] Om en användare tillhör två eller fler hushåll ska den kunna byta mellan hushållen.
+- [x] Om en användare tillhör två eller fler hushåll ska den kunna byta mellan hushållen.
 
 ### Sysslor
 
