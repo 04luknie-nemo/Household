@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - mobile/**
+      - .prettierrc.json
       - .github/workflows/mobile.yml
 
 jobs:
@@ -22,3 +23,4 @@ jobs:
       - run: npm ci
       - run: npx expo lint
       - run: npx tsc --noEmit
+      - run: npx prettier@3.8.1 --check "src/**/*.{ts,tsx}"
