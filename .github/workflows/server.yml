@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - server/**
+      - .prettierrc.json
       - .github/workflows/server.yml
 
 jobs:
@@ -22,3 +23,4 @@ jobs:
       - run: npm ci
       - run: npm run db:generate
       - run: npx tsc --noEmit
+      - run: npx prettier@3.8.1 --check "src/**/*.ts" "prisma/*.ts"
