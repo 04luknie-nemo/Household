@@ -2,7 +2,7 @@ import { HouseholdContext } from "@/components/household-provider";
 import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import { useContext, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
@@ -18,6 +18,7 @@ export default function CreateHousehold() {
   const [isCreated, setIsCreated] = useState(false);
   const [code, setCode] = useState("");
   const { setActiveHouseholdId } = useContext(HouseholdContext);
+  const queryClient = useQueryClient();
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -29,6 +30,7 @@ export default function CreateHousehold() {
       setCode(data.inviteCode);
       setIsCreated(true);
       setActiveHouseholdId(data.id);
+      queryClient.invalidateQueries({ queryKey: ["households"] });
     },
   });
 
