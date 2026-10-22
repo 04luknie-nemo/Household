@@ -11,6 +11,8 @@ Gemensam guide för testfilerna i den här mappen. Här finns inloggning, testda
 | [households-tasks.md](households-tasks.md)           | #53   | `POST /api/households/:id/tasks`                 |
 | [households-tasks-list.md](households-tasks-list.md) | #56   | `GET /api/households/:id/tasks`                  |
 | [households-profile.md](households-profile.md)       | #51   | `GET` och `PATCH /api/households/:id/members/me` |
+| [households-tasks-complete.md](households-tasks-complete.md) | #63   | `POST /api/households/:id/tasks/:taskId/complete` |
+
 
 ## Starta servern
 
@@ -122,6 +124,7 @@ Gäller alla routes under `/api/households`. Utan cookie ska varje route svara `
 | `GET /api/households/<id>/tasks` (#56)        | `401`          |
 | `GET /api/households/<id>/members/me` (#51)   | `401`          |
 | `PATCH /api/households/<id>/members/me` (#51) | `401`          |
+| `POST /api/households/<id>/tasks/<taskId>/complete` (#63) | `401`          |
 
 ```bash
 curl -i -X POST localhost:3000/api/households \
@@ -149,6 +152,8 @@ curl -i localhost:3000/api/households/<id>/members/me
 curl -i -X PATCH localhost:3000/api/households/<id>/members/me \
   -H "Content-Type: application/json" \
   -d '{"nickname":"Anna"}'
+  
+curl -i -X POST localhost:3000/api/households/<id>/tasks/<taskId>/complete
 ```
 
 Bodyn till sysslor måste vara giltig. Annars svarar valideringen `400` innan sessionen kontrolleras.
