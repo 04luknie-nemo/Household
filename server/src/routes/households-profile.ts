@@ -43,7 +43,6 @@ profile.get("/:id/members/me", async (c) => {
   const otherMembers = await db.householdMember.findMany({
     where: {
       householdId: household.id,
-      status: "active",
       userId: { not: session.user.id },
     },
     select: { avatarId: true },
