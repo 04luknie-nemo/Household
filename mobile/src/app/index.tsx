@@ -28,12 +28,18 @@ export default function Index() {
           <Text>{">"}</Text>
         </Pressable>
       </View>
-      <View>
+      <View style={styles.stretch}>
         {period === 0 ? (
           // Blir en daily komponent
           <View style={{ alignItems: "center" }}>
             <Text>Dags View</Text>
-            <TaskRow title="Hello" doneTodayBy={[1, 2]} daysSinceLast={5} isOverdue={false} onPress={() => router.push("/task-modal")}/>
+            <TaskRow
+              title="Hello"
+              doneTodayBy={[1, 2]}
+              daysSinceLast={5}
+              isOverdue={false}
+              onPress={() => router.push("/task-modal")}
+            />
             <View
               style={{
                 borderWidth: 1,
@@ -42,7 +48,6 @@ export default function Index() {
                 alignItems: "center",
               }}
             >
-              
               <Text>Task 1</Text>
               <View style={{ flexDirection: "row", gap: 16 }}>
                 <Link href="/task-modal">Ändra</Link>
@@ -74,5 +79,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: 44,
     height: 44,
+  },
+  stretch: {
+    alignSelf: "stretch",
   },
 });
