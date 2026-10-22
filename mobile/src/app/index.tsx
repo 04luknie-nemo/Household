@@ -1,8 +1,9 @@
+import DayView from "@/components/day-view";
 import StatisticsView from "@/components/statistics";
 import { periods } from "@/constants/periods";
-import { Link } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [period, setPeriod] = useState<number>(0);
@@ -17,7 +18,7 @@ export default function Index() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
       <View style={{ flexDirection: "row", gap: 32, alignItems: "center" }}>
         <Pressable onPress={handleBack} style={styles.arrowbtn}>
           <Text>{"<"}</Text>
@@ -27,27 +28,9 @@ export default function Index() {
           <Text>{">"}</Text>
         </Pressable>
       </View>
-      <View>
+      <View style={styles.stretch}>
         {period === 0 ? (
-          // Blir en daily komponent
-          <View style={{ alignItems: "center" }}>
-            <Text>Dags View</Text>
-            <View
-              style={{
-                borderWidth: 1,
-                gap: 16,
-                padding: 16,
-                alignItems: "center",
-              }}
-            >
-              <Text>Task 1</Text>
-              <View style={{ flexDirection: "row", gap: 16 }}>
-                <Link href="/task-modal">Ändra</Link>
-                <Link href="/task">Detalj för denna task</Link>
-                <Link href="/task-modal">Skapa</Link>
-              </View>
-            </View>
-          </View>
+          <DayView />
         ) : (
           // Statistik komponent
           <View>
@@ -55,7 +38,7 @@ export default function Index() {
           </View>
         )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -71,5 +54,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: 44,
     height: 44,
+  },
+  stretch: {
+    flex: 1,
+    alignSelf: "stretch",
   },
 });
