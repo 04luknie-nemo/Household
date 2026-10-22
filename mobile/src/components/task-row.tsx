@@ -18,7 +18,7 @@ export default function TaskRow({
 }: Props) {
   return (
     <Pressable onPress={onPress} style={[ui.card, s.taskCard]}>
-      <View>
+      <View style={s.titleContainer}>
         <Text style={[typography.body, s.title]} numberOfLines={1}>
           {title}
         </Text>
@@ -43,12 +43,18 @@ const s = StyleSheet.create({
   row: {
     flexDirection: "row",
   },
+  titleContainer: {
+    flex:1,
+    minWidth:0,
+    marginRight: 40
+  },
   title: {
     fontWeight: "600",
   },
   taskCard: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     width: "100%",
   },
 });

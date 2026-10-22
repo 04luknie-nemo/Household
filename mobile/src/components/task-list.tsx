@@ -1,4 +1,4 @@
-import { spacing, typography } from "@/constants/theme";
+import { colors, spacing, typography } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
@@ -21,6 +21,8 @@ export default function TaskList() {
 
   const {
     data: tasks,
+    isPending,
+    error,
   } = useQuery<Task[]>({
     queryKey: ["tasks", userId, sessionId, activeHouseholdId],
     enabled: !!activeHouseholdId && !!userId,
@@ -29,6 +31,14 @@ export default function TaskList() {
         signal,
       }),
   });
+
+  if (isPending) {
+    return <Text style={[typography.body, {color: colors.pending}]}>Hämtar sysslor</Text>;
+  }
+
+  if (error) {
+    return <Text style={[typography.body]}>Kunde inte hämta sysslorna. Försök igen senare...</Text>
+  }
 
   return (
     <FlatList
