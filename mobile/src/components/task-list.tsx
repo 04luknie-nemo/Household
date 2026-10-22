@@ -6,6 +6,7 @@ import { FlatList, Text } from "react-native";
 import { AuthContext } from "./auth-provider";
 import { HouseholdContext } from "./household-provider";
 import TaskRow from "./task-row";
+import { router } from "expo-router";
 
 type Task = {
   id: string;
@@ -41,7 +42,7 @@ export default function TaskList() {
   }
 
   return (
-    <FlatList
+    <FlatList style={{flex:1}}
       contentContainerStyle={{ gap: spacing.sm, padding: spacing.xs }}
       data={tasks}
       keyExtractor={(task) => task.id}
@@ -54,6 +55,10 @@ export default function TaskList() {
           doneTodayBy={item.doneTodayBy}
           daysSinceLast={item.daysSinceLast}
           isOverdue={item.isOverdue}
+          onPress={() => router.push({
+            pathname: "/task",
+            params: { id: item.id }
+          })}
         />
       )}
     ></FlatList>

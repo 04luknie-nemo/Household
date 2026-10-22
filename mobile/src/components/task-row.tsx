@@ -1,3 +1,4 @@
+import { avatars } from "@/constants/avatars";
 import { typography, ui } from "@/constants/theme";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -6,7 +7,7 @@ type Props = {
   doneTodayBy: number[];
   daysSinceLast: number;
   isOverdue: boolean;
-  onPress?: () => void;
+  onPress: () => void;
 };
 
 export default function TaskRow({
@@ -26,9 +27,16 @@ export default function TaskRow({
 
       {doneTodayBy.length > 0 ? (
         <View style={s.row}>
-          {doneTodayBy.map((avatarId) => (
-            <Text key={avatarId}>{avatarId}</Text>
-          ))}
+          {doneTodayBy.map((avatarId) => {
+            const avatar = avatars.find((avatar) => avatar.id === avatarId);
+
+            if(!avatar) return null;
+
+            return ( 
+                <Text key={avatarId} style={{backgroundColor: avatar.color}}>{avatar.name}</Text>
+            )
+          })}
+          
         </View>
       ) : (
         <View>
