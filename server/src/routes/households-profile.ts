@@ -12,7 +12,7 @@ profile.get("/:id/members/me", async (c) => {
   });
 
   if (!session) {
-    return c.json({ error: "Inte inloggad" }, 401);
+    return c.text("Inte inloggad", 401);
   }
 
   const household = await db.household.findUnique({
@@ -31,13 +31,13 @@ profile.get("/:id/members/me", async (c) => {
   });
 
   if (!household) {
-    return c.json({ error: "Hushållet finns inte" }, 404);
+    return c.text("Hushållet finns inte", 404);
   }
 
   const member = household.members[0];
 
   if (!member || member.status !== "active") {
-    return c.json({ error: "Inte aktiv medlem" }, 403);
+    return c.text("Inte aktiv medlem", 403);
   }
 
   const otherMembers = await db.householdMember.findMany({
@@ -61,7 +61,7 @@ profile.patch("/:id/members/me", async (c) => {
   });
 
   if (!session) {
-    return c.json({ error: "Inte inloggad" }, 401);
+    return c.text("Inte inloggad", 401);
   }
 
   const household = await db.household.findUnique({
@@ -76,13 +76,13 @@ profile.patch("/:id/members/me", async (c) => {
   });
 
   if (!household) {
-    return c.json({ error: "Hushållet finns inte" }, 404);
+    return c.text("Hushållet finns inte", 404);
   }
 
   const member = household.members[0];
 
   if (!member || member.status !== "active") {
-    return c.json({ error: "Inte aktiv medlem" }, 403);
+    return c.text("Inte aktiv medlem", 403);
   }
 
   let body: unknown;
@@ -90,11 +90,11 @@ profile.patch("/:id/members/me", async (c) => {
   try {
     body = await c.req.json();
   } catch {
-    return c.json({ error: "Ogiltig JSON" }, 400);
+    return c.text("Ogiltig JSON", 400);
   }
 
   if (typeof body !== "object" || body === null || Array.isArray(body)) {
-    return c.json({ error: "Ogiltig input" }, 400);
+    return c.text("Ogiltig input", 400);
   }
 
   const input = body as Record<string, unknown>;
@@ -106,7 +106,7 @@ profile.patch("/:id/members/me", async (c) => {
       input.nickname.trim().length === 0 ||
       input.nickname.trim().length > 20
     ) {
-      return c.json({ error: "Smeknamnet måste vara 1–20 tecken" }, 400);
+      return c.text("Smeknamnet måste vara 1–20 tecken", 400);
     }
 
     data.nickname = input.nickname.trim();
@@ -118,14 +118,14 @@ profile.patch("/:id/members/me", async (c) => {
       !Number.isInteger(input.avatarId) ||
       !avatars.some((avatar) => avatar.id === input.avatarId)
     ) {
-      return c.json({ error: "Ogiltigt avatarId" }, 400);
+      return c.text("Ogiltigt avatarId", 400);
     }
 
     data.avatarId = input.avatarId;
   }
 
   if (Object.keys(data).length === 0) {
-    return c.json({ error: "Ange nickname och/eller avatarId" }, 400);
+    return c.text("Ange nickname och/eller avatarId", 400);
   }
 
   try {
@@ -144,10 +144,7 @@ profile.patch("/:id/members/me", async (c) => {
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
-      return c.json(
-        { error: "Avataren används redan av en annan medlem" },
-        409,
-      );
+      return c.text("Avataren används redan av en annan medlem", 409);
     }
 
     throw error;

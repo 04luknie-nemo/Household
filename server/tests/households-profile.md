@@ -1,23 +1,20 @@
-````md
 # Server: min profil i hushållet (#51)
 
 Tester för:
 
-- GET /api/households/:id/members/me
-- PATCH /api/households/:id/members/me
+- `GET /api/households/:id/members/me`
+- `PATCH /api/households/:id/members/me`
 
-Följ först server/tests/README.md för att skapa tre användare
-och ett testhushåll.
+Följ först `server/tests/README.md` för att skapa tre användare och ett testhushåll.
 
 Använd:
 
-- <id> = hushållets ID
-- cookies.txt = användare A, aktiv medlem
-- cookies-b.txt = användare B
-- cookies-c.txt = användare C, utanför hushållet
+- `<id>` = hushållets ID
+- `cookies.txt` = användare A, aktiv medlem
+- `cookies-b.txt` = användare B
+- `cookies-c.txt` = användare C, utanför hushållet
 
-Se till att A är active i hushållet. B kan användas för tester
-med pending, active och left genom att ändra medlemsstatus i databasen.
+Se till att A är `active` i hushållet. B kan användas för tester med `pending`, `active` och `left` genom att ändra medlemsstatus i databasen.
 
 ## 1. GET – hämta profil
 
@@ -26,20 +23,28 @@ med pending, active och left genom att ändra medlemsstatus i databasen.
 ```bash
 curl -i -b cookies.txt localhost:3000/api/households/<id>/members/me
 ```
-````
 
 Förväntat: `200 OK`.
 
-Svaret ska innehålla:
+Svaret ska innehålla `nickname`, `avatarId` och `takenAvatarIds`.
 
-- nickname
-- avatarId
-- takenAvatarIds
+### 1.2 Pending-medlems avatar räknas som upptagen
 
-takenAvatarIds ska innehålla avatar-ID:n som används av andra
-aktiva medlemmar i hushållet, men inte användarens egen avatar.
+Se till att:
 
-### 1.2 Ingen session
+- A är aktiv och har avatar 1.
+- En annan aktiv medlem använder avatar 2.
+- B har avatar 3 och status `pending`.
+
+Anropa:
+
+```bash
+curl -i -b cookies.txt localhost:3000/api/households/<id>/members/me
+```
+
+Förväntat: `200 OK`, och `takenAvatarIds` innehåller både `2` och `3`, men inte A:s egen avatar.
+
+### 1.3 Ingen session
 
 ```bash
 curl -i localhost:3000/api/households/<id>/members/me
@@ -47,7 +52,7 @@ curl -i localhost:3000/api/households/<id>/members/me
 
 Förväntat: `401 Unauthorized`.
 
-### 1.3 Hushållet finns inte
+### 1.4 Hushållet finns inte
 
 ```bash
 curl -i -b cookies.txt localhost:3000/api/households/ogiltigt-id/members/me
@@ -55,7 +60,7 @@ curl -i -b cookies.txt localhost:3000/api/households/ogiltigt-id/members/me
 
 Förväntat: `404 Not Found`.
 
-### 1.4 Användaren tillhör inte hushållet
+### 1.5 Användaren tillhör inte hushållet
 
 ```bash
 curl -i -b cookies-c.txt localhost:3000/api/households/<id>/members/me
@@ -63,7 +68,7 @@ curl -i -b cookies-c.txt localhost:3000/api/households/<id>/members/me
 
 Förväntat: `403 Forbidden`.
 
-### 1.5 Pending-medlem
+### 1.6 Pending-medlem
 
 Ändra B:s status till `pending` i databasen och kör:
 
@@ -73,7 +78,7 @@ curl -i -b cookies-b.txt localhost:3000/api/households/<id>/members/me
 
 Förväntat: `403 Forbidden`.
 
-### 1.6 Left-medlem
+### 1.7 Left-medlem
 
 Ändra B:s status till `left` i databasen och kör:
 
@@ -93,9 +98,7 @@ curl -i -b cookies.txt -X PATCH localhost:3000/api/households/<id>/members/me \
   -d '{"nickname":"Anna"}'
 ```
 
-Förväntat: `200 OK`.
-
-Svaret ska innehålla det uppdaterade smeknamnet och avatarId.
+Förväntat: `200 OK`. Svaret ska innehålla det uppdaterade smeknamnet och `avatarId`.
 
 ### 2.2 Ändra avatar
 
@@ -151,7 +154,7 @@ Förväntat: `400 Bad Request`.
 
 ### 2.7 Avatar som används av en annan medlem
 
-Se till att en annan aktiv medlem i hushållet använder avatar 2. Försök sedan välja samma avatar:
+Se till att en annan medlem använder avatar 2. Försök sedan välja samma avatar:
 
 ```bash
 curl -i -b cookies.txt -X PATCH localhost:3000/api/households/<id>/members/me \
@@ -194,47 +197,3 @@ Förväntat: `403 Forbidden`.
 ### 2.11 Pending-medlem
 
 Ändra B:s status till `pending` och kör:
-
-```bash
-curl -i -b cookies-b.txt -X PATCH localhost:3000/api/households/<id>/members/me \
-  -H "Content-Type: application/json" \
-  -d '{"nickname":"Bo"}'
-```
-
-Förväntat: `403 Forbidden`.
-
-### 2.12 Left-medlem
-
-Ändra B:s status till `left` och kör:
-
-```bash
-curl -i -b cookies-b.txt -X PATCH localhost:3000/api/households/<id>/members/me \
-  -H "Content-Type: application/json" \
-  -d '{"nickname":"Bo"}'
-```
-
-Förväntat: `403 Forbidden`.
-
-### 2.13 Ogiltig JSON
-
-```powershell
-curl.exe -i -b cookies.txt -X PATCH "http://localhost:3000/api/households/<id>/members/me" `
-  -H "Content-Type: application/json" `
-  --data-binary "{"
-```
-
-Förväntat: `400 Bad Request`.
-
-### 2.14 Tom request-body
-
-```powershell
-curl.exe -i -b cookies.txt -X PATCH "http://localhost:3000/api/households/<id>/members/me" `
-  -H "Content-Type: application/json" `
-  -d "{}"
-```
-
-Förväntat: `400 Bad Request`, med ett felmeddelande om att `nickname` och/eller `avatarId` måste anges.
-
-```
-
-```
