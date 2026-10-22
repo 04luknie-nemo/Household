@@ -1,5 +1,5 @@
 import { avatars } from "@/constants/avatars";
-import { typography, ui } from "@/constants/theme";
+import { spacing, typography, ui } from "@/constants/theme";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type Props = {
@@ -20,7 +20,7 @@ export default function TaskRow({
   return (
     <Pressable onPress={onPress} style={[ui.card, s.taskCard]}>
       <View style={s.titleContainer}>
-        <Text style={[typography.body, s.title]} numberOfLines={1}>
+        <Text style={ typography.label} numberOfLines={1}>
           {title}
         </Text>
       </View>
@@ -54,15 +54,12 @@ const s = StyleSheet.create({
   titleContainer: {
     flex:1,
     minWidth:0,
-    marginRight: 40
-  },
-  title: {
-    fontWeight: "600",
   },
   taskCard: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
+    gap: spacing.lg * 1.5,
   },
 });

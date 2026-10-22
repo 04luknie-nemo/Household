@@ -1,7 +1,6 @@
 import DayView from "@/components/day-view";
 import StatisticsView from "@/components/statistics";
 import { periods } from "@/constants/periods";
-import { colors, spacing } from "@/constants/theme";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -59,19 +58,5 @@ const styles = StyleSheet.create({
   stretch: {
     flex: 1,
     alignSelf: "stretch",
-  },
-  footerButton: {
-    bottom: spacing.lg,
-    paddingVertical: spacing.md
-  },
-  addButton: {
-    backgroundColor: colors.card, 
-    padding: spacing.lg,
-    flexDirection:"row", 
-    gap: spacing.md,
-  },
-  addButtonText: {
-    color: colors.text,
-    fontWeight: "700",
   },
 });
