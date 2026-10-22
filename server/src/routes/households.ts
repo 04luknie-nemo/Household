@@ -6,8 +6,10 @@ import taskList from "./households-tasks-list.ts";
 import tasksComplete from "./households-tasks-complete.ts";
 import detail from "./households-detail.ts";
 import create from "./households-create.ts";
+import stats from "./households-stats.ts";
 
 const households = new Hono();
+households.route("/", stats);
 
 households.route("/", create);
 households.route("/", detail);

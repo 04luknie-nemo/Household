@@ -11,6 +11,7 @@ Gemensam guide för testfilerna i den här mappen. Här finns inloggning, testda
 | [households-tasks.md](households-tasks.md)                   | #53   | `POST /api/households/:id/tasks`                  |
 | [households-tasks-list.md](households-tasks-list.md)         | #56   | `GET /api/households/:id/tasks`                   |
 | [households-tasks-complete.md](households-tasks-complete.md) | #63   | `POST /api/households/:id/tasks/:taskId/complete` |
+| [households-stats.md](households-stats.md) | #64 | `GET /api/households/:id/stats?period=week` |
 
 ## Starta servern
 
@@ -121,8 +122,11 @@ Gäller alla routes under `/api/households`. Utan cookie ska varje route svara `
 | `POST /api/households/<id>/tasks` (#53)                   | `401`          |
 | `GET /api/households/<id>/tasks` (#56)                    | `401`          |
 | `POST /api/households/<id>/tasks/<taskId>/complete` (#63) | `401`          |
+| `GET /api/households/<id>/stats?period=week` (#64) | `401` |
 
 ```bash
+curl -i "localhost:3000/api/households/<id>/stats?period=week"
+
 curl -i -X POST localhost:3000/api/households \
   -H "Content-Type: application/json" -d '{"name":"Test"}'
 
