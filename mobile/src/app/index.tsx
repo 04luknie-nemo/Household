@@ -1,6 +1,7 @@
 import StatisticsView from "@/components/statistics";
+import TaskRow from "@/components/task-row";
 import { periods } from "@/constants/periods";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -32,6 +33,7 @@ export default function Index() {
           // Blir en daily komponent
           <View style={{ alignItems: "center" }}>
             <Text>Dags View</Text>
+            <TaskRow title="Hello" doneTodayBy={[1, 2]} daysSinceLast={5} isOverdue={false} onPress={() => router.push("/task-modal")}/>
             <View
               style={{
                 borderWidth: 1,
@@ -40,6 +42,7 @@ export default function Index() {
                 alignItems: "center",
               }}
             >
+              
               <Text>Task 1</Text>
               <View style={{ flexDirection: "row", gap: 16 }}>
                 <Link href="/task-modal">Ändra</Link>
