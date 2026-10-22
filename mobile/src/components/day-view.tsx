@@ -32,8 +32,7 @@ export default function DayView() {
   );
 
   const isOwner =
-    activeHousehold?.status === "active" &&
-    activeHousehold?.isOwner === true;
+    activeHousehold?.status === "active" && activeHousehold?.isOwner === true;
 
   return (
     <View style={styles.container}>
@@ -53,11 +52,7 @@ export default function DayView() {
             style={[ui.button, styles.addButton]}
             onPress={() => router.push("/task-modal")}
           >
-            <Ionicons
-              name="add-circle-outline"
-              size={24}
-              color={colors.text}
-            />
+            <Ionicons name="add-circle-outline" size={24} color={colors.text} />
             <Text style={typography.body}>Lägg till</Text>
           </Pressable>
         </View>

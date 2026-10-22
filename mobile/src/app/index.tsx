@@ -38,7 +38,7 @@ export default function Index() {
           </View>
         )}
       </View>
-      </SafeAreaView>  
+    </SafeAreaView>
   );
 }
 

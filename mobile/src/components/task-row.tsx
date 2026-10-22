@@ -20,7 +20,7 @@ export default function TaskRow({
   return (
     <Pressable onPress={onPress} style={[ui.card, s.taskCard]}>
       <View style={s.titleContainer}>
-        <Text style={ typography.label} numberOfLines={1}>
+        <Text style={typography.label} numberOfLines={1}>
           {title}
         </Text>
       </View>
@@ -30,17 +30,20 @@ export default function TaskRow({
           {doneTodayBy.map((avatarId) => {
             const avatar = avatars.find((avatar) => avatar.id === avatarId);
 
-            if(!avatar) return null;
+            if (!avatar) return null;
 
-            return ( 
-                <Text key={avatarId} style={{backgroundColor: avatar.color}}>{avatar.name}</Text>
-            )
+            return (
+              <Text key={avatarId} style={{ backgroundColor: avatar.color }}>
+                {avatar.name}
+              </Text>
+            );
           })}
-          
         </View>
       ) : (
         <View>
-          <Text style={[ui.dayCount, isOverdue && ui.dayCountOverdue]}>{daysSinceLast}</Text>
+          <Text style={[ui.dayCount, isOverdue && ui.dayCountOverdue]}>
+            {daysSinceLast}
+          </Text>
         </View>
       )}
     </Pressable>
@@ -52,8 +55,8 @@ const s = StyleSheet.create({
     flexDirection: "row",
   },
   titleContainer: {
-    flex:1,
-    minWidth:0,
+    flex: 1,
+    minWidth: 0,
   },
   taskCard: {
     flexDirection: "row",

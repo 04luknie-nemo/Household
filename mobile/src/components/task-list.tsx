@@ -34,15 +34,24 @@ export default function TaskList() {
   });
 
   if (isPending) {
-    return <Text style={[typography.body, {color: colors.pending}]}>Hämtar sysslor</Text>;
+    return (
+      <Text style={[typography.body, { color: colors.pending }]}>
+        Hämtar sysslor
+      </Text>
+    );
   }
 
   if (error) {
-    return <Text style={[typography.body]}>Kunde inte hämta sysslorna. Försök igen senare...</Text>
+    return (
+      <Text style={[typography.body]}>
+        Kunde inte hämta sysslorna. Försök igen senare...
+      </Text>
+    );
   }
 
   return (
-    <FlatList style={{flex:1}}
+    <FlatList
+      style={{ flex: 1 }}
       contentContainerStyle={{ gap: spacing.sm, padding: spacing.xs }}
       data={tasks}
       keyExtractor={(task) => task.id}
@@ -55,10 +64,12 @@ export default function TaskList() {
           doneTodayBy={item.doneTodayBy}
           daysSinceLast={item.daysSinceLast}
           isOverdue={item.isOverdue}
-          onPress={() => router.push({
-            pathname: "/task",
-            params: { id: item.id }
-          })}
+          onPress={() =>
+            router.push({
+              pathname: "/task",
+              params: { id: item.id },
+            })
+          }
         />
       )}
     ></FlatList>
