@@ -3,6 +3,7 @@ import join from "./households-join.ts";
 import list from "./households-list.ts";
 import createTask from "./households-tasks.ts";
 import taskList from "./households-tasks-list.ts";
+import tasksComplete from "./households-tasks-complete.ts";
 import detail from "./households-detail.ts";
 import create from "./households-create.ts";
 
@@ -15,4 +16,5 @@ households.route("/", list);
 
 households.route("/", createTask);
 households.route("/", taskList);
+households.route("/", tasksComplete);
 export default households;
