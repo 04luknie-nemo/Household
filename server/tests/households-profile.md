@@ -215,6 +215,26 @@ curl -i -b cookies-b.txt -X PATCH localhost:3000/api/households/<id>/members/me 
 
 Förväntat: `403 Forbidden`.
 
+### 2.13 Ogiltig JSON
+
+```powershell
+curl.exe -i -b cookies.txt -X PATCH "http://localhost:3000/api/households/<id>/members/me" `
+  -H "Content-Type: application/json" `
+  --data-binary "{"
+```
+
+Förväntat: `400 Bad Request`.
+
+### 2.14 Tom request-body
+
+```powershell
+curl.exe -i -b cookies.txt -X PATCH "http://localhost:3000/api/households/<id>/members/me" `
+  -H "Content-Type: application/json" `
+  -d "{}"
+```
+
+Förväntat: `400 Bad Request`, med ett felmeddelande om att `nickname` och/eller `avatarId` måste anges.
+
 ```
 
 ```
