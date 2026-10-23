@@ -1,11 +1,26 @@
 import { ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 
+function getErrorMessage(error: Error) {
+  try {
+    const body = JSON.parse(error.message) as {
+      error?: string;
+      message?: string;
+    };
+
+    return body.error ?? body.message ?? "Något gick fel.";
+  } catch {
+    return error.message || "Något gick fel.";
+  }
+}
+
 export default function JoinHousehold() {
   const [inviteCode, setInviteCode] = useState("");
+  const queryClient = useQueryClient();
   const joinMutation = useMutation({
     mutationFn: () =>
       apiFetch("/api/households/join", {
@@ -14,6 +29,13 @@ export default function JoinHousehold() {
           inviteCode: inviteCode.trim(),
         }),
       }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["households"],
+      });
+
+      router.replace("/select-household");
+    },
   });
 
   return (
@@ -38,6 +60,9 @@ export default function JoinHousehold() {
           {joinMutation.isPending ? "Går med..." : "Gå med"}
         </Text>
       </Pressable>
+      {joinMutation.isError && (
+        <Text>{getErrorMessage(joinMutation.error)}</Text>
+      )}
     </View>
   );
 }
