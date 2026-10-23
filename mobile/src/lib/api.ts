@@ -12,7 +12,9 @@ export async function apiFetch<T>(
     ...options,
     headers: {
       "Content-Type": "application/json",
-      Cookie: await authClient.getCookie(),
+      ...(Platform.OS === "web"
+        ? {}
+        : { Cookie: await authClient.getCookie() }),
       ...options.headers,
     },
     credentials: Platform.OS === "web" ? "include" : "omit",
