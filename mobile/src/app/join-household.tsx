@@ -1,9 +1,10 @@
-import { ui } from "@/constants/theme";
+import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
+import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 function getErrorMessage(error: Error) {
   try {
@@ -39,30 +40,97 @@ export default function JoinHousehold() {
   });
 
   return (
-    <View style={{ gap: 16, padding: 16 }}>
-      <Text>Gå med i hushåll</Text>
+    <View style={styles.container}>
+      <View style={ui.iconCircle}>
+        <Ionicons name="people-outline" size={28} color={colors.onPrimary} />
+      </View>
 
-      <TextInput
-        value={inviteCode}
-        onChangeText={setInviteCode}
-        placeholder="Skriv in anslutningskoden"
-        autoCapitalize="characters"
-        autoCorrect={false}
-        style={ui.input}
-      />
+      <Text style={[typography.body, styles.description]}>
+        Ange hushållets kod för att gå med i ett befintligt hushåll.
+      </Text>
+
+      <View style={styles.formCard}>
+        <Text style={typography.label}>Hushållskod</Text>
+
+        <TextInput
+          value={inviteCode}
+          onChangeText={setInviteCode}
+          placeholder="Ange hushållskod"
+          placeholderTextColor={colors.textMuted}
+          autoCapitalize="characters"
+          autoCorrect={false}
+          style={ui.input}
+          editable={!joinMutation.isPending}
+          accessibilityLabel="Hushållskod"
+        />
+        {joinMutation.isError && (
+          <Text style={styles.error}>
+            {getErrorMessage(joinMutation.error)}
+          </Text>
+        )}
+      </View>
 
       <Pressable
-        style={ui.button}
+        style={[
+          styles.submitButton,
+          (!inviteCode.trim() || joinMutation.isPending) &&
+            styles.disabledButton,
+        ]}
         disabled={!inviteCode.trim() || joinMutation.isPending}
         onPress={() => joinMutation.mutate()}
       >
         <Text style={ui.buttonText}>
-          {joinMutation.isPending ? "Går med..." : "Gå med"}
+          {joinMutation.isPending ? "Skickar förfrågan..." : "Skicka förfrågan"}
         </Text>
       </Pressable>
-      {joinMutation.isError && (
-        <Text>{getErrorMessage(joinMutation.error)}</Text>
-      )}
+      <Text style={[typography.caption, styles.helperText]}>
+        En ägare av hushållet behöver godkänna din förfrågan innan du kan gå
+        med.
+      </Text>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    gap: spacing.lg,
+    alignItems: "center",
+  },
+  description: {
+    ...typography.body,
+    textAlign: "center",
+    width: "100%",
+    marginBottom: spacing.sm,
+  },
+  formCard: {
+    ...ui.card,
+    width: "100%",
+    paddingVertical: spacing.lg,
+    gap: spacing.md,
+  },
+  input: {
+    ...ui.input,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  submitButton: {
+    ...ui.button,
+    width: "100%",
+    marginTop: spacing.sm,
+  },
+  error: {
+    color: colors.primary,
+    fontSize: typography.body.fontSize,
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  helperText: {
+    ...typography.caption,
+    textAlign: "center",
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.xs,
+  },
+});
