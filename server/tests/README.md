@@ -2,15 +2,17 @@
 
 Gemensam guide för testfilerna i den här mappen. Här finns inloggning, testdata och de testfall som gäller alla routes. Varje route har sina egna testfall i en egen fil.
 
-| Fil                                                          | Issue | Route                                             |
-| ------------------------------------------------------------ | ----- | ------------------------------------------------- |
-| [households-create.md](households-create.md)                 | #26   | `POST /api/households`                            |
-| [households-join.md](households-join.md)                     | #22   | `POST /api/households/join`                       |
-| [households-detail.md](households-detail.md)                 | #28   | `GET` och `PATCH /api/households/:id`             |
-| [households-list.md](households-list.md)                     | #31   | `GET /api/households`                             |
-| [households-tasks.md](households-tasks.md)                   | #53   | `POST /api/households/:id/tasks`                  |
-| [households-tasks-list.md](households-tasks-list.md)         | #56   | `GET /api/households/:id/tasks`                   |
+| Fil                                                  | Issue | Route                                            |
+| ---------------------------------------------------- | ----- | ------------------------------------------------ |
+| [households-create.md](households-create.md)         | #26   | `POST /api/households`                           |
+| [households-join.md](households-join.md)             | #22   | `POST /api/households/join`                      |
+| [households-detail.md](households-detail.md)         | #28   | `GET` och `PATCH /api/households/:id`            |
+| [households-list.md](households-list.md)             | #31   | `GET /api/households`                            |
+| [households-tasks.md](households-tasks.md)           | #53   | `POST /api/households/:id/tasks`                 |
+| [households-tasks-list.md](households-tasks-list.md) | #56   | `GET /api/households/:id/tasks`                  |
+| [households-profile.md](households-profile.md)       | #51   | `GET` och `PATCH /api/households/:id/members/me` |
 | [households-tasks-complete.md](households-tasks-complete.md) | #63   | `POST /api/households/:id/tasks/:taskId/complete` |
+
 
 ## Starta servern
 
@@ -111,15 +113,17 @@ npx prisma db push --force-reset
 
 Gäller alla routes under `/api/households`. Utan cookie ska varje route svara `401`.
 
-| Route                                                     | Förväntat svar |
-| --------------------------------------------------------- | -------------- |
-| `POST /api/households`                                    | `401`          |
-| `POST /api/households/join`                               | `401`          |
-| `GET /api/households` (#31)                               | `401`          |
-| `GET /api/households/<id>` (#28)                          | `401`          |
-| `PATCH /api/households/<id>` (#28)                        | `401`          |
-| `POST /api/households/<id>/tasks` (#53)                   | `401`          |
-| `GET /api/households/<id>/tasks` (#56)                    | `401`          |
+| Route                                         | Förväntat svar |
+| --------------------------------------------- | -------------- |
+| `POST /api/households`                        | `401`          |
+| `POST /api/households/join`                   | `401`          |
+| `GET /api/households` (#31)                   | `401`          |
+| `GET /api/households/<id>` (#28)              | `401`          |
+| `PATCH /api/households/<id>` (#28)            | `401`          |
+| `POST /api/households/<id>/tasks` (#53)       | `401`          |
+| `GET /api/households/<id>/tasks` (#56)        | `401`          |
+| `GET /api/households/<id>/members/me` (#51)   | `401`          |
+| `PATCH /api/households/<id>/members/me` (#51) | `401`          |
 | `POST /api/households/<id>/tasks/<taskId>/complete` (#63) | `401`          |
 
 ```bash
@@ -127,7 +131,8 @@ curl -i -X POST localhost:3000/api/households \
   -H "Content-Type: application/json" -d '{"name":"Test"}'
 
 curl -i -X POST localhost:3000/api/households/join \
-  -H "Content-Type: application/json" -d '{"inviteCode":"<kod>","avatarId":2}'
+  -H "Content-Type: application/json" \
+  -d '{"inviteCode":"<kod>","avatarId":2}'
 
 curl -i localhost:3000/api/households
 
@@ -142,6 +147,12 @@ curl -i -X POST localhost:3000/api/households/<id>/tasks \
 
 curl -i localhost:3000/api/households/<id>/tasks
 
+curl -i localhost:3000/api/households/<id>/members/me
+
+curl -i -X PATCH localhost:3000/api/households/<id>/members/me \
+  -H "Content-Type: application/json" \
+  -d '{"nickname":"Anna"}'
+  
 curl -i -X POST localhost:3000/api/households/<id>/tasks/<taskId>/complete
 ```
 
