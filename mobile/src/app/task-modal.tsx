@@ -1,6 +1,23 @@
+import { useState } from "react";
 import { Text, View } from "react-native";
 
+type TaskInput = {
+  title: string;
+  description: string;
+  reoccurInDays: number;
+  worth: number;
+};
+
+const emptyTask: TaskInput = {
+  title: "",
+  description: "",
+  reoccurInDays: 7,
+  worth: 2,
+};
+
 export default function TaskModal() {
+  const [task, setTask] = useState<TaskInput>(emptyTask);
+
   return (
     <View>
       <Text>
