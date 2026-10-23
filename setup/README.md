@@ -41,7 +41,7 @@ npm run db:seed
 npm run dev
 ```
 
-`npm run db:seed` skapar testanvändare, hushåll och medlemskap. Skriptet kan köras flera gånger utan att skapa dubbletter.
+`npm run db:seed` skapar testanvändare, hushåll, medlemskap, sysslor och markeringar. Skriptet kan köras flera gånger utan att skapa dubbletter.
 
 ### Testkonton
 
@@ -64,6 +64,24 @@ Alla testkonton har lösenordet `test1234`.
 | Kollektivet | `ACE247`       | Sara  |
 
 Testdatan innehåller även användare som tillhör flera hushåll och en medlem med status `pending`.
+
+I **Familjen** (Anna, Erik och Sara) finns följande sysslor:
+
+| Syssla          | `reoccurInDays` | `worth` | Markeringar                       |
+| --------------- | --------------- | ------- | --------------------------------- |
+| Diska           | 1               | 2       | Anna idag, Erik idag              |
+| Dammsuga        | 7               | 4       | Sara för 3 dagar sedan            |
+| Vattna blommor  | 3               | 1       | Erik för 5 dagar sedan (försenad) |
+| Tvätta          | 7               | 6       | aldrig gjord                      |
+| Laga mat        | 1               | 8       | Anna igår, Sara i förrgår         |
+| Rensa kylskåpet | 14              | 4       | arkiverad, Anna förra veckan      |
+
+I **Kompisar** (Erik och Johan) finns två sysslor med en markering var:
+
+| Syssla        | `reoccurInDays` | `worth` | Markeringar             |
+| ------------- | --------------- | ------- | ----------------------- |
+| Handla        | 7               | 4       | Erik idag               |
+| Ta ut soporna | 3               | 2       | Johan för 2 dagar sedan |
 
 Servern kör på `http://localhost:3000`. Testa med `http://localhost:3000/api/auth/ok`.
 
