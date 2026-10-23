@@ -55,7 +55,6 @@ join.post("/join", async (c) => {
   const existingMembers = await db.householdMember.findMany({
     where: {
       householdId: household.id,
-      status: { not: "left" },
     },
     select: { avatarId: true },
   });
