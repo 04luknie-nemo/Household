@@ -1,6 +1,12 @@
 import { auth } from "../src/lib/auth.ts";
 import { db } from "./db.ts";
 
+const msPerDay = 24 * 60 * 60 * 1000;
+
+function daysAgo(days: number) {
+  return new Date(Date.now() - days * msPerDay);
+}
+
 const testUsers = [
   { name: "Anna", email: "anna@test.se", password: "test1234" },
   { name: "Erik", email: "erik@test.se", password: "test1234" },
@@ -36,6 +42,62 @@ const testHouseholds = [
         status: "active" as const,
       },
     ],
+    tasks: [
+      {
+        title: "Diska",
+        description: "Plocka i och ur diskmaskinen",
+        reoccurInDays: 1,
+        worth: 2,
+        isArchived: false,
+        completions: [
+          { email: "anna@test.se", daysAgo: 0 },
+          { email: "erik@test.se", daysAgo: 0 },
+        ],
+      },
+      {
+        title: "Dammsuga",
+        description: "Dammsug alla rum",
+        reoccurInDays: 7,
+        worth: 4,
+        isArchived: false,
+        completions: [{ email: "sara@test.se", daysAgo: 3 }],
+      },
+      {
+        title: "Vattna blommor",
+        description: "Vattna krukväxterna i fönstren",
+        reoccurInDays: 3,
+        worth: 1,
+        isArchived: false,
+        completions: [{ email: "erik@test.se", daysAgo: 5 }],
+      },
+      {
+        title: "Tvätta",
+        description: "Tvätta och häng upp tvätten",
+        reoccurInDays: 7,
+        worth: 6,
+        isArchived: false,
+        completions: [],
+      },
+      {
+        title: "Laga mat",
+        description: "Laga middag till familjen",
+        reoccurInDays: 1,
+        worth: 8,
+        isArchived: false,
+        completions: [
+          { email: "anna@test.se", daysAgo: 1 },
+          { email: "sara@test.se", daysAgo: 2 },
+        ],
+      },
+      {
+        title: "Rensa kylskåpet",
+        description: "Släng gammal mat och torka hyllor",
+        reoccurInDays: 14,
+        worth: 4,
+        isArchived: true,
+        completions: [{ email: "anna@test.se", daysAgo: 8 }],
+      },
+    ],
   },
   {
     name: "Kompisar",
@@ -61,6 +123,24 @@ const testHouseholds = [
         avatarId: 3,
         isOwner: false,
         status: "pending" as const,
+      },
+    ],
+    tasks: [
+      {
+        title: "Handla",
+        description: "Handla mat inför veckan",
+        reoccurInDays: 7,
+        worth: 4,
+        isArchived: false,
+        completions: [{ email: "erik@test.se", daysAgo: 0 }],
+      },
+      {
+        title: "Ta ut soporna",
+        description: "Gå ut med sopor och återvinning",
+        reoccurInDays: 3,
+        worth: 2,
+        isArchived: false,
+        completions: [{ email: "johan@test.se", daysAgo: 2 }],
       },
     ],
   },
@@ -90,6 +170,7 @@ const testHouseholds = [
         status: "active" as const,
       },
     ],
+    tasks: [],
   },
 ];
 
@@ -140,6 +221,8 @@ async function main() {
       },
     });
 
+    const membersByEmail = new Map<string, string>();
+
     for (const memberData of householdData.members) {
       const userId = users.get(memberData.email);
 
@@ -147,7 +230,7 @@ async function main() {
         throw new Error(`Användaren saknas: ${memberData.email}`);
       }
 
-      await db.householdMember.upsert({
+      const member = await db.householdMember.upsert({
         where: {
           userId_householdId: {
             userId,
@@ -169,10 +252,67 @@ async function main() {
           status: memberData.status,
         },
       });
+
+      membersByEmail.set(memberData.email, member.id);
+    }
+
+    for (const taskData of householdData.tasks) {
+      const existingTask = await db.task.findFirst({
+        where: {
+          householdId: household.id,
+          title: taskData.title,
+        },
+      });
+
+      const task = existingTask
+        ? await db.task.update({
+            where: { id: existingTask.id },
+            data: {
+              description: taskData.description,
+              reoccurInDays: taskData.reoccurInDays,
+              worth: taskData.worth,
+              isArchived: taskData.isArchived,
+              createdAt: new Date(),
+            },
+          })
+        : await db.task.create({
+            data: {
+              householdId: household.id,
+              title: taskData.title,
+              description: taskData.description,
+              reoccurInDays: taskData.reoccurInDays,
+              worth: taskData.worth,
+              isArchived: taskData.isArchived,
+            },
+          });
+
+      await db.completedTask.deleteMany({
+        where: { taskId: task.id },
+      });
+
+      for (const completion of taskData.completions) {
+        const memberId = membersByEmail.get(completion.email);
+
+        if (!memberId) {
+          throw new Error(
+            `Medlem saknas i ${householdData.name}: ${completion.email}`,
+          );
+        }
+
+        await db.completedTask.create({
+          data: {
+            taskId: task.id,
+            memberId,
+            createdAt: daysAgo(completion.daysAgo),
+          },
+        });
+      }
     }
   }
 
-  console.log("Seed completed! 5 testanvändare och 3 hushåll är redo.");
+  console.log(
+    "Seed completed! 5 testanvändare, 3 hushåll, sysslor och markeringar är redo.",
+  );
 }
 
 main()
