@@ -28,31 +28,21 @@ join.post("/join", async (c) => {
   if (
     typeof body !== "object" ||
     body === null ||
-    !("inviteCode" in body) ||
-    !("avatarId" in body)
+    Array.isArray(body) ||
+    !("inviteCode" in body)
   ) {
-    return c.json({ error: "inviteCode och avatarId krävs" }, 400);
+    return c.json({ error: "inviteCode krävs" }, 400);
   }
 
-  const { inviteCode, avatarId } = body;
+  const input = body as Record<string, unknown>;
+  const inviteCode = input.inviteCode;
+  const requestedAvatarId = input.avatarId;
 
-  if (
-    typeof inviteCode !== "string" ||
-    inviteCode.trim() === "" ||
-    typeof avatarId !== "number" ||
-    !Number.isInteger(avatarId)
-  ) {
-    return c.json({ error: "Ogiltig input" }, 400);
+  if (typeof inviteCode !== "string" || inviteCode.trim() === "") {
+    return c.json({ error: "Ogiltig inviteCode" }, 400);
   }
 
-  // 3. Kontrollera att avatar-ID:t finns
-  const validAvatar = avatars.some((avatar) => avatar.id === avatarId);
-
-  if (!validAvatar) {
-    return c.json({ error: "Ogiltigt avatarId" }, 400);
-  }
-
-  // 4. Hitta hushållet med inbjudningskoden
+  // 3. Hitta hushållet med inbjudningskoden
   const household = await db.household.findUnique({
     where: { inviteCode: inviteCode.toUpperCase().trim() },
   });
@@ -61,6 +51,52 @@ join.post("/join", async (c) => {
     return c.json({ error: "Hushållet hittades inte" }, 404);
   }
 
+  // 4. Hämta avatarer som används av medlemmar som inte har lämnat hushållet
+  const existingMembers = await db.householdMember.findMany({
+    where: {
+      householdId: household.id,
+    },
+    select: { avatarId: true },
+  });
+
+  const takenAvatarIds = new Set(
+    existingMembers.map((member) => member.avatarId),
+  );
+
+  let avatarId: number;
+
+  if (requestedAvatarId === undefined) {
+    // Välj den lägsta lediga avataren automatiskt
+    const availableAvatar = avatars.find(
+      (avatar) => !takenAvatarIds.has(avatar.id),
+    );
+
+    if (!availableAvatar) {
+      return c.json({ error: "Hushållet är fullt" }, 409);
+    }
+
+    avatarId = availableAvatar.id;
+  } else {
+    // Om avatarId skickas måste det vara giltigt
+    if (
+      typeof requestedAvatarId !== "number" ||
+      !Number.isInteger(requestedAvatarId) ||
+      !avatars.some((avatar) => avatar.id === requestedAvatarId)
+    ) {
+      return c.json({ error: "Ogiltigt avatarId" }, 400);
+    }
+
+    if (takenAvatarIds.has(requestedAvatarId)) {
+      return c.json(
+        { error: "Avataren används redan av en annan medlem" },
+        409,
+      );
+    }
+
+    avatarId = requestedAvatarId;
+  }
+
+  // 5. Skapa medlemsförfrågan
   try {
     const member = await db.householdMember.create({
       data: {
