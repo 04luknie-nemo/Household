@@ -36,7 +36,7 @@ inte text som ska skickas till servern. Ersätt även vinkelparenteserna.
 curl -i -b cookies.txt -X POST "localhost:3000/api/households/<id>/tasks" \
   -H "Content-Type: application/json" \
   -d '{"title":"Laga mat","description":"","reoccurInDays":1,"worth":4}'
-  
+
 curl -i -b cookies.txt -X POST "localhost:3000/api/households/<id>/tasks" \
   -H "Content-Type: application/json" \
   -d '{"title":"Städa","description":"","reoccurInDays":7,"worth":2}'
@@ -45,6 +45,7 @@ curl -i -b cookies.txt -X POST "localhost:3000/api/households/<id>/tasks" \
 Varje kommando ska ge status **201** och ett JSON-svar. Här är ett förkortat
 exempel på svaret när Laga mat har skapats (dina id:n blir andra):
 
+EXEMPEL
 ```json
 // {
 //   "id": "11111111-1111-4111-8111-111111111111",
@@ -63,6 +64,7 @@ exempel på svaret när Laga mat har skapats (dina id:n blir andra):
 
 Med exempelvärdena ovan blir URL:en för att markera Laga mat som färdig:
 
+EXEMPEL
 ```text
 <!-- http://localhost:3000/api/households/22222222-2222-4222-8222-222222222222/tasks/11111111-1111-4111-8111-111111111111/complete -->
 ```
