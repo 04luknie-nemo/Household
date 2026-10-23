@@ -5,6 +5,7 @@ import join from "./households-join.ts";
 import list from "./households-list.ts";
 import profile from "./households-profile.ts";
 import taskList from "./households-tasks-list.ts";
+import tasksEdit from "./households-tasks-edit.ts";
 import createTask from "./households-tasks.ts";
 import tasksComplete from "./households-tasks-complete.ts";
 
@@ -16,6 +17,7 @@ households.route("/", join);
 households.route("/", list);
 households.route("/", createTask);
 households.route("/", taskList);
+households.route("/", tasksEdit);
 households.route("/", profile);
 households.route("/", tasksComplete);
 
