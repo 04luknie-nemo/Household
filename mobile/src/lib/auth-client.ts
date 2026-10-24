@@ -18,13 +18,15 @@ export const apiUrl =
     : (tunnelUrl ?? "http://" + devHost + ":3000");
 
 export const authClient = createAuthClient({
-  // Webben når servern via localhost, telefon/emulator behöver datorns IP
   baseURL: apiUrl,
-  plugins: [
-    expoClient({
-      scheme: "mobile",
-      storagePrefix: "mobile",
-      storage: SecureStore,
-    }),
-  ],
+  plugins:
+    Platform.OS === "web"
+      ? []
+      : [
+          expoClient({
+            scheme: "mobile",
+            storagePrefix: "mobile",
+            storage: SecureStore,
+          }),
+        ],
 });
