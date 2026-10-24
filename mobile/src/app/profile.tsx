@@ -89,6 +89,9 @@ export default function Profile() {
       </View>
     );
   }
+  // Appens egen kontroll först, annars felet från servern. Visas i en ruta.
+  const saveError = error ?? renameMutation.error?.message ?? null;
+
   // Medan man redigerar visar cirkeln avataren man valt, annars den sparade.
   const shownAvatar =
     avatars.find(
@@ -144,15 +147,15 @@ export default function Profile() {
               style={ui.input}
             />
           </View>
-          {error && (
-            <Text style={[typography.caption, { color: colors.primary }]}>
-              {error}
-            </Text>
-          )}
-          {renameMutation.error && (
-            <Text style={[typography.caption, { color: colors.primary }]}>
-              {renameMutation.error.message}
-            </Text>
+          {saveError && (
+            <View style={styles.errorBox}>
+              <Ionicons
+                name="alert-circle-outline"
+                size={20}
+                color={colors.primary}
+              />
+              <Text style={styles.errorText}>{saveError}</Text>
+            </View>
           )}
           <Pressable
             style={ui.button}
@@ -290,5 +293,20 @@ const styles = StyleSheet.create({
   },
   rowText: {
     flex: 1,
+  },
+  errorBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    padding: spacing.sm + spacing.xs,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: colors.pending,
+    backgroundColor: colors.pendingBackground,
+  },
+  errorText: {
+    ...typography.body,
+    flex: 1,
+    color: colors.primary,
   },
 });
