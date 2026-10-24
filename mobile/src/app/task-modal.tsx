@@ -1,5 +1,6 @@
+import { Text } from "expo-router/build/react-navigation";
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
 
 type TaskInput = {
   title: string;
@@ -20,10 +21,24 @@ export default function TaskModal() {
 
   return (
     <View>
-      <Text>
-        Här har vi form för att antingen redigera eller skapa ny task, beroende
-        på om länken som tog dig hit skickade med task id eller inte
-      </Text>
+      <TextInput
+        placeholder="Ange Titel"
+        value={task.title}
+        onChangeText={(text) => setTask({ ...task, title: text })}
+      />
+
+      <TextInput
+        placeholder="Ange beskrivning"
+        value={task.description}
+        onChangeText={(text) => setTask({ ...task, description: text })}
+        multiline
+      />
+
+      <Text>Återkommer: var {task.reoccurInDays}</Text>
+
+      <Pressable onPress={() => setTask({ ...task, reoccurInDays: 1 })}>
+        <Text>1</Text>
+      </Pressable>
     </View>
   );
 }
