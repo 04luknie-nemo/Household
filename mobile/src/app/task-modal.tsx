@@ -34,7 +34,7 @@ export default function TaskModal() {
         multiline
       />
 
-      <Text>Återkommer: var {task.reoccurInDays}</Text>
+      <Text>Återkommer: var {task.reoccurInDays} dag</Text>
 
       <Pressable onPress={() => setTask({ ...task, reoccurInDays: 1 })}>
         <Text>1</Text>
