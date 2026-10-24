@@ -29,6 +29,7 @@ export default function Profile() {
   };
   const { data: session } = authClient.useSession();
 
+  const [error, setError] = useState<string | null>(null);
   const { activeHouseholdId } = useContext(HouseholdContext);
   const { userId, sessionId } = useContext(AuthContext);
   const {
@@ -46,11 +47,19 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
 
   function startEdit() {
+    setError(null);
     setNickname(profile?.nickname ?? "");
     setAvatarId(profile?.avatarId ?? 0);
     setIsEditing(true);
   }
-
+  function handleSave() {
+    if (!nickname.trim()) {
+      setError("Smeknamn får inte vara tomt!");
+      return;
+    }
+    setError(null);
+    renameMutation.mutate();
+  }
   const renameMutation = useMutation({
     mutationFn: () =>
       apiFetch(`/api/households/${activeHouseholdId}/members/me`, {
@@ -135,7 +144,11 @@ export default function Profile() {
               style={ui.input}
             />
           </View>
-
+          {error && (
+            <Text style={[typography.caption, { color: colors.primary }]}>
+              {error}
+            </Text>
+          )}
           {renameMutation.error && (
             <Text style={[typography.caption, { color: colors.primary }]}>
               {renameMutation.error.message}
@@ -143,7 +156,7 @@ export default function Profile() {
           )}
           <Pressable
             style={ui.button}
-            onPress={() => renameMutation.mutate()}
+            onPress={handleSave}
             disabled={renameMutation.isPending}
           >
             <Text style={ui.buttonText}>Spara</Text>
