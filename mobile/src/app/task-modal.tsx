@@ -17,10 +17,12 @@ const emptyTask: TaskInput = {
 };
 
 const days = Array.from({ length: 31 }, (_, index) => index + 1);
+const worthOptions = [1, 2, 4, 6, 8];
 
 export default function TaskModal() {
   const [task, setTask] = useState<TaskInput>(emptyTask);
   const [showDays, setShowDays] = useState(false);
+  const [showWorth, setShowWorth] = useState(false);
 
   return (
     <View
@@ -118,7 +120,10 @@ export default function TaskModal() {
           </Text>
         </View>
 
-        <Pressable>
+        <Pressable
+          onPress={() => setShowWorth(!showWorth)}
+          style={{ position: "relative" }}
+        >
           <Text
             style={[
               ui.dayCount,
@@ -127,6 +132,23 @@ export default function TaskModal() {
           >
             {task.worth}
           </Text>
+          {showWorth && (
+            <View
+              style={[
+                ui.card,
+                {
+                  position: "absolute",
+                  top: 30,
+                  right: 0,
+                  zIndex: 10,
+                },
+              ]}
+            >
+              {worthOptions.map((value) => (
+                <Text key={value}>{value}</Text>
+              ))}
+            </View>
+          )}
         </Pressable>
       </View>
 
