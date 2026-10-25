@@ -37,7 +37,7 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 
 ### Hushåll
 
-- [ ] Ett hushåll ska ha ett namn och en genererad (enkel) kod så andra kan gå med i hushållet. Namnet ska gå att ändra. \*
+- [x] Ett hushåll ska ha ett namn och en genererad (enkel) kod så andra kan gå med i hushållet. Namnet ska gå att ändra. \*
 - [ ] Alla användare i ett hushåll ska kunna se vilka som tillhör ett hushåll.
 - [ ] En ägare av ett hushåll ska kunna se förfrågningar om att gå med i hushållet.
 - [ ] En ägare ska kunna acceptera eller neka förfrågningar.
@@ -49,7 +49,7 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 
 - [x] En användare ska kunna registrera och logga in sig. \*
 - [x] En användare ska kunna skapa ett nytt hushåll. \*
-- [ ] En användare ska kunna gå med i ett hushåll genom att ange hushållets kod. \*
+- [x] En användare ska kunna gå med i ett hushåll genom att ange hushållets kod. \*
 - [ ] När en användare har valt att gå med i ett hushåll behöver en ägare först godkänna användaren.
 - [ ] En användare ska kunna lämna ett hushåll.
 
@@ -58,7 +58,7 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 - [ ] En användare ska kunna ange sitt namn. \*
 - [ ] En användare ska kunna välja en avatar (emoji-djur och färg) från en fördefinierad lista. \*
 - [ ] Valda avatarer ska inte kunna väljas av andra användare i hushållet. \*
-- [ ] Avataren ska användas i appen för att visa vad användaren har gjort. \*
+- [x] Avataren ska användas i appen för att visa vad användaren har gjort. \*
 - [ ] En användare ska kunna ställa in appens utseende (mörkt, ljust, auto).
 - [x] Om en användare tillhör två eller fler hushåll ska den kunna byta mellan hushållen.
 
@@ -73,8 +73,8 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 
 ### Dagsvyn
 
-- [ ] Alla sysslor ska listas i en dagsvy och ge en översikt kring vad som behöver göras. \*
-- [ ] Utöver namnet ska vem/vilka som gjort sysslan visas, hur många dagar sedan den gjordes senast och om den är försenad. \*
+- [x] Alla sysslor ska listas i en dagsvy och ge en översikt kring vad som behöver göras. \*
+- [x] Utöver namnet ska vem/vilka som gjort sysslan visas, hur många dagar sedan den gjordes senast och om den är försenad. \*
 - [ ] När en användare väljer en syssla visas beskrivningen, och med ett enkelt tryck går sysslan att markera som gjord. \*
 
 ### Statistik
