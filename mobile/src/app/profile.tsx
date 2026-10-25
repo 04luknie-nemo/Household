@@ -48,6 +48,7 @@ export default function Profile() {
 
   function startEdit() {
     setError(null);
+    renameMutation.reset();
     setNickname(profile?.nickname ?? "");
     setAvatarId(profile?.avatarId ?? 0);
     setIsEditing(true);
@@ -89,6 +90,7 @@ export default function Profile() {
       </View>
     );
   }
+
   // Appens egen kontroll först, annars felet från servern. Visas i en ruta.
   const saveError = error ?? renameMutation.error?.message ?? null;
 
@@ -162,7 +164,9 @@ export default function Profile() {
             onPress={handleSave}
             disabled={renameMutation.isPending}
           >
-            <Text style={ui.buttonText}>Spara</Text>
+            <Text style={ui.buttonText}>
+              {renameMutation.isPending ? "Sparar..." : "Spara"}
+            </Text>
           </Pressable>
           <Pressable
             style={[ui.button, ui.buttonSecondary]}
@@ -266,7 +270,7 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
   },
   chosenAvatar: {
-    borderColor: colors.text,
+    borderColor: colors.primary,
   },
   takenAvatar: {
     opacity: 0.3,
