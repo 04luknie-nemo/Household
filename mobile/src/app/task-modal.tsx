@@ -23,10 +23,22 @@ export default function TaskModal() {
   const [showDays, setShowDays] = useState(false);
 
   return (
-    <View style={{ padding: spacing.md, gap: spacing.sm }}>
+    <View
+      style={{
+        padding: spacing.md,
+        gap: spacing.sm,
+        maxWidth: 400,
+        alignSelf: "center",
+        width: "100%",
+      }}
+    >
       <TextInput
-        style={[ui.input, { backgroundColor: colors.card }]}
+        style={[
+          ui.input,
+          { backgroundColor: colors.card, borderRadius: radius.md },
+        ]}
         placeholder="Titel"
+        placeholderTextColor={colors.textMuted}
         value={task.title}
         onChangeText={(text) => setTask({ ...task, title: text })}
       />
@@ -36,35 +48,86 @@ export default function TaskModal() {
           ui.input,
           {
             backgroundColor: colors.card,
+            borderRadius: radius.md,
             minHeight: 130,
             textAlignVertical: "top",
           },
         ]}
         placeholder="Beskrivning"
+        placeholderTextColor={colors.textMuted}
         value={task.description}
         onChangeText={(text) => setTask({ ...task, description: text })}
         multiline
       />
+
       <View
-        style={{ flexDirection: "row", gap: spacing.sm, alignItems: "center" }}
-      >
-        <Text>Återkommer: var</Text>
-
-        <Pressable
-          style={{
-            backgroundColor: colors.primary,
-            borderRadius: radius.pill,
-            width: 28,
-            height: 28,
+        style={[
+          ui.card,
+          {
+            flexDirection: "row",
             alignItems: "center",
-            justifyContent: "center",
-          }}
-          onPress={() => setShowDays(!showDays)}
-        >
-          <Text style={{ color: colors.onPrimary }}>{task.reoccurInDays}</Text>
-        </Pressable>
+            justifyContent: "space-between",
+          },
+        ]}
+      >
+        <Text>Återkommer:</Text>
 
-        <Text>dag</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: spacing.sm,
+          }}
+        >
+          <Text>var</Text>
+
+          <Pressable
+            style={{
+              backgroundColor: colors.primary,
+              borderRadius: radius.pill,
+              width: 28,
+              height: 28,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onPress={() => setShowDays(!showDays)}
+          >
+            <Text style={{ color: colors.onPrimary }}>
+              {task.reoccurInDays}
+            </Text>
+          </Pressable>
+
+          <Text>dag</Text>
+        </View>
+      </View>
+
+      <View
+        style={[
+          ui.card,
+          {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          },
+        ]}
+      >
+        <View style={{ gap: spacing.xs }}>
+          <Text style={{ fontWeight: "600" }}>Värde:</Text>
+          <Text style={{ color: colors.textMuted }}>
+            Hur energikrävande är sysslan?
+          </Text>
+        </View>
+
+        <Pressable>
+          <Text
+            style={[
+              ui.dayCount,
+              { color: colors.text, fontWeight: "600", fontSize: 14 },
+            ]}
+          >
+            {task.worth}
+          </Text>
+        </Pressable>
       </View>
 
       {showDays && (
