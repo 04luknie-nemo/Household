@@ -148,10 +148,14 @@ export default function Task() {
         </View>
       )}
       {completeMutation.isError && (
-        <Text>{getErrorMessage(completeMutation.error)}</Text>
+        <Text accessibilityRole="alert">
+          {getErrorMessage(completeMutation.error)}
+        </Text>
       )}
 
       <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Markera sysslan som gjord"
         disabled={completeMutation.isPending}
         onPress={() => completeMutation.mutate()}
       >
