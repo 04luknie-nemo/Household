@@ -41,9 +41,9 @@ export const typography = {
 
 export const position = StyleSheet.create({
   horizantalCenter: {
-    display:"flex",
-    justifyContent:"center"
-  }
+    display: "flex",
+    justifyContent: "center",
+  },
 });
 
 export const statisticsStyles = StyleSheet.create({

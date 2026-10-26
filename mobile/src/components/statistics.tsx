@@ -1,14 +1,13 @@
 import { periods } from "@/constants/periods";
-import { position, statisticsStyles as styles, typography } from "@/constants/theme";
+import {
+  position,
+  statisticsStyles as styles,
+  typography,
+} from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { AuthContext } from "./auth-provider";
 import { HouseholdContext } from "./household-provider";
 import StatisticsPie, { type MemberPoints } from "./statistics-pie";
@@ -50,7 +49,7 @@ export default function StatisticsView({ period }: { period: number }) {
   if (period !== 1) {
     return <Text style={typography.body}>Kommer snart</Text>;
   }
-  
+
   if (isPending) {
     return (
       <Text style={typography.body}>
@@ -62,7 +61,8 @@ export default function StatisticsView({ period }: { period: number }) {
     return (
       <View style={styles.content}>
         <Text style={[typography.body, position.horizantalCenter]}>
-          Kunde inte hämta statistiken. Kontrollera nätverksanslutningen och försök igen senare...
+          Kunde inte hämta statistiken. Kontrollera nätverksanslutningen och
+          försök igen senare...
         </Text>
       </View>
     );
