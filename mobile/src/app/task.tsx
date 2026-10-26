@@ -1,11 +1,20 @@
 import { AuthContext } from "@/components/auth-provider";
 import { HouseholdContext } from "@/components/household-provider";
 import { avatars } from "@/constants/avatars";
+import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
+import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useContext } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 type TaskDetails = {
   id: string;
@@ -14,6 +23,22 @@ type TaskDetails = {
   reoccurInDays: number;
   worth: number;
 };
+
+type TaskSummary = {
+  id: string;
+  title: string;
+  doneTodayBy: number[];
+  daysSinceLast: number;
+  isOverdue: boolean;
+};
+
+type Household = {
+  id: string;
+  name: string;
+  status: "pending" | "active" | "left";
+  isOwner: boolean;
+};
+
 function getErrorMessage(error: Error) {
   try {
     const body = JSON.parse(error.message) as {
@@ -26,54 +51,65 @@ function getErrorMessage(error: Error) {
     return error.message || "Något gick fel. Försök igen.";
   }
 }
+
 export default function Task() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id: paramId } = useLocalSearchParams<{ id: string }>();
+  const taskId = Array.isArray(paramId) ? paramId[0] : paramId;
 
   const { activeHouseholdId } = useContext(HouseholdContext);
   const { userId, sessionId } = useContext(AuthContext);
+  const queryClient = useQueryClient();
 
   const taskQuery = useQuery<TaskDetails>({
-    queryKey: ["task", userId, sessionId, activeHouseholdId, id],
-    enabled: !!userId && !!activeHouseholdId && !!id,
+    queryKey: ["task", userId, sessionId, activeHouseholdId, taskId],
+    enabled: !!userId && !!activeHouseholdId && !!taskId,
     queryFn: ({ signal }) =>
       apiFetch<TaskDetails>(
-        `/api/households/${activeHouseholdId}/tasks/${id}`,
+        `/api/households/${activeHouseholdId}/tasks/${taskId}`,
         { signal },
       ),
   });
-  const tasksQuery = useQuery<
-    {
-      id: string;
-      title: string;
-      doneTodayBy: number[];
-      daysSinceLast: number;
-      isOverdue: boolean;
-    }[]
-  >({
+
+  const tasksQuery = useQuery<TaskSummary[]>({
     queryKey: ["tasks", userId, sessionId, activeHouseholdId],
     enabled: !!userId && !!activeHouseholdId,
     queryFn: ({ signal }) =>
-      apiFetch(`/api/households/${activeHouseholdId}/tasks`, {
+      apiFetch<TaskSummary[]>(`/api/households/${activeHouseholdId}/tasks`, {
         signal,
       }),
   });
-  const taskSummary = tasksQuery.data?.find((item) => item.id === id);
 
+  const householdsQuery = useQuery<Household[]>({
+    queryKey: ["households", userId, sessionId],
+    enabled: !!userId && !!activeHouseholdId,
+    queryFn: ({ signal }) =>
+      apiFetch<Household[]>("/api/households", { signal }),
+  });
+
+  const task = taskQuery.data;
+  const taskSummary = tasksQuery.data?.find((item) => item.id === taskId);
   const doneTodayBy = taskSummary?.doneTodayBy ?? [];
-  const queryClient = useQueryClient();
+
+  const activeHousehold = householdsQuery.data?.find(
+    (household) => household.id === activeHouseholdId,
+  );
+
+  const isOwner =
+    activeHousehold?.status === "active" && activeHousehold.isOwner;
 
   const completeMutation = useMutation({
     mutationFn: () =>
-      apiFetch(`/api/households/${activeHouseholdId}/tasks/${id}/complete`, {
-        method: "POST",
-      }),
+      apiFetch(
+        `/api/households/${activeHouseholdId}/tasks/${taskId}/complete`,
+        { method: "POST" },
+      ),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["tasks", userId, sessionId, activeHouseholdId],
         }),
         queryClient.invalidateQueries({
-          queryKey: ["task", userId, sessionId, activeHouseholdId, id],
+          queryKey: ["task", userId, sessionId, activeHouseholdId, taskId],
         }),
       ]);
     },
@@ -81,90 +117,198 @@ export default function Task() {
 
   if (!activeHouseholdId) {
     return (
-      <View>
-        <Text>Välj ett hushåll först.</Text>
+      <View style={styles.messageContainer}>
+        <Text style={typography.body}>Välj ett hushåll först.</Text>
       </View>
     );
   }
 
   if (taskQuery.isPending) {
     return (
-      <View>
-        <ActivityIndicator />
-        <Text>Hämtar sysslan...</Text>
+      <View style={styles.messageContainer}>
+        <ActivityIndicator color={colors.primary} />
+        <Text style={typography.body}>Hämtar sysslan...</Text>
       </View>
     );
   }
 
-  if (taskQuery.isError || !taskQuery.data) {
+  if (taskQuery.isError || !task) {
     return (
-      <View>
-        <Text>{taskQuery.error?.message ?? "Sysslan kunde inte hittas."}</Text>
-
-        <Pressable onPress={() => taskQuery.refetch()}>
-          <Text>Försök igen</Text>
+      <View style={styles.messageContainer}>
+        <Text style={typography.body}>
+          {taskQuery.error
+            ? getErrorMessage(taskQuery.error)
+            : "Sysslan kunde inte hittas."}
+        </Text>
+        <Pressable style={ui.button} onPress={() => taskQuery.refetch()}>
+          <Text style={ui.buttonText}>Försök igen</Text>
         </Pressable>
       </View>
     );
   }
 
   return (
-    <View>
-      <Text>{taskQuery.data.title}</Text>
-
-      <Text>{taskQuery.data.description || "Ingen beskrivning finns."}</Text>
-
-      <Text>Medverkande</Text>
-
-      {tasksQuery.isPending ? (
-        <ActivityIndicator />
-      ) : tasksQuery.isError ? (
-        <Text>Kunde inte hämta dagens medverkande.</Text>
-      ) : doneTodayBy.length === 0 ? (
-        <Text>Ingen har gjort sysslan idag ännu.</Text>
-      ) : (
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          {doneTodayBy.map((avatarId, index) => {
-            const avatar = avatars.find((item) => item.id === avatarId);
-
-            if (!avatar) return null;
-
-            return (
-              <View
-                key={`${avatarId}-${index}`}
-                style={{
-                  backgroundColor: avatar.color,
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text style={{ fontSize: 20 }}>{avatar.name}</Text>
-              </View>
-            );
-          })}
-        </View>
-      )}
-      {completeMutation.isError && (
-        <Text accessibilityRole="alert">
-          {getErrorMessage(completeMutation.error)}
-        </Text>
-      )}
-
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Markera sysslan som gjord"
-        disabled={completeMutation.isPending}
-        onPress={() => completeMutation.mutate()}
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
       >
-        {completeMutation.isPending ? (
-          <ActivityIndicator />
-        ) : (
-          <Text>Gjord</Text>
+        <View style={styles.heading}>
+          <Text style={[typography.title, styles.title]}>{task.title}</Text>
+
+          {isOwner && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Ändra syssla"
+              onPress={() =>
+                router.push({
+                  pathname: "/task-modal",
+                  params: { id: task.id },
+                })
+              }
+              hitSlop={8}
+            >
+              <Ionicons name="create-outline" size={24} color={colors.text} />
+            </Pressable>
+          )}
+        </View>
+
+        <View style={ui.card}>
+          <Text style={typography.label}>Beskrivning</Text>
+          <Text style={typography.body}>
+            {task.description?.trim() || "Ingen beskrivning finns."}
+          </Text>
+        </View>
+
+        <View style={styles.contributors}>
+          <Text style={typography.label}>Medverkande</Text>
+
+          {tasksQuery.isPending ? (
+            <ActivityIndicator color={colors.primary} />
+          ) : tasksQuery.isError ? (
+            <Text style={typography.body}>
+              Kunde inte hämta dagens medverkande.
+            </Text>
+          ) : doneTodayBy.length === 0 ? (
+            <Text style={typography.caption}>
+              Ingen har gjort sysslan idag ännu.
+            </Text>
+          ) : (
+            <View style={styles.avatarList}>
+              {doneTodayBy.map((avatarId, index) => {
+                const avatar = avatars.find((item) => item.id === avatarId);
+
+                if (!avatar) return null;
+
+                return (
+                  <View
+                    key={`${avatarId}-${index}`}
+                    style={[styles.avatar, { backgroundColor: avatar.color }]}
+                  >
+                    <Text style={styles.avatarText}>{avatar.name}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+        </View>
+
+        {completeMutation.isError && (
+          <Text accessibilityRole="alert" style={styles.error}>
+            {getErrorMessage(completeMutation.error)}
+          </Text>
         )}
-      </Pressable>
+
+        {completeMutation.isSuccess && (
+          <Text accessibilityRole="alert" style={styles.success}>
+            Sysslan markerades som gjord!
+          </Text>
+        )}
+      </ScrollView>
+
+      <View style={styles.footer}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Markera sysslan som gjord"
+          style={[
+            ui.button,
+            styles.completeButton,
+            completeMutation.isPending && styles.disabledButton,
+          ]}
+          disabled={completeMutation.isPending}
+          onPress={() => completeMutation.mutate()}
+        >
+          {completeMutation.isPending ? (
+            <ActivityIndicator color={colors.onPrimary} />
+          ) : (
+            <Text style={ui.buttonText}>Gjord</Text>
+          )}
+        </Pressable>
+      </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    padding: spacing.md,
+    gap: spacing.lg,
+  },
+  messageContainer: {
+    flex: 1,
+    padding: spacing.lg,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: colors.background,
+  },
+  heading: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: spacing.md,
+  },
+  title: {
+    flex: 1,
+  },
+  contributors: {
+    gap: spacing.md,
+  },
+  avatarList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+  },
+  avatar: {
+    minWidth: 40,
+    minHeight: 40,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: spacing.xs,
+  },
+  avatarText: {
+    fontSize: 20,
+  },
+  footer: {
+    padding: spacing.md,
+  },
+  completeButton: {
+    width: "100%",
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  error: {
+    ...typography.body,
+    color: colors.primary,
+  },
+  success: {
+    ...typography.body,
+    color: colors.text,
+  },
+});
