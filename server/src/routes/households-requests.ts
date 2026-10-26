@@ -125,7 +125,7 @@ requests.get("/:id/requests", async (c) => {
   });
 
   // Tom lista hanteras i issue #95
-  return c.json(requests, 200);
+  return c.json(pending, 200);
 });
 
 export default requests;
