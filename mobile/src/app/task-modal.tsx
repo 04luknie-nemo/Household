@@ -36,6 +36,7 @@ export default function TaskModal() {
   const [showWorth, setShowWorth] = useState(false);
   const [titleError, setTitleError] = useState("");
   const [saveError, setSaveError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const queryClient = useQueryClient();
   const { activeHouseholdId } = useContext(HouseholdContext);
@@ -233,16 +234,19 @@ export default function TaskModal() {
       )}
 
       <Pressable
+        disabled={isSaving}
         onPress={async () => {
           if (!task.title.trim()) {
             setTitleError("Du måste ange en titel");
             return;
           }
           if (!activeHouseholdId) {
+            setSaveError("Du måste välja ett hushåll först.");
             return;
           }
 
           setSaveError("");
+          setIsSaving(true);
 
           try {
             await apiFetch(`/api/households/${activeHouseholdId}/tasks`, {
@@ -258,6 +262,8 @@ export default function TaskModal() {
           } catch (error) {
             console.error("Kunde inte skapa sysslan:", error);
             setSaveError("Kunde inte skapa sysslan. Försök igen.");
+          } finally {
+            setIsSaving(false);
           }
         }}
         style={{
@@ -269,7 +275,7 @@ export default function TaskModal() {
         }}
       >
         <Text style={{ color: colors.onPrimary, fontWeight: "600" }}>
-          Spara
+          {isSaving ? "Sparar..." : "Spara"}
         </Text>
       </Pressable>
 
