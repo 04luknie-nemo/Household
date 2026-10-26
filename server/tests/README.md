@@ -14,6 +14,7 @@ Gemensam guide för testfilerna i den här mappen. Här finns inloggning, testda
 | [households-profile.md](households-profile.md)       | #51   | `GET` och `PATCH /api/households/:id/members/me` |
 | [households-tasks-complete.md](households-tasks-complete.md) | #63   | `POST /api/households/:id/tasks/:taskId/complete` |
 | [households-stats.md](households-stats.md) | #64 | `GET /api/households/:id/stats?period=week` |
+| [households-members.md](households-members.md) | #76 | `GET /api/households/:id/members` |
 
 ## Starta servern
 

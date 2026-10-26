@@ -10,6 +10,7 @@ import tasksComplete from "./households-tasks-complete.ts";
 import tasksEdit from "./households-tasks-edit.ts";
 import taskList from "./households-tasks-list.ts";
 import createTask from "./households-tasks.ts";
+import members from "./households-members.ts";
 
 const households = new Hono();
 
@@ -23,6 +24,7 @@ households.route("/", taskList);
 households.route("/", tasksEdit);
 households.route("/", profile);
 households.route("/", tasksComplete);
+households.route("/", members);
 households.route("/", requests);
 
 export default households;
