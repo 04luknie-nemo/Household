@@ -90,3 +90,40 @@ requests.delete("/:id/requests/:memberId", async (c) => {
   });
   return c.body(null, 204);
 });
+
+requests.get("/:id/requests", async (c) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  if (!session) {
+    return c.text("Inte inloggad", 401);
+  }
+  const household = await db.household.findUnique({
+    where: { id: c.req.param("id") },
+    select: {
+      id: true,
+      members: {
+        where: { userId: session.user.id },
+        select: { status: true, isOwner: true },
+      },
+    },
+  });
+  if (!household) {
+    return c.text("Hushållet finns inte!", 404);
+  }
+  const me = household.members[0];
+  if (!me || me.status !== "active") {
+    return c.text("Du är inte medlem!", 403);
+  }
+  if (!me.isOwner) {
+    return c.text("Du är inte en ägare!", 403);
+  }
+
+  // UNIKT
+  const requests = await db.householdMember.findMany({
+    where: { householdId: household.id, status: "pending" },
+    select: { id: true, nickname: true, avatarId: true, createdAt: true },
+    orderBy: { createdAt: "asc" },
+  });
+
+  // Tom lista hanteras i issue #95
+  return c.json(requests, 200);
+});
