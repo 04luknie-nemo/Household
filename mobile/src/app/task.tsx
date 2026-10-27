@@ -1,11 +1,10 @@
 import { AuthContext } from "@/components/auth-provider";
 import { HouseholdContext } from "@/components/household-provider";
 import { avatars } from "@/constants/avatars";
-import { colors, spacing, typography, ui } from "@/constants/theme";
+import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
-import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useContext } from "react";
 import {
   ActivityIndicator,
@@ -32,10 +31,10 @@ type TaskSummary = {
   isOverdue: boolean;
 };
 
-type Household = {
+type HouseholdMember = {
   id: string;
-  name: string;
-  status: "pending" | "active" | "left";
+  nickname: string;
+  avatarId: number;
   isOwner: boolean;
 };
 
@@ -49,6 +48,21 @@ function getErrorMessage(error: Error) {
     return body.error ?? body.message ?? error.message;
   } catch {
     return error.message || "Något gick fel. Försök igen.";
+  }
+}
+
+function isNotFoundError(error: Error | null) {
+  if (!error) return false;
+
+  try {
+    const body = JSON.parse(error.message) as {
+      status?: number;
+      statusCode?: number;
+    };
+
+    return body.status === 404 || body.statusCode === 404;
+  } catch {
+    return /\b404\b/.test(error.message);
   }
 }
 
@@ -79,23 +93,19 @@ export default function Task() {
       }),
   });
 
-  const householdsQuery = useQuery<Household[]>({
-    queryKey: ["households", userId, sessionId],
+  const membersQuery = useQuery<HouseholdMember[]>({
+    queryKey: ["members", userId, sessionId, activeHouseholdId],
     enabled: !!userId && !!activeHouseholdId,
     queryFn: ({ signal }) =>
-      apiFetch<Household[]>("/api/households", { signal }),
+      apiFetch<HouseholdMember[]>(
+        `/api/households/${activeHouseholdId}/members`,
+        { signal },
+      ),
   });
 
   const task = taskQuery.data;
   const taskSummary = tasksQuery.data?.find((item) => item.id === taskId);
   const doneTodayBy = taskSummary?.doneTodayBy ?? [];
-
-  const activeHousehold = householdsQuery.data?.find(
-    (household) => household.id === activeHouseholdId,
-  );
-
-  const isOwner =
-    activeHousehold?.status === "active" && activeHousehold.isOwner;
 
   const completeMutation = useMutation({
     mutationFn: () =>
@@ -111,9 +121,20 @@ export default function Task() {
         queryClient.invalidateQueries({
           queryKey: ["task", userId, sessionId, activeHouseholdId, taskId],
         }),
+        queryClient.invalidateQueries({
+          queryKey: ["stats-this-week", userId, sessionId, activeHouseholdId],
+        }),
       ]);
     },
   });
+
+  if (!activeHouseholdId) {
+    return (
+      <View style={styles.messageContainer}>
+        <Text style={typography.body}>Välj ett hushåll först.</Text>
+      </View>
+    );
+  }
 
   if (!activeHouseholdId) {
     return (
@@ -140,9 +161,12 @@ export default function Task() {
             ? getErrorMessage(taskQuery.error)
             : "Sysslan kunde inte hittas."}
         </Text>
-        <Pressable style={ui.button} onPress={() => taskQuery.refetch()}>
-          <Text style={ui.buttonText}>Försök igen</Text>
-        </Pressable>
+
+        {!isNotFoundError(taskQuery.error) && (
+          <Pressable style={ui.button} onPress={() => taskQuery.refetch()}>
+            <Text style={ui.buttonText}>Försök igen</Text>
+          </Pressable>
+        )}
       </View>
     );
   }
@@ -155,22 +179,6 @@ export default function Task() {
       >
         <View style={styles.heading}>
           <Text style={[typography.title, styles.title]}>{task.title}</Text>
-
-          {isOwner && (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Ändra syssla"
-              onPress={() =>
-                router.push({
-                  pathname: "/task-modal",
-                  params: { id: task.id },
-                })
-              }
-              hitSlop={8}
-            >
-              <Ionicons name="create-outline" size={24} color={colors.text} />
-            </Pressable>
-          )}
         </View>
 
         <View style={ui.card}>
@@ -183,9 +191,9 @@ export default function Task() {
         <View style={styles.contributors}>
           <Text style={typography.label}>Medverkande</Text>
 
-          {tasksQuery.isPending ? (
+          {tasksQuery.isPending || membersQuery.isPending ? (
             <ActivityIndicator color={colors.primary} />
-          ) : tasksQuery.isError ? (
+          ) : tasksQuery.isError || membersQuery.isError ? (
             <Text style={typography.body}>
               Kunde inte hämta dagens medverkande.
             </Text>
@@ -195,17 +203,25 @@ export default function Task() {
             </Text>
           ) : (
             <View style={styles.avatarList}>
-              {doneTodayBy.map((avatarId, index) => {
+              {doneTodayBy.map((avatarId) => {
                 const avatar = avatars.find((item) => item.id === avatarId);
+                const member = membersQuery.data?.find(
+                  (item) => item.avatarId === avatarId,
+                );
 
                 if (!avatar) return null;
 
                 return (
-                  <View
-                    key={`${avatarId}-${index}`}
-                    style={[styles.avatar, { backgroundColor: avatar.color }]}
-                  >
-                    <Text style={styles.avatarText}>{avatar.name}</Text>
+                  <View key={avatarId} style={styles.contributor}>
+                    <View
+                      style={[styles.avatar, { backgroundColor: avatar.color }]}
+                    >
+                      <Text style={styles.avatarText}>{avatar.name}</Text>
+                    </View>
+
+                    <Text style={typography.caption}>
+                      {member?.nickname || "Okänd"}
+                    </Text>
                   </View>
                 );
               })}
@@ -283,10 +299,14 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: spacing.sm,
   },
+  contributor: {
+    alignItems: "center",
+    gap: spacing.xs,
+  },
   avatar: {
     minWidth: 40,
     minHeight: 40,
-    borderRadius: 999,
+    borderRadius: radius.pill,
     alignItems: "center",
     justifyContent: "center",
     padding: spacing.xs,
