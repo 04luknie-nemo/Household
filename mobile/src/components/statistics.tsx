@@ -1,4 +1,4 @@
-import { periods } from "@/constants/periods";
+import { apiPeriods, periods } from "@/constants/periods";
 import {
   position,
   statisticsStyles as styles,
@@ -30,6 +30,9 @@ type Stats = {
 export default function StatisticsView({ period }: { period: number }) {
   const { activeHouseholdId } = useContext(HouseholdContext);
   const { userId, sessionId } = useContext(AuthContext);
+
+  const apiPeriod = apiPeriods[period];
+
   const {
     data: stats,
     isPending,
@@ -37,17 +40,17 @@ export default function StatisticsView({ period }: { period: number }) {
     refetch,
     isRefetching,
   } = useQuery<Stats>({
-    queryKey: ["stats-this-week", userId, sessionId, activeHouseholdId],
-    enabled: !!activeHouseholdId && !!userId && period === 1,
+    queryKey: ["stats", userId, sessionId, activeHouseholdId, apiPeriod],
+    enabled: !!activeHouseholdId && !!userId && !!apiPeriod,
     queryFn: ({ signal }) =>
       apiFetch<Stats>(
-        `/api/households/${activeHouseholdId}/stats?period=week`,
+        `/api/households/${activeHouseholdId}/stats?period=${apiPeriod}`,
         { signal },
       ),
   });
 
-  if (period !== 1) {
-    return <Text style={typography.body}>Kommer snart</Text>;
+  if (!apiPeriod) {
+    return null;
   }
 
   if (isPending) {
@@ -81,7 +84,7 @@ export default function StatisticsView({ period }: { period: number }) {
     >
       {stats.total.length === 0 ? (
         <Text style={[typography.title, position.horizantalCenter]}>
-          Inga sysslor har gjorts denna veckan.
+          Inga sysslor har gjorts denna perioden.
         </Text>
       ) : (
         <>
