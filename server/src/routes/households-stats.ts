@@ -5,7 +5,7 @@ import { auth } from "../lib/auth.ts";
 const stats = new Hono();
 
 function periodRange(period: string | undefined) {
-  if (period !== "week" && period !== "lastWeek") {
+  if (period !== "week" && period !== "lastWeek" && period !== "lastMonth") {
     return null;
   }
 
@@ -20,6 +20,11 @@ function periodRange(period: string | undefined) {
     lastMonday.setDate(lastMonday.getDate() - 7);
 
     return { from: lastMonday, to: monday };
+  } else if (period === "lastMonth") {
+    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+    return { from: lastMonth, to: thisMonth };
   }
 
   return { from: monday, to: now };

@@ -1,6 +1,6 @@
-# Statistik denna och förra veckan (#64, #101)
+# Statistik denna vecka, förra veckan och förra månaden (#64, #101)
 
-Route: `GET /api/households/:id/stats?period=week` eller `period=lastWeek`.
+Route: `GET /api/households/:id/stats` med `period=week`, `period=lastWeek` eller `period=lastMonth`.
 Följ [README](README.md) för server, användare och cookies. Kör kommandona
 från `server/` i Bash/Git Bash (i PowerShell: använd `curl.exe` och anpassa radbrytningarna).
 Använd ett nytt testhushåll så att befintliga markeringar inte påverkar resultatet.
@@ -155,8 +155,7 @@ Statistiken för det första hushållet ska vara oförändrad.
 
 ## 8. Förra veckan (#101)
 
-Dessa fall testar `period=lastWeek`. `lastMonth` läggs till i nästa steg och
-är ännu inte en giltig period.
+Dessa fall testar `period=lastWeek`. För `lastMonth`, se avsnitt 9.
 
 ### Förbered ett separat testhushåll
 
@@ -242,3 +241,107 @@ curl -i -b cookies-b.txt "localhost:3000/api/households/<id>/stats?period=lastWe
 Förväntat: 403 för både pending och left, 200 efter återställning till active.
 Kör även de befintliga veckotesterna på ett nytt testhushåll för att kontrollera
 att `week` fortfarande fungerar.
+
+## 9. Förra månaden (#101)
+
+Kör från `server/` med samma lokala tidszon som servern. A ska vara inloggad
+via `cookies.txt`. Genomför fallen i ordning och inom samma kalendermånad.
+
+### Förbered ett nytt testhushåll och en syssla
+
+Använd ett nytt hushåll för att undvika markeringarna från veckotesterna:
+
+```bash
+curl -i -b cookies.txt -X POST "localhost:3000/api/households" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test av förra månaden"}'
+```
+
+Spara svarets `id` som `<manad-id>`. Skapa en syssla värd 4 poäng:
+
+```bash
+curl -i -b cookies.txt -X POST "localhost:3000/api/households/<manad-id>/tasks" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Månadssyssla","description":"","reoccurInDays":7,"worth":4}'
+```
+
+Spara sysslans `id` som `<manad-task>`. Hämta A:s medlemskap:
+
+```bash
+npx tsx -e "import('./prisma/db.ts').then(async ({ db }) => console.log(await db.householdMember.findMany({ where: { householdId: '<manad-id>' } })))"
+```
+
+Spara medlemskapets `id` som `<manad-medlem>` (inte `userId`). Ersätt
+platshållarna inklusive vinkelparenteserna i alla följande kommandon.
+
+### Tom period
+
+```bash
+curl -i -b cookies.txt "localhost:3000/api/households/<manad-id>/stats?period=lastMonth"
+```
+
+Förväntat: 200 och `{"total":[],"perTask":[]}`. Sysslan utan markeringar
+ska inte finnas med i svaret.
+
+### Markering mitt i förra månaden
+
+Skapa en markering den 15:e förra månaden klockan 12:00:
+
+```bash
+npx tsx -e "import('./prisma/db.ts').then(async ({ db }) => { const now=new Date(); console.log(await db.completedTask.create({data:{memberId:'<manad-medlem>',taskId:'<manad-task>',createdAt:new Date(now.getFullYear(),now.getMonth()-1,15,12)}})); })"
+curl -i -b cookies.txt "localhost:3000/api/households/<manad-id>/stats?period=lastMonth"
+```
+
+Förväntat: 200. `total` innehåller bara A (avatarId 1, A:s nickname) med
+4 poäng. `perTask` innehåller bara Månadssyssla med A och 4 poäng.
+
+### Startgränsen inkluderas och slutgränsen exkluderas
+
+Kör följande kommando **en gång**. Det lägger till fyra markeringar:
+
+| Tidpunkt | Ska räknas i `lastMonth`? |
+| --- | --- |
+| En millisekund före den 1:a förra månaden 00:00 | Nej |
+| Exakt den 1:a förra månaden 00:00 | Ja |
+| En millisekund före den 1:a denna månad 00:00 | Ja |
+| Exakt den 1:a denna månad 00:00 | Nej |
+
+```bash
+npx tsx -e "import('./prisma/db.ts').then(async ({ db }) => { const now=new Date(); const start=new Date(now.getFullYear(),now.getMonth()-1,1); const end=new Date(now.getFullYear(),now.getMonth(),1); const dates=[new Date(start.getTime()-1),start,new Date(end.getTime()-1),end]; console.log(await db.completedTask.createMany({data:dates.map(createdAt=>({memberId:'<manad-medlem>',taskId:'<manad-task>',createdAt}))})); })"
+curl -i -b cookies.txt "localhost:3000/api/households/<manad-id>/stats?period=lastMonth"
+```
+
+Förväntat: A har **12 poäng** i både `total` och Månadssysslas `members`:
+4 från den 15:e plus 8 från de två inkluderade gränsmarkeringarna. De två
+markeringarna utanför intervallet får inte öka poängen. Inga andra poster
+ska finnas med. Om kommandona körs flera gånger skapas dubbletter; börja då
+om med ett nytt testhushåll.
+
+Månaderna är kalenderbaserade, inte de senaste 30 dagarna. Körs testet i
+januari ska markeringen den 15:e hamna i december föregående år och
+slutgränsen vara den 1 januari innevarande år. Ändra inte datorns klocka
+för testet; vid automatiserade datumtester kan tiden simuleras.
+
+### Felkoder för lastMonth
+
+C ska vara inloggad via `cookies-c.txt` och stå utanför månadstesthushållet.
+
+```bash
+curl -i "localhost:3000/api/households/<manad-id>/stats?period=lastMonth"
+curl -i -b cookies-c.txt "localhost:3000/api/households/<manad-id>/stats?period=lastMonth"
+curl -i -b cookies.txt "localhost:3000/api/households/finns-inte/stats?period=lastMonth"
+curl -i -b cookies.txt "localhost:3000/api/households/<manad-id>/stats?period=lastmonth"
+```
+
+Förväntat i ordning: 401, 403, 404, 400.
+För pending/left: använd B:s medlemskap i det ursprungliga hushållet från
+fall 6, ändra status enligt README avsnitt 4 och kör:
+
+```bash
+curl -i -b cookies-b.txt "localhost:3000/api/households/<id>/stats?period=lastMonth"
+```
+
+Förväntat: 403 för pending och left, 200 efter återställning till active.
+Kör även fallen för `week` och `lastWeek` för att kontrollera att de
+fortfarande fungerar. En markering kan tillhöra både en vecka och en månad;
+det är korrekt eftersom perioderna kan överlappa.
