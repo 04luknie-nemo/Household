@@ -11,6 +11,7 @@ export const colors = {
   border: "#E0E0E0",
   text: "#323232",
   textMuted: "#969696",
+  error: "#B42318",
   owner: "#F29741",
   ownerBackground: "#FCEDDE",
   member: "#64B5F4",
