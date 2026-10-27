@@ -1,11 +1,19 @@
 import { AuthContext } from "@/components/auth-provider";
 import { HouseholdContext } from "@/components/household-provider";
-import { colors, spacing, typography, ui } from "@/constants/theme";
+import { avatars } from "@/constants/avatars";
+import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 type HouseholdDetail = {
   id: string;
   name: string;
@@ -16,6 +24,13 @@ type HouseholdListItem = {
   id: string;
   name: string;
   status: string;
+  isOwner: boolean;
+};
+
+type HouseholdMember = {
+  id: string;
+  nickname: string;
+  avatarId: number;
   isOwner: boolean;
 };
 
@@ -45,6 +60,20 @@ export default function Household() {
       apiFetch<HouseholdListItem[]>("/api/households", { signal }),
   });
 
+  const {
+    data: members,
+    isPending: memberPending,
+    error: memberError,
+  } = useQuery({
+    queryKey: ["members", activeHouseholdId],
+    queryFn: ({ signal }) =>
+      apiFetch<HouseholdMember[]>(
+        `/api/households/${activeHouseholdId}/members`,
+        { signal },
+      ),
+    enabled: activeHouseholdId !== null,
+  });
+
   const isOwner =
     households?.find((h) => h.id === activeHouseholdId)?.isOwner ?? false;
 
@@ -66,6 +95,7 @@ export default function Household() {
 
   if (householdPending) return <Text>Laddar...</Text>;
   if (householdError) return <Text>{householdError.message}</Text>;
+
   return (
     <View style={{ gap: spacing.md, padding: spacing.md }}>
       <View style={ui.card}>
@@ -118,7 +148,6 @@ export default function Household() {
             </View>
           )}
         </View>
-        {/* <Text>Antal medlemmar</Text> */}
       </View>
       <View style={ui.card}>
         <Text style={typography.label}>Anslutningskod</Text>
@@ -127,10 +156,44 @@ export default function Household() {
           Dela koden för att bjuda in andra till hushållet
         </Text>
       </View>
-      {/* VG Krav finns i issue #77 <View style={ui.card}>
+      <View style={ui.card}>
         <Text style={typography.label}>Medlemmar</Text>
-        <FlatList data={listan med aktiva hushållets medlemmar} />
+        {memberPending && <Text>Medlemmar laddar...</Text>}
+        {memberError ? (
+          <Text>{memberError.message}</Text>
+        ) : (
+          <FlatList
+            data={members}
+            contentContainerStyle={{ gap: spacing.sm }}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+            renderItem={({ item: member }) => {
+              const avatar = avatars.find((a) => a.id === member.avatarId);
+              return (
+                <View style={styles.memberCard}>
+                  <View
+                    style={[styles.avatar, { backgroundColor: avatar?.color }]}
+                  >
+                    <Text>{avatar?.name}</Text>
+                  </View>
+                  <Text style={[typography.body, styles.memberNickname]}>
+                    {member.nickname}
+                  </Text>
+                  <Text
+                    style={[
+                      ui.badge,
+                      member.isOwner ? ui.badgeOwner : ui.badgeMember,
+                    ]}
+                  >
+                    {member.isOwner ? "Ägare" : "Medlem"}
+                  </Text>
+                </View>
+              );
+            }}
+          />
+        )}
       </View>
+      {/* VG Krav finns i issue #95
       <View style={ui.card}>
         <Text style={typography.body}>Ansökningar</Text>
       </View> */}
@@ -155,5 +218,20 @@ const styles = StyleSheet.create({
   },
   edit: {
     gap: spacing.sm,
+  },
+  avatar: {
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    width: 40,
+    height: 40,
+  },
+  memberCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  memberNickname: {
+    flex: 1,
   },
 });
