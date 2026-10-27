@@ -15,6 +15,7 @@ Gemensam guide för testfilerna i den här mappen. Här finns inloggning, testda
 | [households-tasks-complete.md](households-tasks-complete.md) | #63   | `POST /api/households/:id/tasks/:taskId/complete` |
 | [households-stats.md](households-stats.md) | #64 | `GET /api/households/:id/stats?period=week` |
 | [households-members.md](households-members.md) | #76 | `GET /api/households/:id/members` |
+| [households-requests.md](households-requests.md) | #94 | `GET /api/households/:id/requests`, `POST .../requests/:memberId/approve` och `DELETE .../requests/:memberId` |
 
 ## Starta servern
 
@@ -130,6 +131,9 @@ Gäller alla routes under `/api/households`. Utan cookie ska varje route svara `
 | `PATCH /api/households/<id>/members/me` (#51)             | `401`          |
 | `POST /api/households/<id>/tasks/<taskId>/complete` (#63) | `401`          |
 | `GET /api/households/<id>/stats?period=week` (#64) | `401` |
+| `GET /api/households/<id>/requests` (#94) | `401` |
+| `POST /api/households/<id>/requests/<memberId>/approve` (#94) | `401` |
+| `DELETE /api/households/<id>/requests/<memberId>` (#94) | `401` |
 
 ```bash
 curl -i "localhost:3000/api/households/<id>/stats?period=week"
@@ -167,6 +171,12 @@ curl -i -X PATCH localhost:3000/api/households/<id>/members/me \
   -d '{"nickname":"Anna"}'
   
 curl -i -X POST localhost:3000/api/households/<id>/tasks/<taskId>/complete
+
+curl -i localhost:3000/api/households/<id>/requests
+
+curl -i -X POST localhost:3000/api/households/<id>/requests/<memberId>/approve
+
+curl -i -X DELETE localhost:3000/api/households/<id>/requests/<memberId>
 ```
 
 Bodyn till sysslor måste vara giltig. Annars svarar valideringen `400` innan sessionen kontrolleras.
