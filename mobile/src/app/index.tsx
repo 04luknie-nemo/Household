@@ -1,12 +1,27 @@
+import { AuthContext } from "@/components/auth-provider";
 import DayView from "@/components/day-view";
+import { HouseholdContext } from "@/components/household-provider";
 import StatisticsView from "@/components/statistics";
-import { periods } from "@/constants/periods";
-import { useState } from "react";
+import { apiPeriods, periods } from "@/constants/periods";
+import { statsQueryOptions } from "@/lib/stats";
+import { useQueries } from "@tanstack/react-query";
+import { useContext, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [period, setPeriod] = useState<number>(0);
+
+  const { activeHouseholdId } = useContext(HouseholdContext);
+  const { userId, sessionId } = useContext(AuthContext);
+
+  useQueries({
+    queries: apiPeriods
+      .filter((apiPeriod) => apiPeriod !== null)
+      .map((apiPeriod) =>
+        statsQueryOptions(userId, sessionId, activeHouseholdId, apiPeriod),
+      ),
+  });
 
   function handleBack() {
     if (period === periods.length - 1) return;

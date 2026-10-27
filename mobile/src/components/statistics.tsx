@@ -4,28 +4,13 @@ import {
   statisticsStyles as styles,
   typography,
 } from "@/constants/theme";
-import { apiFetch } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { AuthContext } from "./auth-provider";
 import { HouseholdContext } from "./household-provider";
-import StatisticsPie, { type MemberPoints } from "./statistics-pie";
-
-type MemberTotal = MemberPoints & {
-  nickname: string;
-};
-
-type TaskStats = {
-  taskId: string;
-  title: string;
-  members: MemberPoints[];
-};
-
-type Stats = {
-  total: MemberTotal[];
-  perTask: TaskStats[];
-};
+import StatisticsPie from "./statistics-pie";
+import { statsQueryOptions } from "@/lib/stats";
 
 export default function StatisticsView({ period }: { period: number }) {
   const { activeHouseholdId } = useContext(HouseholdContext);
@@ -39,15 +24,9 @@ export default function StatisticsView({ period }: { period: number }) {
     error,
     refetch,
     isRefetching,
-  } = useQuery<Stats>({
-    queryKey: ["stats", userId, sessionId, activeHouseholdId, apiPeriod],
-    enabled: !!activeHouseholdId && !!userId && !!apiPeriod,
-    queryFn: ({ signal }) =>
-      apiFetch<Stats>(
-        `/api/households/${activeHouseholdId}/stats?period=${apiPeriod}`,
-        { signal },
-      ),
-  });
+  } = useQuery(
+    statsQueryOptions(userId, sessionId, activeHouseholdId, apiPeriod),
+  );
 
   if (!apiPeriod) {
     return null;
