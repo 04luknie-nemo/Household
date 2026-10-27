@@ -1,17 +1,28 @@
 import { Hono } from "hono";
-import { auth } from "../lib/auth.ts";
 import { db } from "../../prisma/db.ts";
+import { auth } from "../lib/auth.ts";
 
 const stats = new Hono();
 
 function periodRange(period: string | undefined) {
+  if (period !== "week" && period !== "lastWeek") {
+    return null;
+  }
+
   // Samma lokala tidszon som dagsvyn. Kalenderdagar hanterar sommartid.
   const now = new Date();
   const monday = new Date(now);
   monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
   monday.setHours(0, 0, 0, 0);
 
-  return { from: monday, to: now}
+  if (period === "lastWeek") {
+    const lastMonday = new Date(monday);
+    lastMonday.setDate(lastMonday.getDate() - 7);
+
+    return { from: lastMonday, to: monday };
+  }
+
+  return { from: monday, to: now };
 }
 
 stats.get("/:id/stats", async (c) => {
@@ -42,17 +53,11 @@ stats.get("/:id/stats", async (c) => {
     return c.text("Ogiltig period", 400);
   }
 
-  // Samma lokala tidszon som dagsvyn. Kalenderdagar hanterar sommartid.
-  const now = new Date();
-  const monday = new Date(now);
-  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
-  monday.setHours(0, 0, 0, 0);
-
   const completedTasks = await db.completedTask.findMany({
     where: {
       task: { householdId: household.id },
       member: { householdId: household.id },
-      createdAt: { gte: range.from, lte: range.to },
+      createdAt: { gte: range.from, lt: range.to },
     },
     select: {
       task: { select: { id: true, title: true, worth: true } },

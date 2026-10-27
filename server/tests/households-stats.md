@@ -1,6 +1,6 @@
-﻿# Statistik denna vecka (#64)
+# Statistik denna och förra veckan (#64, #101)
 
-Route: `GET /api/households/:id/stats?period=week`.
+Route: `GET /api/households/:id/stats?period=week` eller `period=lastWeek`.
 Följ [README](README.md) för server, användare och cookies. Kör kommandona
 från `server/` i Bash/Git Bash (i PowerShell: använd `curl.exe` och anpassa radbrytningarna).
 Använd ett nytt testhushåll så att befintliga markeringar inte påverkar resultatet.
@@ -139,7 +139,7 @@ curl -i "localhost:3000/api/households/<id>/stats?period=week"
 curl -i -b cookies-c.txt "localhost:3000/api/households/<id>/stats?period=week"
 curl -i -b cookies.txt "localhost:3000/api/households/finns-inte/stats?period=week"
 curl -i -b cookies.txt "localhost:3000/api/households/<id>/stats?period=month"
-curl -i -b cookies.txt "localhost:3000/api/households/<id>/stats?period=lastWeek"
+curl -i -b cookies.txt "localhost:3000/api/households/<id>/stats?period=lastweek"
 curl -i -b cookies.txt "localhost:3000/api/households/<id>/stats"
 ```
 
@@ -152,3 +152,93 @@ GET med cookies-b.txt ska ge 403 i båda fallen. Återställ B till `active`: 20
 
 Skapa ett annat hushåll med en syssla och markera den som gjord.
 Statistiken för det första hushållet ska vara oförändrad.
+
+## 8. Förra veckan (#101)
+
+Dessa fall testar `period=lastWeek`. `lastMonth` läggs till i nästa steg och
+är ännu inte en giltig period.
+
+### Förbered ett separat testhushåll
+
+Kör från `server/` med servern igång. Använd samma tidszon för servern och
+kommandona nedan, enligt inledningen. A är inloggad i `cookies.txt`.
+Skapa ett nytt hushåll så att markeringarna från fall 1–7 inte påverkar resultatet:
+
+```bash
+curl -i -b cookies.txt -X POST "localhost:3000/api/households" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test av förra veckan"}'
+```
+
+Spara svarets `id` som `<historik-id>`. Skapa sedan en syssla:
+
+```bash
+curl -i -b cookies.txt -X POST "localhost:3000/api/households/<historik-id>/tasks" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Testsyssla","description":"","reoccurInDays":7,"worth":4}'
+```
+
+Spara sysslans `id` som `<historik-task>`. Hämta medlemskapet för A:
+
+```bash
+npx tsx -e "import('./prisma/db.ts').then(async ({ db }) => console.log(await db.householdMember.findMany({ where: { householdId: '<historik-id>' } })))"
+```
+
+Spara medlemskapets `id` som `<historik-medlem>` (inte `userId`). Ersätt alla
+platshållare inklusive vinkelparenteserna i följande kommandon.
+
+### Tom period
+
+```bash
+curl -i -b cookies.txt "localhost:3000/api/households/<historik-id>/stats?period=lastWeek"
+curl -i -b cookies.txt "localhost:3000/api/households/<historik-id>/stats?period=week"
+```
+
+Båda ska ge 200 och `{"total":[],"perTask":[]}`.
+
+### Startgräns, slutgräns och uppdelning mellan veckorna
+
+Kör följande **en gång**. Det skapar fyra markeringar på testsysslan:
+
+- En millisekund före förra måndagen: ska inte räknas i någon av de två veckorna.
+- Exakt förra måndagen 00:00: ska räknas i `lastWeek`.
+- En millisekund före denna måndag: ska räknas i `lastWeek`.
+- Exakt denna måndag 00:00: ska räknas i `week`, men inte i `lastWeek`.
+
+```bash
+npx tsx -e "import('./prisma/db.ts').then(async ({ db }) => { const monday=new Date(); monday.setDate(monday.getDate()-((monday.getDay()+6)%7)); monday.setHours(0,0,0,0); const lastMonday=new Date(monday); lastMonday.setDate(lastMonday.getDate()-7); const dates=[new Date(lastMonday.getTime()-1),lastMonday,new Date(monday.getTime()-1),monday]; console.log(await db.completedTask.createMany({data:dates.map(createdAt=>({memberId:'<historik-medlem>',taskId:'<historik-task>',createdAt}))})); })"
+curl -i -b cookies.txt "localhost:3000/api/households/<historik-id>/stats?period=lastWeek"
+curl -i -b cookies.txt "localhost:3000/api/households/<historik-id>/stats?period=week"
+```
+
+Förväntat:
+
+| Period | `total` | `perTask` |
+| --- | --- | --- |
+| `lastWeek` | A har 8 poäng | Testsyssla har A med 8 poäng |
+| `week` | A har 4 poäng | Testsyssla har A med 4 poäng |
+
+A har avatarId 1 som hushållets skapare. `total` ska också innehålla A:s nickname.
+Inga andra medlemmar eller sysslor ska finnas i svaren. Kör inte seed-kommandot
+igen i samma testhushåll: det lägger till ytterligare markeringar och dubblar poängen.
+
+### Felkoder för lastWeek
+
+```bash
+curl -i "localhost:3000/api/households/<historik-id>/stats?period=lastWeek"
+curl -i -b cookies-c.txt "localhost:3000/api/households/<historik-id>/stats?period=lastWeek"
+curl -i -b cookies.txt "localhost:3000/api/households/finns-inte/stats?period=lastWeek"
+curl -i -b cookies.txt "localhost:3000/api/households/<historik-id>/stats?period=lastweek"
+```
+
+Förväntat i ordning: 401, 403, 404, 400. C får inte vara medlem i testhushållet.
+För pending/left-kontroller: använd B:s medlemskap i det ursprungliga hushållet
+från fall 6. Sätt status via README avsnitt 4 och anropa:
+
+```bash
+curl -i -b cookies-b.txt "localhost:3000/api/households/<id>/stats?period=lastWeek"
+```
+
+Förväntat: 403 för både pending och left, 200 efter återställning till active.
+Kör även de befintliga veckotesterna på ett nytt testhushåll för att kontrollera
+att `week` fortfarande fungerar.
