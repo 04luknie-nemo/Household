@@ -4,7 +4,7 @@ import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
@@ -121,7 +121,7 @@ export default function SelectHousehold() {
                     <View style={styles.selectedCheck}>
                       <Ionicons
                         name="checkmark"
-                        size={14}
+                        size={20}
                         color={colors.onPrimary}
                       />
                     </View>
@@ -135,19 +135,27 @@ export default function SelectHousehold() {
         </View>
 
         <View style={styles.actions}>
-          <Link href="/create-household" style={styles.actionLink}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push("/create-household")}
+            style={styles.actionLink}
+          >
             <Ionicons
               name="add-circle-outline"
-              size={17}
+              size={20}
               color={colors.primary}
             />
             <Text style={styles.actionText}>Skapa nytt hushåll</Text>
-          </Link>
+          </Pressable>
 
-          <Link href="/join-household" style={styles.actionLink}>
-            <Ionicons name="people-outline" size={17} color={colors.primary} />
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push("/join-household")}
+            style={styles.actionLink}
+          >
+            <Ionicons name="people-outline" size={20} color={colors.primary} />
             <Text style={styles.actionText}>Gå med i hushåll</Text>
-          </Link>
+          </Pressable>
         </View>
       </View>
 
@@ -282,6 +290,7 @@ const styles = {
   actionLink: {
     flexDirection: "row" as const,
     alignItems: "center" as const,
+    justifyContent: "center" as const,
     gap: spacing.xs,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xs,
