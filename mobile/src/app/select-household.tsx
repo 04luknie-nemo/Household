@@ -1,6 +1,6 @@
 import { AuthContext } from "@/components/auth-provider";
 import { HouseholdContext } from "@/components/household-provider";
-import { ui } from "@/constants/theme";
+import { spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { Link, router } from "expo-router";
@@ -42,10 +42,12 @@ export default function SelectHousehold() {
   }
 
   return (
-    <View style={{ gap: 32 }}>
-      <View style={{ gap: 16, borderWidth: 1, padding: 16 }}>
-        <Text>Här kommer listan på dina hushåll</Text>
-        <Text>Klicka på hushåll för att välja det</Text>
+    <View style={{ padding: spacing.md, gap: spacing.lg }}>
+      <View style={{ gap: spacing.md }}>
+        <Text style={typography.title}>Välj hushåll</Text>
+        <Text style={typography.body}>
+          Välj vilket hushåll du vill fortsätta till.
+        </Text>
         {households?.map((household) => (
           <Pressable
             key={household.id}
