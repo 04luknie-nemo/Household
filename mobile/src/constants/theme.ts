@@ -40,6 +40,31 @@ export const typography = {
   caption: { fontSize: 12, color: colors.textMuted },
 } satisfies Record<string, TextStyle>;
 
+export const position = StyleSheet.create({
+  horizantalCenter: {
+    display: "flex",
+    justifyContent: "center",
+  },
+});
+
+export const statisticsStyles = StyleSheet.create({
+  scroll: { flex: 1 },
+  content: { paddingVertical: spacing.lg, gap: spacing.lg },
+  diagram: { alignItems: "center", gap: spacing.xs, width: "100%" },
+  totalChart: { width: 190, aspectRatio: 1 },
+  taskChart: { width: "100%", maxWidth: 108, aspectRatio: 1 },
+  title: { ...typography.label, textAlign: "center" },
+  grid: { flexDirection: "row", flexWrap: "wrap", rowGap: spacing.md },
+  task: { width: "33.333%", paddingHorizontal: spacing.xs },
+  legend: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: spacing.xs,
+  },
+  legendText: { ...typography.caption, color: colors.text },
+});
+
 // Gemensamma stilar för komponenter som finns på flera skärmar i Figma.
 // Kombinera med en array, t.ex. style={[ui.card, ui.cardSelected]}.
 export const ui = StyleSheet.create({

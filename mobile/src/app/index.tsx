@@ -29,14 +29,7 @@ export default function Index() {
         </Pressable>
       </View>
       <View style={styles.stretch}>
-        {period === 0 ? (
-          <DayView />
-        ) : (
-          // Statistik komponent
-          <View>
-            <StatisticsView period={period} />
-          </View>
-        )}
+        {period === 0 ? <DayView /> : <StatisticsView period={period} />}
       </View>
     </SafeAreaView>
   );
