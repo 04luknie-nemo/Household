@@ -13,7 +13,7 @@ Gemensam guide för testfilerna i den här mappen. Här finns inloggning, testda
 | [households-tasks-edit.md](households-tasks-edit.md) | #55   | `GET` och `PATCH /api/households/:id/tasks/:taskId` |
 | [households-profile.md](households-profile.md)       | #51   | `GET` och `PATCH /api/households/:id/members/me` |
 | [households-tasks-complete.md](households-tasks-complete.md) | #63   | `POST /api/households/:id/tasks/:taskId/complete` |
-| [households-stats.md](households-stats.md) | #64 | `GET /api/households/:id/stats?period=week` |
+| [households-stats.md](households-stats.md) | #64, #101 | `GET /api/households/:id/stats` med `period=week`, `lastWeek` eller `lastMonth` |
 | [households-members.md](households-members.md) | #76 | `GET /api/households/:id/members` |
 | [households-requests.md](households-requests.md) | #94 | `GET /api/households/:id/requests`, `POST .../requests/:memberId/approve` och `DELETE .../requests/:memberId` |
 
@@ -131,12 +131,16 @@ Gäller alla routes under `/api/households`. Utan cookie ska varje route svara `
 | `PATCH /api/households/<id>/members/me` (#51)             | `401`          |
 | `POST /api/households/<id>/tasks/<taskId>/complete` (#63) | `401`          |
 | `GET /api/households/<id>/stats?period=week` (#64) | `401` |
+| `GET /api/households/<id>/stats?period=lastWeek` (#101) | `401` |
+| `GET /api/households/<id>/stats?period=lastMonth` (#101) | `401` |
 | `GET /api/households/<id>/requests` (#94) | `401` |
 | `POST /api/households/<id>/requests/<memberId>/approve` (#94) | `401` |
 | `DELETE /api/households/<id>/requests/<memberId>` (#94) | `401` |
 
 ```bash
 curl -i "localhost:3000/api/households/<id>/stats?period=week"
+curl -i "localhost:3000/api/households/<id>/stats?period=lastWeek"
+curl -i "localhost:3000/api/households/<id>/stats?period=lastMonth"
 
 curl -i -X POST localhost:3000/api/households \
   -H "Content-Type: application/json" -d '{"name":"Test"}'

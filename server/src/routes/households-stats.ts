@@ -1,8 +1,34 @@
 import { Hono } from "hono";
-import { auth } from "../lib/auth.ts";
 import { db } from "../../prisma/db.ts";
+import { auth } from "../lib/auth.ts";
 
 const stats = new Hono();
+
+function periodRange(period: string | undefined) {
+  if (period !== "week" && period !== "lastWeek" && period !== "lastMonth") {
+    return null;
+  }
+
+  // Samma lokala tidszon som dagsvyn. Kalenderdagar hanterar sommartid.
+  const now = new Date();
+  const monday = new Date(now);
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  monday.setHours(0, 0, 0, 0);
+
+  if (period === "lastWeek") {
+    const lastMonday = new Date(monday);
+    lastMonday.setDate(lastMonday.getDate() - 7);
+
+    return { from: lastMonday, to: monday };
+  } else if (period === "lastMonth") {
+    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+    return { from: lastMonth, to: thisMonth };
+  }
+
+  return { from: monday, to: now };
+}
 
 stats.get("/:id/stats", async (c) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
@@ -26,21 +52,17 @@ stats.get("/:id/stats", async (c) => {
   if (household.members[0]?.status !== "active") {
     return c.text("Inte medlem", 403);
   }
-  if (c.req.query("period") !== "week") {
+
+  const range = periodRange(c.req.query("period"));
+  if (!range) {
     return c.text("Ogiltig period", 400);
   }
-
-  // Samma lokala tidszon som dagsvyn. Kalenderdagar hanterar sommartid.
-  const now = new Date();
-  const monday = new Date(now);
-  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
-  monday.setHours(0, 0, 0, 0);
 
   const completedTasks = await db.completedTask.findMany({
     where: {
       task: { householdId: household.id },
       member: { householdId: household.id },
-      createdAt: { gte: monday, lte: now },
+      createdAt: { gte: range.from, lt: range.to },
     },
     select: {
       task: { select: { id: true, title: true, worth: true } },
