@@ -1,5 +1,6 @@
 import { colors } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Link, router, Stack } from "expo-router";
 import { useContext } from "react";
@@ -91,9 +92,25 @@ export default function RootStack() {
           name="task-modal"
           options={{
             presentation: "modal",
+            title: "Lägg Till",
             headerLeft: () => (
-              <Pressable onPress={() => router.back()} style={{ padding: 12 }}>
-                <Text>X</Text>
+              <Pressable
+                onPress={() => router.back()}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: colors.background,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginLeft: 12,
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="close-circle-outline"
+                  size={20}
+                  color={colors.text}
+                />
               </Pressable>
             ),
             headerRight: () => null,
