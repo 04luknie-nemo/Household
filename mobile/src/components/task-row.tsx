@@ -1,4 +1,4 @@
-import { avatars } from "@/constants/avatars";
+import Avatar from "@/components/avatar";
 import { spacing, typography, ui } from "@/constants/theme";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -27,17 +27,9 @@ export default function TaskRow({
 
       {doneTodayBy.length > 0 ? (
         <View style={s.row}>
-          {doneTodayBy.map((avatarId) => {
-            const avatar = avatars.find((avatar) => avatar.id === avatarId);
-
-            if (!avatar) return null;
-
-            return (
-              <Text key={avatarId} style={{ backgroundColor: avatar.color }}>
-                {avatar.name}
-              </Text>
-            );
-          })}
+          {doneTodayBy.map((avatarId) => (
+            <Avatar key={avatarId} avatarId={avatarId} size="sm" />
+          ))}
         </View>
       ) : (
         <View>
@@ -53,6 +45,7 @@ export default function TaskRow({
 const s = StyleSheet.create({
   row: {
     flexDirection: "row",
+    gap: spacing.xs,
   },
   titleContainer: {
     flex: 1,

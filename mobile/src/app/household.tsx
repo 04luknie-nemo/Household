@@ -1,7 +1,7 @@
 import { AuthContext } from "@/components/auth-provider";
+import Avatar from "@/components/avatar";
 import { HouseholdContext } from "@/components/household-provider";
-import { avatars } from "@/constants/avatars";
-import { colors, radius, spacing, typography, ui } from "@/constants/theme";
+import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +14,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+
 type HouseholdDetail = {
   id: string;
   name: string;
@@ -167,39 +168,33 @@ export default function Household() {
             contentContainerStyle={{ gap: spacing.sm }}
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
-            renderItem={({ item: member }) => {
-              const avatar = avatars.find((a) => a.id === member.avatarId);
-              return (
-                <View style={styles.memberCard}>
-                  <View
-                    style={[styles.avatar, { backgroundColor: avatar?.color }]}
-                  >
-                    <Text>{avatar?.name}</Text>
-                  </View>
-                  <Text style={[typography.body, styles.memberNickname]}>
-                    {member.nickname}
-                  </Text>
-                  <Text
-                    style={[
-                      ui.badge,
-                      member.isOwner ? ui.badgeOwner : ui.badgeMember,
-                    ]}
-                  >
-                    {member.isOwner ? "Ägare" : "Medlem"}
-                  </Text>
-                </View>
-              );
-            }}
+            renderItem={({ item: member }) => (
+              <View style={styles.memberCard}>
+                <Avatar avatarId={member.avatarId} />
+                <Text style={[typography.body, styles.memberNickname]}>
+                  {member.nickname}
+                </Text>
+                <Text
+                  style={[
+                    ui.badge,
+                    member.isOwner ? ui.badgeOwner : ui.badgeMember,
+                  ]}
+                >
+                  {member.isOwner ? "Ägare" : "Medlem"}
+                </Text>
+              </View>
+            )}
           />
         )}
       </View>
       {/* VG Krav finns i issue #95
-      <View style={ui.card}>
-        <Text style={typography.body}>Ansökningar</Text>
-      </View> */}
+          <View style={ui.card}>
+            <Text style={typography.body}>Ansökningar</Text>
+          </View> */}
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   center: {
     alignSelf: "center",
@@ -218,13 +213,6 @@ const styles = StyleSheet.create({
   },
   edit: {
     gap: spacing.sm,
-  },
-  avatar: {
-    borderRadius: radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
-    width: 40,
-    height: 40,
   },
   memberCard: {
     flexDirection: "row",

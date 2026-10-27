@@ -60,7 +60,7 @@ export default function StatisticsView({ period }: { period: number }) {
   if (error) {
     return (
       <View style={styles.content}>
-        <Text style={[typography.body, position.horizantalCenter]}>
+        <Text style={[typography.body, position.horizontalCenter]}>
           Kunde inte hämta statistiken. Kontrollera nätverksanslutningen och
           försök igen senare...
         </Text>
@@ -80,7 +80,7 @@ export default function StatisticsView({ period }: { period: number }) {
       }
     >
       {stats.total.length === 0 ? (
-        <Text style={[typography.title, position.horizantalCenter]}>
+        <Text style={[typography.title, position.horizontalCenter]}>
           Inga sysslor har gjorts denna veckan.
         </Text>
       ) : (
