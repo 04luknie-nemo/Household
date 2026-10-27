@@ -42,12 +42,13 @@ export default function SelectHousehold() {
   }
 
   return (
-    <View style={{ padding: spacing.md, gap: spacing.lg }}>
-      <View style={{ gap: spacing.md }}>
-        <Text style={typography.title}>Välj hushåll</Text>
-        <Text style={typography.body}>
-          Välj vilket hushåll du vill fortsätta till.
-        </Text>
+    <View style={{ gap: spacing.md }}>
+      <Text style={typography.title}>Välj hushåll</Text>
+      <Text style={typography.body}>
+        Välj vilket hushåll du vill fortsätta till.
+      </Text>
+
+      <View style={{ gap: spacing.sm }}>
         {households?.map((household) => (
           <Pressable
             key={household.id}
@@ -59,25 +60,22 @@ export default function SelectHousehold() {
               selectedHouseholdId === household.id && ui.cardSelected,
             ]}
           >
-            <Text>
-              {household.name}{" "}
-              {household.status === "pending" && " - Väntar på godkännande"}
-            </Text>
+            <Text style={typography.label}>{household.name}</Text>
           </Pressable>
         ))}
-        <Pressable
-          disabled={selectedHouseholdId === null}
-          onPress={() => {
-            if (selectedHouseholdId !== null) {
-              setActiveHouseholdId(selectedHouseholdId);
-              router.replace("/");
-            }
-          }}
-          style={ui.button}
-        >
-          <Text style={ui.buttonText}>Fortsätt</Text>
-        </Pressable>
       </View>
+      <Pressable
+        disabled={selectedHouseholdId === null}
+        onPress={() => {
+          if (selectedHouseholdId !== null) {
+            setActiveHouseholdId(selectedHouseholdId);
+            router.replace("/");
+          }
+        }}
+        style={ui.button}
+      >
+        <Text style={ui.buttonText}>Fortsätt</Text>
+      </Pressable>
 
       <Link href="/create-household" style={{ borderWidth: 1, padding: 16 }}>
         <Text>Skapa hushåll</Text>
