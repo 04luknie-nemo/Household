@@ -4,6 +4,16 @@ import { db } from "../../prisma/db.ts";
 
 const stats = new Hono();
 
+function periodRange(period: string | undefined) {
+  // Samma lokala tidszon som dagsvyn. Kalenderdagar hanterar sommartid.
+  const now = new Date();
+  const monday = new Date(now);
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  monday.setHours(0, 0, 0, 0);
+
+  return { from: monday, to: now}
+}
+
 stats.get("/:id/stats", async (c) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   if (!session) {
@@ -26,7 +36,9 @@ stats.get("/:id/stats", async (c) => {
   if (household.members[0]?.status !== "active") {
     return c.text("Inte medlem", 403);
   }
-  if (c.req.query("period") !== "week") {
+
+  const range = periodRange(c.req.query("period"));
+  if (!range) {
     return c.text("Ogiltig period", 400);
   }
 
@@ -40,7 +52,7 @@ stats.get("/:id/stats", async (c) => {
     where: {
       task: { householdId: household.id },
       member: { householdId: household.id },
-      createdAt: { gte: monday, lte: now },
+      createdAt: { gte: range.from, lte: range.to },
     },
     select: {
       task: { select: { id: true, title: true, worth: true } },
