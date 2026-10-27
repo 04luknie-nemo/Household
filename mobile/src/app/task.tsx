@@ -51,21 +51,6 @@ function getErrorMessage(error: Error) {
   }
 }
 
-function isNotFoundError(error: Error | null) {
-  if (!error) return false;
-
-  try {
-    const body = JSON.parse(error.message) as {
-      status?: number;
-      statusCode?: number;
-    };
-
-    return body.status === 404 || body.statusCode === 404;
-  } catch {
-    return /\b404\b/.test(error.message);
-  }
-}
-
 export default function Task() {
   const { id: paramId } = useLocalSearchParams<{ id: string }>();
   const taskId = Array.isArray(paramId) ? paramId[0] : paramId;
@@ -136,14 +121,6 @@ export default function Task() {
     );
   }
 
-  if (!activeHouseholdId) {
-    return (
-      <View style={styles.messageContainer}>
-        <Text style={typography.body}>Välj ett hushåll först.</Text>
-      </View>
-    );
-  }
-
   if (taskQuery.isPending) {
     return (
       <View style={styles.messageContainer}>
@@ -162,11 +139,9 @@ export default function Task() {
             : "Sysslan kunde inte hittas."}
         </Text>
 
-        {!isNotFoundError(taskQuery.error) && (
-          <Pressable style={ui.button} onPress={() => taskQuery.refetch()}>
-            <Text style={ui.buttonText}>Försök igen</Text>
-          </Pressable>
-        )}
+        <Pressable style={ui.button} onPress={() => taskQuery.refetch()}>
+          <Text style={ui.buttonText}>Försök igen</Text>
+        </Pressable>
       </View>
     );
   }
