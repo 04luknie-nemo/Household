@@ -121,11 +121,17 @@ export default function RootStack() {
       <Stack.Protected guard={isLoggedIn}>
         <Stack.Screen
           name="select-household"
-          options={{ headerRight: () => null }}
+          options={{
+            title: "Välj hushåll",
+            headerRight: () => null,
+          }}
         />
         <Stack.Screen
           name="create-household"
-          options={{ headerRight: () => null }}
+          options={{
+            title: "Skapa hushåll",
+            headerRight: () => null,
+          }}
         />
         <Stack.Screen
           name="join-household"
