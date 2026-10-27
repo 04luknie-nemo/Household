@@ -301,8 +301,8 @@ const styles = {
   },
 
   continueButton: {
-    width: "85%" as const,
-    minHeight: 42,
+    width: "100%" as const,
+    minHeight: 45,
     paddingVertical: spacing.sm,
     alignSelf: "center" as const,
     justifyContent: "center" as const,
