@@ -3,6 +3,7 @@ import DayView from "@/components/day-view";
 import { HouseholdContext } from "@/components/household-provider";
 import StatisticsView from "@/components/statistics";
 import { apiPeriods, periods } from "@/constants/periods";
+import { typography } from "@/constants/theme";
 import { statsQueryOptions } from "@/lib/stats";
 import { useQueries } from "@tanstack/react-query";
 import { useContext, useState } from "react";
@@ -15,7 +16,7 @@ export default function Index() {
   const { activeHouseholdId } = useContext(HouseholdContext);
   const { userId, sessionId } = useContext(AuthContext);
 
-  useQueries({
+  const statsQueries = useQueries({
     queries: apiPeriods
       .filter((apiPeriod) => apiPeriod !== null)
       .map((apiPeriod) =>
@@ -23,13 +24,25 @@ export default function Index() {
       ),
   });
 
+  const hasStatsError = statsQueries.some((query) => query.isError);
+
+  const visiblePeriods = [
+    0,
+    ...statsQueries.flatMap((query, index) =>
+      (query.data?.total.length ?? 0) > 0 ? [index + 1] : [],
+    ),
+  ];
+
+  const selectedPeriod = visiblePeriods.includes(period) ? period : 0;
+  const selectedIndex = visiblePeriods.indexOf(selectedPeriod);
+
   function handleBack() {
-    if (period === periods.length - 1) return;
-    setPeriod((prev) => prev + 1);
+    if (selectedIndex >= visiblePeriods.length - 1) return;
+    setPeriod(visiblePeriods[selectedIndex + 1]);
   }
   function handleForward() {
-    if (period === 0) return;
-    setPeriod((prev) => prev - 1);
+    if (selectedIndex <= 0) return;
+    setPeriod(visiblePeriods[selectedIndex - 1]);
   }
 
   return (
@@ -38,13 +51,22 @@ export default function Index() {
         <Pressable onPress={handleBack} style={styles.arrowbtn}>
           <Text>{"<"}</Text>
         </Pressable>
-        <Text>{periods[period]}</Text>
+        <Text>{periods[selectedPeriod]}</Text>
         <Pressable onPress={handleForward} style={styles.arrowbtn}>
           <Text>{">"}</Text>
         </Pressable>
       </View>
+      {hasStatsError && (
+        <Text style={typography.body}>
+          Kunde inte hämta statistik för alla perioder. Försök igen senare...
+        </Text>
+      )}
       <View style={styles.stretch}>
-        {period === 0 ? <DayView /> : <StatisticsView period={period} />}
+        {selectedPeriod === 0 ? (
+          <DayView />
+        ) : (
+          <StatisticsView period={selectedPeriod} />
+        )}
       </View>
     </SafeAreaView>
   );

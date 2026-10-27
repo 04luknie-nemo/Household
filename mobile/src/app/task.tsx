@@ -107,7 +107,7 @@ export default function Task() {
           queryKey: ["task", userId, sessionId, activeHouseholdId, taskId],
         }),
         queryClient.invalidateQueries({
-          queryKey: ["stats-this-week", userId, sessionId, activeHouseholdId],
+          queryKey: ["stats"],
         }),
       ]);
     },
