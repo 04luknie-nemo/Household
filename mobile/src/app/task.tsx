@@ -1,7 +1,7 @@
 import { AuthContext } from "@/components/auth-provider";
+import Avatar from "@/components/avatar";
 import { HouseholdContext } from "@/components/household-provider";
-import { avatars } from "@/constants/avatars";
-import { colors, radius, spacing, typography, ui } from "@/constants/theme";
+import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
@@ -179,20 +179,13 @@ export default function Task() {
           ) : (
             <View style={styles.avatarList}>
               {doneTodayBy.map((avatarId) => {
-                const avatar = avatars.find((item) => item.id === avatarId);
                 const member = membersQuery.data?.find(
                   (item) => item.avatarId === avatarId,
                 );
 
-                if (!avatar) return null;
-
                 return (
                   <View key={avatarId} style={styles.contributor}>
-                    <View
-                      style={[styles.avatar, { backgroundColor: avatar.color }]}
-                    >
-                      <Text style={styles.avatarText}>{avatar.name}</Text>
-                    </View>
+                    <Avatar avatarId={avatarId} />
 
                     <Text style={typography.caption}>
                       {member?.nickname || "Okänd"}
@@ -277,17 +270,6 @@ const styles = StyleSheet.create({
   contributor: {
     alignItems: "center",
     gap: spacing.xs,
-  },
-  avatar: {
-    minWidth: 40,
-    minHeight: 40,
-    borderRadius: radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: spacing.xs,
-  },
-  avatarText: {
-    fontSize: 20,
   },
   footer: {
     padding: spacing.md,

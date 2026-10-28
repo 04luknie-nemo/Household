@@ -41,9 +41,8 @@ export const typography = {
 } satisfies Record<string, TextStyle>;
 
 export const position = StyleSheet.create({
-  horizantalCenter: {
-    display: "flex",
-    justifyContent: "center",
+  horizontalCenter: {
+    textAlign: "center",
   },
 });
 
@@ -165,5 +164,25 @@ export const ui = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarSm: {
+    width: 24,
+    height: 24,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarEmoji: {
+    fontSize: 20,
+  },
+  avatarEmojiSm: {
+    fontSize: 13,
   },
 });
