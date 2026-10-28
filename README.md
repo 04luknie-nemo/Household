@@ -20,6 +20,16 @@ Kryssrutorna i kravlistan nedan visar vad som är klart i main. Avvikelser från
 
 Appikonen och splashen syns bara i en dev build (`npx expo run:android`), inte i Expo Go.
 
+## Medverkande
+
+- Lukas Niemi ([04luknie-nemo](https://github.com/04luknie-nemo))
+- Christian Olausson ([Olausson44](https://github.com/Olausson44))
+- Martin ([Coolastelammetcodes](https://github.com/Coolastelammetcodes))
+- Mattias ([MattiasMeza](https://github.com/MattiasMeza))
+- Shahad ([shahadAlroomi](https://github.com/shahadAlroomi))
+
+Produktägare: David Jensen.
+
 ## Arbetssätt med AI
 
 Gruppen använder AI-assistenter i projektet. Se [docs/AI-ARBETSSATT.md](docs/AI-ARBETSSATT.md) för hur vi delar upp arbetet och granskar kod.
@@ -38,7 +48,7 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 ### Hushåll
 
 - [x] Ett hushåll ska ha ett namn och en genererad (enkel) kod så andra kan gå med i hushållet. Namnet ska gå att ändra. \*
-- [ ] Alla användare i ett hushåll ska kunna se vilka som tillhör ett hushåll.
+- [x] Alla användare i ett hushåll ska kunna se vilka som tillhör ett hushåll.
 - [ ] En ägare av ett hushåll ska kunna se förfrågningar om att gå med i hushållet.
 - [ ] En ägare ska kunna acceptera eller neka förfrågningar.
 - [ ] En ägare ska kunna göra andra till ägare.
@@ -55,17 +65,17 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 
 ### Profil
 
-- [ ] En användare ska kunna ange sitt namn. \*
-- [ ] En användare ska kunna välja en avatar (emoji-djur och färg) från en fördefinierad lista. \*
-- [ ] Valda avatarer ska inte kunna väljas av andra användare i hushållet. \*
+- [x] En användare ska kunna ange sitt namn. \*
+- [x] En användare ska kunna välja en avatar (emoji-djur och färg) från en fördefinierad lista. \*
+- [x] Valda avatarer ska inte kunna väljas av andra användare i hushållet. \*
 - [x] Avataren ska användas i appen för att visa vad användaren har gjort. \*
 - [ ] En användare ska kunna ställa in appens utseende (mörkt, ljust, auto).
 - [x] Om en användare tillhör två eller fler hushåll ska den kunna byta mellan hushållen.
 
 ### Sysslor
 
-- [ ] En ägare ska kunna lägga till sysslor att göra i hemmet. \*
-- [ ] En syssla ska ha ett namn, en beskrivning, hur ofta den ska göras (dagar) och en vikt som beskriver hur energikrävande den är. \*
+- [x] En ägare ska kunna lägga till sysslor att göra i hemmet. \*
+- [x] En syssla ska ha ett namn, en beskrivning, hur ofta den ska göras (dagar) och en vikt som beskriver hur energikrävande den är. \*
 - [ ] En användare ska kunna lägga till en ljudinspelning och en bild för att beskriva sysslan.
 - [ ] En ägare ska kunna redigera en syssla. \*
 - [ ] En ägare ska kunna ta bort en syssla.
@@ -75,16 +85,16 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 
 - [x] Alla sysslor ska listas i en dagsvy och ge en översikt kring vad som behöver göras. \*
 - [x] Utöver namnet ska vem/vilka som gjort sysslan visas, hur många dagar sedan den gjordes senast och om den är försenad. \*
-- [ ] När en användare väljer en syssla visas beskrivningen, och med ett enkelt tryck går sysslan att markera som gjord. \*
+- [x] När en användare väljer en syssla visas beskrivningen, och med ett enkelt tryck går sysslan att markera som gjord. \*
 
 ### Statistik
 
-- [ ] En användare ska kunna se fördelningen av gjorda sysslor mellan användarna i sitt hushåll. \*
-- [ ] Varje statistikvy ska visa den totala fördelningen (med vikterna inräknade) och fördelningen för varje enskild syssla. \*
-- [ ] Det ska finnas en statistikvy över "nuvarande vecka". \*
-- [ ] Det ska finnas en statistikvy över "förra veckan".
-- [ ] Det ska finnas en statistikvy över "förra månaden".
-- [ ] Om det inte finns statistik för en vy ska vyn inte visas.
+- [x] En användare ska kunna se fördelningen av gjorda sysslor mellan användarna i sitt hushåll. \*
+- [x] Varje statistikvy ska visa den totala fördelningen (med vikterna inräknade) och fördelningen för varje enskild syssla. \*
+- [x] Det ska finnas en statistikvy över "nuvarande vecka". \*
+- [x] Det ska finnas en statistikvy över "förra veckan".
+- [x] Det ska finnas en statistikvy över "förra månaden".
+- [x] Om det inte finns statistik för en vy ska vyn inte visas.
 
 ### Schemaläggning
 
