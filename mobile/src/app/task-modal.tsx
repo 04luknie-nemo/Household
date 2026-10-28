@@ -2,6 +2,8 @@ import { AuthContext } from "@/components/auth-provider";
 import { HouseholdContext } from "@/components/household-provider";
 import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
+import { reoccurLabel } from "@/lib/reoccur";
+import { Ionicons } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
@@ -177,71 +179,58 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
       >
         <Text style={styles.label}>Återkommer:</Text>
 
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: spacing.sm,
-          }}
-        >
-          <Text style={styles.valueText}>var</Text>
+        <View style={{ position: "relative" }}>
+          <Pressable
+            style={styles.reoccurButton}
+            accessibilityRole="button"
+            accessibilityLabel={`Återkommer ${reoccurLabel(task.reoccurInDays)}. Ändra`}
+            accessibilityState={{ expanded: showDays }}
+            onPress={() => {
+              setShowWorth(false);
+              setShowDays(!showDays);
+            }}
+          >
+            <Text style={styles.reoccurButtonText}>
+              {reoccurLabel(task.reoccurInDays)}
+            </Text>
+            <Ionicons
+              name={showDays ? "chevron-up" : "chevron-down"}
+              size={16}
+              color={colors.onPrimary}
+            />
+          </Pressable>
 
-          <View style={{ position: "relative" }}>
-            <Pressable
-              style={{
-                backgroundColor: colors.primary,
-                borderRadius: radius.pill,
-                width: 24,
-                height: 24,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              accessibilityRole="button"
-              accessibilityLabel="Välj antal dagar"
-              accessibilityState={{ expanded: showDays }}
-              onPress={() => {
-                setShowWorth(false);
-                setShowDays(!showDays);
-              }}
-            >
-              <Text style={{ color: colors.onPrimary }}>
-                {task.reoccurInDays}
-              </Text>
-            </Pressable>
-
-            {showDays && (
-              <View style={[ui.card, styles.dropdown]}>
-                <ScrollView
-                  style={{ maxHeight: 200 }}
-                  keyboardShouldPersistTaps="handled"
-                  nestedScrollEnabled
-                >
-                  {days.map((day) => (
-                    <Pressable
-                      key={day}
-                      accessibilityRole="button"
-                      accessibilityState={{
-                        selected: task.reoccurInDays === day,
-                      }}
-                      onPress={() => {
-                        setTask({ ...task, reoccurInDays: day });
-                        setShowDays(false);
-                      }}
-                      style={({ pressed }) => [
-                        styles.dropdownOption,
-                        (pressed || task.reoccurInDays === day) &&
-                          styles.dropdownOptionActive,
-                      ]}
-                    >
-                      <Text style={styles.dropdownText}>{day}</Text>
-                    </Pressable>
-                  ))}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
-          <Text style={styles.valueText}>dag</Text>
+          {showDays && (
+            <View style={[ui.card, styles.dropdown, styles.daysDropdown]}>
+              <ScrollView
+                style={{ maxHeight: 200 }}
+                keyboardShouldPersistTaps="handled"
+                nestedScrollEnabled
+              >
+                {days.map((day) => (
+                  <Pressable
+                    key={day}
+                    accessibilityRole="button"
+                    accessibilityState={{
+                      selected: task.reoccurInDays === day,
+                    }}
+                    onPress={() => {
+                      setTask({ ...task, reoccurInDays: day });
+                      setShowDays(false);
+                    }}
+                    style={({ pressed }) => [
+                      styles.dropdownOption,
+                      styles.daysOption,
+                      (pressed || task.reoccurInDays === day) &&
+                        styles.dropdownOptionActive,
+                    ]}
+                  >
+                    <Text style={styles.dropdownText}>{reoccurLabel(day)}</Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
+          )}
         </View>
       </View>
 
@@ -389,10 +378,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
   },
-  valueText: {
-    color: colors.text,
-    fontSize: 18,
-  },
   repeatCard: {
     minHeight: 55,
     paddingVertical: spacing.sm + spacing.xs,
@@ -417,6 +402,27 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     alignItems: "center",
     justifyContent: "center",
+  },
+  reoccurButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    backgroundColor: colors.primary,
+    borderRadius: radius.pill,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+  },
+  reoccurButtonText: {
+    color: colors.onPrimary,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  daysDropdown: {
+    width: 160,
+  },
+  daysOption: {
+    alignItems: "flex-start",
+    paddingHorizontal: spacing.sm,
   },
   dropdownOptionActive: {
     backgroundColor: colors.background,
