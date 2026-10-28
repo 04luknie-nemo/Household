@@ -7,6 +7,7 @@ import list from "./households-list.ts";
 import members from "./households-members.ts";
 import profile from "./households-profile.ts";
 import requests from "./households-requests.ts";
+import handleSetOwner from "./households-set-owner.ts";
 import stats from "./households-stats.ts";
 import tasksComplete from "./households-tasks-complete.ts";
 import tasksEdit from "./households-tasks-edit.ts";
@@ -28,5 +29,6 @@ households.route("/", tasksComplete);
 households.route("/", members);
 households.route("/", requests);
 households.route("/", leave);
+households.route("/", handleSetOwner);
 
 export default households;
