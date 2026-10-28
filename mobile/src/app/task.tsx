@@ -4,7 +4,7 @@ import { HouseholdContext } from "@/components/household-provider";
 import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { useContext } from "react";
 import {
   ActivityIndicator,
@@ -153,9 +153,7 @@ export default function Task() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.heading}>
-          <Text style={[typography.title, styles.title]}>{task.title}</Text>
-        </View>
+        <Stack.Screen options={{ title: task.title }} />
 
         <View style={ui.card}>
           <Text style={typography.label}>Beskrivning</Text>
@@ -164,7 +162,7 @@ export default function Task() {
           </Text>
         </View>
 
-        <View style={styles.contributors}>
+        <View style={ui.card}>
           <Text style={typography.label}>Medverkande</Text>
 
           {tasksQuery.isPending || membersQuery.isPending ? (
@@ -250,18 +248,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.md,
     backgroundColor: colors.background,
-  },
-  heading: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: spacing.md,
-  },
-  title: {
-    flex: 1,
-  },
-  contributors: {
-    gap: spacing.md,
   },
   avatarList: {
     flexDirection: "row",
