@@ -86,7 +86,7 @@ export default function SelectHousehold() {
                   ui.card,
                   styles.householdCard,
                   pending && styles.pendingCard,
-                  selected && styles.selectedCard,
+                  selected && ui.cardSelected,
                 ]}
               >
                 <View style={styles.cardContent}>
@@ -196,9 +196,8 @@ const styles = {
   },
 
   description: {
-    Color: "#000000",
     ...typography.caption,
-    fontSize: 13,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
 
@@ -210,22 +209,7 @@ const styles = {
     minHeight: 60,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
-    borderRadius: radius.md,
     justifyContent: "center" as const,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: "transparent",
-  },
-
-  selectedCard: {
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-  },
-
-  pendingCard: {
-    backgroundColor: "#E7E7E7",
-    borderWidth: 0,
-    boxShadow: "none",
   },
 
   cardContent: {
@@ -254,12 +238,10 @@ const styles = {
 
   householdName: {
     ...typography.label,
-    fontSize: 13,
   },
 
   householdSubtitle: {
     ...typography.caption,
-    fontSize: 11,
   },
 
   selectedCheck: {
@@ -297,9 +279,8 @@ const styles = {
   },
 
   actionText: {
+    ...typography.label,
     color: colors.primary,
-    fontSize: 12,
-    fontWeight: "600" as const,
   },
 
   bottom: {
@@ -326,5 +307,9 @@ const styles = {
     alignItems: "center" as const,
     justifyContent: "center" as const,
     padding: spacing.md,
+  },
+  pendingCard: {
+    backgroundColor: "#E7E7E7",
+    boxShadow: "none",
   },
 };
