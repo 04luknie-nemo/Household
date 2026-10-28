@@ -1,5 +1,6 @@
 import { apiPeriods, periods } from "@/constants/periods";
 import {
+  emptyText,
   position,
   statisticsStyles as styles,
   typography,
@@ -62,8 +63,8 @@ export default function StatisticsView({ period }: { period: number }) {
       }
     >
       {stats.total.length === 0 ? (
-        <Text style={[typography.title, position.horizontalCenter]}>
-          Inga sysslor har gjorts denna perioden.
+        <Text style={emptyText.title}>
+          Inga sysslor har gjorts denna period.
         </Text>
       ) : (
         <>
