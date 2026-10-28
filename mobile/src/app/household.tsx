@@ -1,7 +1,7 @@
 import { AuthContext } from "@/components/auth-provider";
 import Avatar from "@/components/avatar";
 import { HouseholdContext } from "@/components/household-provider";
-import { colors, spacing, typography, ui } from "@/constants/theme";
+import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -234,66 +234,86 @@ export default function Household() {
           />
         )}
       </View>
-      {isOwner && requests && requests.length > 0 && (
-        <View style={ui.card}>
-          <Text style={typography.label}>Ansökningar</Text>
+      {isOwner &&
+        (requestsPending || requestsError || (requests?.length ?? 0) > 0) && (
+          <View style={ui.card}>
+            <Text style={typography.label}>Ansökningar</Text>
 
-          {requests.map((request) => (
-            <View key={request.id} style={styles.memberCard}>
-              <Avatar avatarId={request.avatarId} />
+            {requests?.map((request) => (
+              <View key={request.id} style={styles.memberCard}>
+                <Avatar avatarId={request.avatarId} />
 
-              <Text style={[typography.body, styles.memberNickname]}>
-                {request.nickname}
-              </Text>
+                <Text style={[typography.body, styles.memberNickname]}>
+                  {request.nickname}
+                </Text>
 
-              <Text style={[ui.badge, ui.badgePending]}>Väntar</Text>
+                <Text style={[ui.badge, ui.badgePending]}>Väntar</Text>
 
-              <View style={styles.actions}>
-                <Pressable
-                  style={[ui.button, styles.action]}
-                  onPress={() => approveMutation.mutate(request.id)}
-                  disabled={
-                    approveMutation.isPending || rejectMutation.isPending
-                  }
-                >
-                  <Text style={ui.buttonText}>Godkänn</Text>
-                </Pressable>
+                <View style={styles.actions}>
+                  <Pressable
+                    style={[styles.iconButton, styles.rejectButton]}
+                    onPress={() => rejectMutation.mutate(request.id)}
+                    disabled={
+                      approveMutation.isPending || rejectMutation.isPending
+                    }
+                    accessibilityRole="button"
+                    accessibilityLabel={`Neka ${request.nickname}`}
+                  >
+                    <Ionicons name="close" size={18} color={colors.textMuted} />
+                  </Pressable>
 
-                <Pressable
-                  style={[ui.button, ui.buttonSecondary, styles.action]}
-                  onPress={() => rejectMutation.mutate(request.id)}
-                  disabled={
-                    approveMutation.isPending || rejectMutation.isPending
-                  }
-                >
-                  <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
-                    Neka
-                  </Text>
-                </Pressable>
+                  <Pressable
+                    style={[styles.iconButton, styles.approveButton]}
+                    onPress={() => approveMutation.mutate(request.id)}
+                    disabled={
+                      approveMutation.isPending || rejectMutation.isPending
+                    }
+                    accessibilityRole="button"
+                    accessibilityLabel={`Godkänn ${request.nickname}`}
+                  >
+                    <Ionicons
+                      name="checkmark"
+                      size={18}
+                      color={colors.onPrimary}
+                    />
+                  </Pressable>
+                </View>
               </View>
-            </View>
-          ))}
+            ))}
 
-          {requestsPending && <Text>Laddar ansökningar...</Text>}
+            {requestsPending && <Text>Laddar ansökningar...</Text>}
 
-          {requestsError && (
-            <Text style={[typography.caption, { color: colors.primary }]}>
-              {requestsError.message}
-            </Text>
-          )}
+            {requestsError && (
+              <Text style={[typography.caption, { color: colors.primary }]}>
+                {requestsError.message}
+              </Text>
+            )}
 
-          {(approveMutation.error || rejectMutation.error) && (
-            <Text style={[typography.caption, { color: colors.primary }]}>
-              {(approveMutation.error || rejectMutation.error)?.message}
-            </Text>
-          )}
-        </View>
-      )}
+            {(approveMutation.error || rejectMutation.error) && (
+              <Text style={[typography.caption, { color: colors.primary }]}>
+                {(approveMutation.error || rejectMutation.error)?.message}
+              </Text>
+            )}
+          </View>
+        )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  iconButton: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  rejectButton: {
+    backgroundColor: colors.input,
+  },
+  approveButton: {
+    backgroundColor: colors.primary,
+  },
   center: {
     alignSelf: "center",
   },
