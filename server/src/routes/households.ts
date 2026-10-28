@@ -2,7 +2,10 @@ import { Hono } from "hono";
 import create from "./households-create.ts";
 import detail from "./households-detail.ts";
 import join from "./households-join.ts";
+import leave from "./households-leave.ts";
 import list from "./households-list.ts";
+import membersOwner from "./households-members-owner.ts";
+import members from "./households-members.ts";
 import profile from "./households-profile.ts";
 import requests from "./households-requests.ts";
 import stats from "./households-stats.ts";
@@ -10,7 +13,6 @@ import tasksComplete from "./households-tasks-complete.ts";
 import tasksEdit from "./households-tasks-edit.ts";
 import taskList from "./households-tasks-list.ts";
 import createTask from "./households-tasks.ts";
-import members from "./households-members.ts";
 
 const households = new Hono();
 
@@ -26,5 +28,7 @@ households.route("/", profile);
 households.route("/", tasksComplete);
 households.route("/", members);
 households.route("/", requests);
+households.route("/", leave);
+households.route("/", membersOwner);
 
 export default households;
