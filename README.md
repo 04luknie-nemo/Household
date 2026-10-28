@@ -54,7 +54,17 @@ Se [setup/README.md](setup/README.md) för miljövariabler, Android, iPhone och 
 
 Kryssrutorna i kravlistan nedan visar vad som är klart i main. Avvikelser från skisserna dokumenteras i [#73](https://github.com/04luknie-nemo/Household/issues/73).
 
-Appikonen och splashen syns bara i en dev build (`npx expo run:android`), inte i Expo Go.
+### Appikon och splash
+
+Appikonen och splashen syns bara i en riktig build (`npx expo run:android`), inte i Expo Go. Så här ser de ut:
+
+<p>
+  <img src="mobile/assets/images/icon.png" alt="Appikonen: ett vitt hus på rosa bakgrund" width="160" />
+  &nbsp;&nbsp;
+  <img src="docs/bilder/splash.png" alt="Splashen: rosa cirkel med ett vitt hus mitt på en ljusgrå skärm" width="160" />
+</p>
+
+Ikonen är `mobile/assets/images/icon.png`. Splashen visar `splash-icon.png` på bakgrunden `#F1F1F1`, enligt `app.json`.
 
 ## Medverkande
 
