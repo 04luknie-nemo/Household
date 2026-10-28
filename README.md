@@ -78,7 +78,9 @@ Produktägare: David Jensen.
 
 ## Avvikelser från skisserna
 
-Kravet säger att designen ska utgå från skisserna, och att undantag diskuteras med produktägaren, godkänns och dokumenteras. Tabellen visar var appen skiljer sig från Figma. Mindre stilfel rättas i [#132](https://github.com/04luknie-nemo/Household/issues/132) och står inte här.
+Kravet säger att designen ska utgå från skisserna, och att undantag diskuteras med produktägaren, godkänns och dokumenteras. Tabellen visar var appen skiljer sig från Figma. Appen följer skisserna: samma skärmar, samma rosa färg (`#CC5C6E`), ljusgrå bakgrund (`#F1F1F1`) och vita kort. Fyra avvikelser märks när man använder appen: headern, statistiken, profilen och rullgardinsmenyerna i Skapa syssla. Tabellen visar alla, jämförda med Figma den 28 oktober.
+
+Mindre stilfel rättas i [#132](https://github.com/04luknie-nemo/Household/issues/132): hushållets namn i headern, den tomma dagsvyn och statistiken, hushållets kort, att bara ägaren ser anslutningskoden, en etikett i Skapa hushåll och korten i detaljvyn. Tills #132 är mergad avviker de också.
 
 | Skärm        | Skissen                                                                | Appen                                                                                  | Varför                                                                                        | Godkänd av David |
 | ------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------- |
@@ -110,7 +112,7 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 
 - [x] En logga, splashscreen och appikon ska designas och användas. \*
 - [x] Applikationen ska byggas med RN, Expo och TS. \*
-- [x] Designen av appen ska utgå ifrån befintliga skisser. Undantag diskuteras med produktägaren, godkänns och dokumenteras. \*
+- [x] Designen av appen ska utgå ifrån befintliga skisser. Undantag diskuteras med produktägaren, godkänns och dokumenteras. \* Se [Avvikelser från skisserna](#avvikelser-från-skisserna).
 - [x] Information ska kommuniceras till och från en server.
 
 ### Hushåll
