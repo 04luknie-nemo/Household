@@ -2,20 +2,22 @@
 
 Gemensam guide för testfilerna i den här mappen. Här finns inloggning, testdata och de testfall som gäller alla routes. Varje route har sina egna testfall i en egen fil.
 
-| Fil                                                  | Issue | Route                                            |
-| ---------------------------------------------------- | ----- | ------------------------------------------------ |
-| [households-create.md](households-create.md)         | #26   | `POST /api/households`                           |
-| [households-join.md](households-join.md)             | #22   | `POST /api/households/join`                      |
-| [households-detail.md](households-detail.md)         | #28   | `GET` och `PATCH /api/households/:id`            |
-| [households-list.md](households-list.md)             | #31   | `GET /api/households`                            |
-| [households-tasks.md](households-tasks.md)           | #53   | `POST /api/households/:id/tasks`                 |
-| [households-tasks-list.md](households-tasks-list.md) | #56   | `GET /api/households/:id/tasks`                  |
-| [households-tasks-edit.md](households-tasks-edit.md) | #55   | `GET` och `PATCH /api/households/:id/tasks/:taskId` |
-| [households-profile.md](households-profile.md)       | #51   | `GET` och `PATCH /api/households/:id/members/me` |
-| [households-tasks-complete.md](households-tasks-complete.md) | #63   | `POST /api/households/:id/tasks/:taskId/complete` |
-| [households-stats.md](households-stats.md) | #64, #101 | `GET /api/households/:id/stats` med `period=week`, `lastWeek` eller `lastMonth` |
-| [households-members.md](households-members.md) | #76 | `GET /api/households/:id/members` |
-| [households-requests.md](households-requests.md) | #94 | `GET /api/households/:id/requests`, `POST .../requests/:memberId/approve` och `DELETE .../requests/:memberId` |
+| Fil                                                          | Issue     | Route                                                                                                         |
+| ------------------------------------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------- |
+| [households-create.md](households-create.md)                 | #26       | `POST /api/households`                                                                                        |
+| [households-join.md](households-join.md)                     | #22       | `POST /api/households/join`                                                                                   |
+| [households-detail.md](households-detail.md)                 | #28       | `GET` och `PATCH /api/households/:id`                                                                         |
+| [households-list.md](households-list.md)                     | #31       | `GET /api/households`                                                                                         |
+| [households-tasks.md](households-tasks.md)                   | #53       | `POST /api/households/:id/tasks`                                                                              |
+| [households-tasks-list.md](households-tasks-list.md)         | #56       | `GET /api/households/:id/tasks`                                                                               |
+| [households-tasks-edit.md](households-tasks-edit.md)         | #55       | `GET` och `PATCH /api/households/:id/tasks/:taskId`                                                           |
+| [households-profile.md](households-profile.md)               | #51       | `GET` och `PATCH /api/households/:id/members/me`                                                              |
+| [households-tasks-complete.md](households-tasks-complete.md) | #63       | `POST /api/households/:id/tasks/:taskId/complete`                                                             |
+| [households-stats.md](households-stats.md)                   | #64, #101 | `GET /api/households/:id/stats` med `period=week`, `lastWeek` eller `lastMonth`                               |
+| [households-members.md](households-members.md)               | #76       | `GET /api/households/:id/members`                                                                             |
+| [households-requests.md](households-requests.md)             | #94       | `GET /api/households/:id/requests`, `POST .../requests/:memberId/approve` och `DELETE .../requests/:memberId` |
+| [households-leave.md](households-leave.md)                   | #104      | `POST /api/households/:id/leave`                                                                              |
+| [households-members-owner.md](households-members-owner.md)   | #103      | `POST /api/households/:id/members/:memberId/owner`                                                            |
 
 ## Starta servern
 
@@ -116,26 +118,28 @@ npx prisma db push --force-reset
 
 Gäller alla routes under `/api/households`. Utan cookie ska varje route svara `401`.
 
-| Route                                                     | Förväntat svar |
-| --------------------------------------------------------- | -------------- |
-| `POST /api/households`                                    | `401`          |
-| `POST /api/households/join`                               | `401`          |
-| `GET /api/households` (#31)                               | `401`          |
-| `GET /api/households/<id>` (#28)                          | `401`          |
-| `PATCH /api/households/<id>` (#28)                        | `401`          |
-| `POST /api/households/<id>/tasks` (#53)                   | `401`          |
-| `GET /api/households/<id>/tasks` (#56)                    | `401`          |
-| `GET /api/households/<id>/tasks/<taskId>` (#55)           | `401`          |
-| `PATCH /api/households/<id>/tasks/<taskId>` (#55)         | `401`          |
-| `GET /api/households/<id>/members/me` (#51)               | `401`          |
-| `PATCH /api/households/<id>/members/me` (#51)             | `401`          |
-| `POST /api/households/<id>/tasks/<taskId>/complete` (#63) | `401`          |
-| `GET /api/households/<id>/stats?period=week` (#64) | `401` |
-| `GET /api/households/<id>/stats?period=lastWeek` (#101) | `401` |
-| `GET /api/households/<id>/stats?period=lastMonth` (#101) | `401` |
-| `GET /api/households/<id>/requests` (#94) | `401` |
-| `POST /api/households/<id>/requests/<memberId>/approve` (#94) | `401` |
-| `DELETE /api/households/<id>/requests/<memberId>` (#94) | `401` |
+| Route                                                         | Förväntat svar |
+| ------------------------------------------------------------- | -------------- |
+| `POST /api/households`                                        | `401`          |
+| `POST /api/households/join`                                   | `401`          |
+| `GET /api/households` (#31)                                   | `401`          |
+| `GET /api/households/<id>` (#28)                              | `401`          |
+| `PATCH /api/households/<id>` (#28)                            | `401`          |
+| `POST /api/households/<id>/tasks` (#53)                       | `401`          |
+| `GET /api/households/<id>/tasks` (#56)                        | `401`          |
+| `GET /api/households/<id>/tasks/<taskId>` (#55)               | `401`          |
+| `PATCH /api/households/<id>/tasks/<taskId>` (#55)             | `401`          |
+| `GET /api/households/<id>/members/me` (#51)                   | `401`          |
+| `PATCH /api/households/<id>/members/me` (#51)                 | `401`          |
+| `POST /api/households/<id>/tasks/<taskId>/complete` (#63)     | `401`          |
+| `GET /api/households/<id>/stats?period=week` (#64)            | `401`          |
+| `GET /api/households/<id>/stats?period=lastWeek` (#101)       | `401`          |
+| `GET /api/households/<id>/stats?period=lastMonth` (#101)      | `401`          |
+| `GET /api/households/<id>/requests` (#94)                     | `401`          |
+| `POST /api/households/<id>/requests/<memberId>/approve` (#94) | `401`          |
+| `DELETE /api/households/<id>/requests/<memberId>` (#94)       | `401`          |
+| `POST /api/households/<id>/leave` (#104)                      | `401`          |
+| `POST /api/households/<id>/members/<memberId>/owner` (#103)   | `401`          |
 
 ```bash
 curl -i "localhost:3000/api/households/<id>/stats?period=week"
@@ -173,7 +177,7 @@ curl -i localhost:3000/api/households/<id>/members/me
 curl -i -X PATCH localhost:3000/api/households/<id>/members/me \
   -H "Content-Type: application/json" \
   -d '{"nickname":"Anna"}'
-  
+
 curl -i -X POST localhost:3000/api/households/<id>/tasks/<taskId>/complete
 
 curl -i localhost:3000/api/households/<id>/requests
@@ -181,6 +185,10 @@ curl -i localhost:3000/api/households/<id>/requests
 curl -i -X POST localhost:3000/api/households/<id>/requests/<memberId>/approve
 
 curl -i -X DELETE localhost:3000/api/households/<id>/requests/<memberId>
+
+curl -i -X POST localhost:3000/api/households/<id>/leave
+
+curl -i -X POST localhost:3000/api/households/<id>/members/<memberId>/owner
 ```
 
 Bodyn till sysslor måste vara giltig. Annars svarar valideringen `400` innan sessionen kontrolleras.

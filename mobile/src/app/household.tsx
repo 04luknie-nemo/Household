@@ -1,6 +1,6 @@
 import { AuthContext } from "@/components/auth-provider";
+import Avatar from "@/components/avatar";
 import { HouseholdContext } from "@/components/household-provider";
-import { avatars } from "@/constants/avatars";
 import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,6 +14,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+
 type HouseholdDetail = {
   id: string;
   name: string;
@@ -32,6 +33,12 @@ type HouseholdMember = {
   nickname: string;
   avatarId: number;
   isOwner: boolean;
+};
+type HouseholdRequest = {
+  id: string;
+  nickname: string;
+  avatarId: number;
+  createdAt: string;
 };
 
 export default function Household() {
@@ -76,6 +83,47 @@ export default function Household() {
 
   const isOwner =
     households?.find((h) => h.id === activeHouseholdId)?.isOwner ?? false;
+
+  const {
+    data: requests,
+    isPending: requestsPending,
+    error: requestsError,
+  } = useQuery({
+    queryKey: ["requests", activeHouseholdId],
+    queryFn: ({ signal }) =>
+      apiFetch<HouseholdRequest[]>(
+        `/api/households/${activeHouseholdId}/requests`,
+        { signal },
+      ),
+    enabled: activeHouseholdId !== null && isOwner,
+  });
+  const approveMutation = useMutation({
+    mutationFn: (memberId: string) =>
+      apiFetch(
+        `/api/households/${activeHouseholdId}/requests/${memberId}/approve`,
+        { method: "POST" },
+      ),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["requests", activeHouseholdId],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["members"] });
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (memberId: string) =>
+      apiFetch<void>(
+        `/api/households/${activeHouseholdId}/requests/${memberId}`,
+        { method: "DELETE" },
+      ),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["requests", activeHouseholdId],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["members"] });
+    },
+  });
 
   function startEdit() {
     setName(household?.name ?? "");
@@ -167,40 +215,105 @@ export default function Household() {
             contentContainerStyle={{ gap: spacing.sm }}
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
-            renderItem={({ item: member }) => {
-              const avatar = avatars.find((a) => a.id === member.avatarId);
-              return (
-                <View style={styles.memberCard}>
-                  <View
-                    style={[styles.avatar, { backgroundColor: avatar?.color }]}
-                  >
-                    <Text>{avatar?.name}</Text>
-                  </View>
-                  <Text style={[typography.body, styles.memberNickname]}>
-                    {member.nickname}
-                  </Text>
-                  <Text
-                    style={[
-                      ui.badge,
-                      member.isOwner ? ui.badgeOwner : ui.badgeMember,
-                    ]}
-                  >
-                    {member.isOwner ? "Ägare" : "Medlem"}
-                  </Text>
-                </View>
-              );
-            }}
+            renderItem={({ item: member }) => (
+              <View style={styles.memberCard}>
+                <Avatar avatarId={member.avatarId} />
+                <Text style={[typography.body, styles.memberNickname]}>
+                  {member.nickname}
+                </Text>
+                <Text
+                  style={[
+                    ui.badge,
+                    member.isOwner ? ui.badgeOwner : ui.badgeMember,
+                  ]}
+                >
+                  {member.isOwner ? "Ägare" : "Medlem"}
+                </Text>
+              </View>
+            )}
           />
         )}
       </View>
-      {/* VG Krav finns i issue #95
-      <View style={ui.card}>
-        <Text style={typography.body}>Ansökningar</Text>
-      </View> */}
+      {isOwner &&
+        (requestsPending || requestsError || (requests?.length ?? 0) > 0) && (
+          <View style={ui.card}>
+            <Text style={typography.label}>Ansökningar</Text>
+
+            {requests?.map((request) => (
+              <View key={request.id} style={styles.memberCard}>
+                <Avatar avatarId={request.avatarId} />
+
+                <Text style={[typography.body, styles.memberNickname]}>
+                  {request.nickname}
+                </Text>
+
+                <Text style={[ui.badge, ui.badgePending]}>Väntar</Text>
+
+                <View style={styles.actions}>
+                  <Pressable
+                    style={[styles.iconButton, styles.rejectButton]}
+                    onPress={() => rejectMutation.mutate(request.id)}
+                    disabled={
+                      approveMutation.isPending || rejectMutation.isPending
+                    }
+                    accessibilityRole="button"
+                    accessibilityLabel={`Neka ${request.nickname}`}
+                  >
+                    <Ionicons name="close" size={18} color={colors.textMuted} />
+                  </Pressable>
+
+                  <Pressable
+                    style={[styles.iconButton, styles.approveButton]}
+                    onPress={() => approveMutation.mutate(request.id)}
+                    disabled={
+                      approveMutation.isPending || rejectMutation.isPending
+                    }
+                    accessibilityRole="button"
+                    accessibilityLabel={`Godkänn ${request.nickname}`}
+                  >
+                    <Ionicons
+                      name="checkmark"
+                      size={18}
+                      color={colors.onPrimary}
+                    />
+                  </Pressable>
+                </View>
+              </View>
+            ))}
+
+            {requestsPending && <Text>Laddar ansökningar...</Text>}
+
+            {requestsError && (
+              <Text style={[typography.caption, { color: colors.primary }]}>
+                {requestsError.message}
+              </Text>
+            )}
+
+            {(approveMutation.error || rejectMutation.error) && (
+              <Text style={[typography.caption, { color: colors.primary }]}>
+                {(approveMutation.error || rejectMutation.error)?.message}
+              </Text>
+            )}
+          </View>
+        )}
     </View>
   );
 }
+
 const styles = StyleSheet.create({
+  iconButton: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  rejectButton: {
+    backgroundColor: colors.input,
+  },
+  approveButton: {
+    backgroundColor: colors.primary,
+  },
   center: {
     alignSelf: "center",
   },
@@ -218,13 +331,6 @@ const styles = StyleSheet.create({
   },
   edit: {
     gap: spacing.sm,
-  },
-  avatar: {
-    borderRadius: radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
-    width: 40,
-    height: 40,
   },
   memberCard: {
     flexDirection: "row",

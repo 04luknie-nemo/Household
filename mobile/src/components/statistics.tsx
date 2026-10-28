@@ -1,53 +1,35 @@
-import { periods } from "@/constants/periods";
+import { apiPeriods, periods } from "@/constants/periods";
 import {
   position,
   statisticsStyles as styles,
   typography,
 } from "@/constants/theme";
-import { apiFetch } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { AuthContext } from "./auth-provider";
 import { HouseholdContext } from "./household-provider";
-import StatisticsPie, { type MemberPoints } from "./statistics-pie";
-
-type MemberTotal = MemberPoints & {
-  nickname: string;
-};
-
-type TaskStats = {
-  taskId: string;
-  title: string;
-  members: MemberPoints[];
-};
-
-type Stats = {
-  total: MemberTotal[];
-  perTask: TaskStats[];
-};
+import StatisticsPie from "./statistics-pie";
+import { statsQueryOptions } from "@/lib/stats";
 
 export default function StatisticsView({ period }: { period: number }) {
   const { activeHouseholdId } = useContext(HouseholdContext);
   const { userId, sessionId } = useContext(AuthContext);
+
+  const apiPeriod = apiPeriods[period];
+
   const {
     data: stats,
     isPending,
     error,
     refetch,
     isRefetching,
-  } = useQuery<Stats>({
-    queryKey: ["stats-this-week", userId, sessionId, activeHouseholdId],
-    enabled: !!activeHouseholdId && !!userId && period === 1,
-    queryFn: ({ signal }) =>
-      apiFetch<Stats>(
-        `/api/households/${activeHouseholdId}/stats?period=week`,
-        { signal },
-      ),
-  });
+  } = useQuery(
+    statsQueryOptions(userId, sessionId, activeHouseholdId, apiPeriod),
+  );
 
-  if (period !== 1) {
-    return <Text style={typography.body}>Kommer snart</Text>;
+  if (!apiPeriod) {
+    return null;
   }
 
   if (isPending) {
@@ -60,7 +42,7 @@ export default function StatisticsView({ period }: { period: number }) {
   if (error) {
     return (
       <View style={styles.content}>
-        <Text style={[typography.body, position.horizantalCenter]}>
+        <Text style={[typography.body, position.horizontalCenter]}>
           Kunde inte hämta statistiken. Kontrollera nätverksanslutningen och
           försök igen senare...
         </Text>
@@ -80,8 +62,8 @@ export default function StatisticsView({ period }: { period: number }) {
       }
     >
       {stats.total.length === 0 ? (
-        <Text style={[typography.title, position.horizantalCenter]}>
-          Inga sysslor har gjorts denna veckan.
+        <Text style={[typography.title, position.horizontalCenter]}>
+          Inga sysslor har gjorts denna perioden.
         </Text>
       ) : (
         <>

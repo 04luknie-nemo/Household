@@ -1,7 +1,7 @@
 import { AuthContext } from "@/components/auth-provider";
+import Avatar from "@/components/avatar";
 import { HouseholdContext } from "@/components/household-provider";
-import { avatars } from "@/constants/avatars";
-import { colors, radius, spacing, typography, ui } from "@/constants/theme";
+import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
@@ -14,6 +14,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type TaskDetails = {
   id: string;
@@ -125,7 +126,7 @@ export default function Task() {
           queryKey: ["task", userId, sessionId, activeHouseholdId, taskId],
         }),
         queryClient.invalidateQueries({
-          queryKey: ["stats-this-week", userId, sessionId, activeHouseholdId],
+          queryKey: ["stats"],
         }),
       ]);
     },
@@ -165,7 +166,7 @@ export default function Task() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -220,20 +221,13 @@ export default function Task() {
           ) : (
             <View style={styles.avatarList}>
               {doneTodayBy.map((avatarId) => {
-                const avatar = avatars.find((item) => item.id === avatarId);
                 const member = membersQuery.data?.find(
                   (item) => item.avatarId === avatarId,
                 );
 
-                if (!avatar) return null;
-
                 return (
                   <View key={avatarId} style={styles.contributor}>
-                    <View
-                      style={[styles.avatar, { backgroundColor: avatar.color }]}
-                    >
-                      <Text style={styles.avatarText}>{avatar.name}</Text>
-                    </View>
+                    <Avatar avatarId={avatarId} />
 
                     <Text style={typography.caption}>
                       {member?.nickname || "Okänd"}
@@ -277,7 +271,7 @@ export default function Task() {
           )}
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -321,17 +315,6 @@ const styles = StyleSheet.create({
   contributor: {
     alignItems: "center",
     gap: spacing.xs,
-  },
-  avatar: {
-    minWidth: 40,
-    minHeight: 40,
-    borderRadius: radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: spacing.xs,
-  },
-  avatarText: {
-    fontSize: 20,
   },
   footer: {
     padding: spacing.md,
