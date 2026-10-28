@@ -3,10 +3,11 @@ import DayView from "@/components/day-view";
 import { HouseholdContext } from "@/components/household-provider";
 import StatisticsView from "@/components/statistics";
 import { apiPeriods, periods } from "@/constants/periods";
-import { typography } from "@/constants/theme";
 import { statsQueryOptions } from "@/lib/stats";
 import { useQueries } from "@tanstack/react-query";
 import { useContext, useState } from "react";
+import { colors, spacing, typography } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -35,6 +36,8 @@ export default function Index() {
 
   const selectedPeriod = visiblePeriods.includes(period) ? period : 0;
   const selectedIndex = visiblePeriods.indexOf(selectedPeriod);
+  const canGoBack = period < periods.length - 1;
+  const canGoForward = period > 0;
 
   function handleBack() {
     if (selectedIndex >= visiblePeriods.length - 1) return;
@@ -47,13 +50,37 @@ export default function Index() {
 
   return (
     <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
-      <View style={{ flexDirection: "row", gap: 32, alignItems: "center" }}>
-        <Pressable onPress={handleBack} style={styles.arrowbtn}>
-          <Text>{"<"}</Text>
+      <View style={styles.periodBar}>
+        <Pressable
+          onPress={handleBack}
+          disabled={!canGoBack}
+          style={[styles.arrowBtn, !canGoBack && styles.disabledArrow]}
+          hitSlop={8}
+          accessibilityLabel="Föregående period"
+        >
+          <Ionicons
+            name="chevron-back"
+            size={24}
+            color={canGoBack ? colors.primary : colors.textMuted}
+          />
         </Pressable>
-        <Text>{periods[selectedPeriod]}</Text>
-        <Pressable onPress={handleForward} style={styles.arrowbtn}>
-          <Text>{">"}</Text>
+
+        <Text style={[typography.title, styles.periodTitle]}>
+          {periods[selectedPeriod]}
+        </Text>
+
+        <Pressable
+          onPress={handleForward}
+          disabled={!canGoForward}
+          style={[styles.arrowBtn, !canGoForward && styles.disabledArrow]}
+          hitSlop={8}
+          accessibilityLabel="Nästa period"
+        >
+          <Ionicons
+            name="chevron-forward"
+            size={24}
+            color={canGoForward ? colors.primary : colors.textMuted}
+          />
         </Pressable>
       </View>
       {hasStatsError && (
@@ -61,6 +88,7 @@ export default function Index() {
           Kunde inte hämta statistik för alla perioder. Försök igen senare...
         </Text>
       )}
+
       <View style={styles.stretch}>
         {selectedPeriod === 0 ? (
           <DayView />
@@ -76,14 +104,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 16,
+    padding: spacing.md,
   },
-  arrowbtn: {
+  periodBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  periodTitle: {
+    textAlign: "center",
+    flex: 1,
+  },
+  arrowBtn: {
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
     width: 44,
     height: 44,
+  },
+  disabledArrow: {
+    opacity: 0.4,
   },
   stretch: {
     flex: 1,
