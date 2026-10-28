@@ -250,7 +250,7 @@ export default function Household() {
           />
         )}
       </View>
-     
+
       {isOwner &&
         (requestsPending || requestsError || (requests?.length ?? 0) > 0) && (
           <View style={ui.card}>
@@ -276,11 +276,7 @@ export default function Household() {
                     accessibilityRole="button"
                     accessibilityLabel={`Neka ${request.nickname}`}
                   >
-                    <Ionicons
-                      name="close"
-                      size={18}
-                      color={colors.textMuted}
-                    />
+                    <Ionicons name="close" size={18} color={colors.textMuted} />
                   </Pressable>
 
                   <Pressable
