@@ -2,7 +2,7 @@ import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { Link, Redirect, router, Stack } from "expo-router";
+import { Link, router, Stack } from "expo-router";
 import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
 import { AuthContext } from "./auth-provider";
@@ -52,10 +52,6 @@ export default function RootStack() {
     );
   }
 
-  if (isLoggedIn && !hasActiveHousehold) {
-    return <Redirect href="/select-household" />;
-  }
-
   return (
     <Stack
       screenOptions={{
@@ -84,7 +80,10 @@ export default function RootStack() {
           ) : null,
       }}
     >
-      <Stack.Protected guard={isLoggedIn && hasActiveHousehold}>
+      <Stack.Protected
+        guard={isLoggedIn && hasActiveHousehold}
+        redirectTo={isLoggedIn ? "/select-household" : "/login"}
+      >
         <Stack.Screen
           name="index"
           options={{
@@ -151,7 +150,7 @@ export default function RootStack() {
         />
       </Stack.Protected>
 
-      <Stack.Protected guard={isLoggedIn}>
+      <Stack.Protected guard={isLoggedIn} redirectTo="/login">
         <Stack.Screen
           name="select-household"
           options={{
@@ -177,7 +176,10 @@ export default function RootStack() {
         />
       </Stack.Protected>
 
-      <Stack.Protected guard={!isLoggedIn}>
+      <Stack.Protected
+        guard={!isLoggedIn}
+        redirectTo={hasActiveHousehold ? "/" : "/select-household"}
+      >
         <Stack.Screen
           name="login"
           options={{ title: "Logga in", headerShown: false }}
