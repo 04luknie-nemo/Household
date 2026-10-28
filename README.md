@@ -52,7 +52,7 @@ Se [setup/README.md](setup/README.md) för miljövariabler, Android, iPhone och 
 2. Logga in med ett testkonto från [Testkonton](setup/README.md#testkonton). Alla har lösenordet `test1234`.
 3. Anna, Erik, Sara och Johan är aktiva i två hushåll var och väljer hushåll vid första inloggningen. Maja väntar på godkännande i Kompisar.
 
-Kryssrutorna i kravlistan nedan visar vad som är klart i main. Avvikelser från skisserna dokumenteras i [#73](https://github.com/04luknie-nemo/Household/issues/73).
+Kryssrutorna i kravlistan nedan visar vad som är klart i main. Avvikelser från skisserna står under [Avvikelser från skisserna](#avvikelser-från-skisserna).
 
 ### Appikon och splash
 
@@ -75,6 +75,26 @@ Ikonen är `mobile/assets/images/icon.png`. Splashen visar `splash-icon.png` på
 - Shahad ([shahadAlroomi](https://github.com/shahadAlroomi))
 
 Produktägare: David Jensen.
+
+## Avvikelser från skisserna
+
+Kravet säger att designen ska utgå från skisserna, och att undantag diskuteras med produktägaren, godkänns och dokumenteras. Tabellen visar var appen skiljer sig från Figma. Mindre stilfel rättas i [#132](https://github.com/04luknie-nemo/Household/issues/132) och står inte här.
+
+| Skärm        | Skissen                                                                | Appen                                                                    | Varför                                                                                | Godkänd av David |
+| ------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- | ---------------- |
+| Header       | Bokstaven P för profil och ett hus i en rosa ruta för att byta hushåll | Ikoner för profil och byt hushåll                                        | Ikonerna förklarar sig själva och kommer från samma ikonbibliotek som resten av appen |                  |
+| Splash       | Huset i en rosa cirkel med texten Hushållet under                      | Bara huset i en rosa cirkel. Syns inte i Expo Go, bara i en riktig build | Expo Go visar sin egen. Se bilderna under [Appikon och splash](#appikon-och-splash)   |                  |
+| Statistik    | Emoji inne i varje tårtbit                                             | Emoji och poäng under varje diagram                                      | Smala bitar blev oläsliga, och poängen visar vikten                                   |                  |
+| Statistik    | Även perioderna oktober och 2020                                       | Denna vecka, förra veckan och förra månaden. Tomma perioder visas inte   | Följer kravlistan                                                                     |                  |
+| Skapa syssla | En rad med siffror för återkommer och värde                            | Rullgardinsmenyer                                                        | Får plats på smala skärmar                                                            |                  |
+| Profil       | Knapp för mörkt läge                                                   | Inget mörkt läge                                                         | VG-krav som gruppen valt bort                                                         |                  |
+| Profil       | Avatarerna visas hela tiden                                            | Avatarerna visas när man trycker på pennan                               | Sidan blir kortare när man bara vill se profilen                                      |                  |
+| Hushåll      | E-post eller smeknamn under varje medlem                               | Bara smeknamnet                                                          | Servern skickar inte e-post till andra medlemmar                                      |                  |
+| Hushåll      | Knapparna Pausa och Återuppta på en medlem                             | Finns inte                                                               | VG-krav som gruppen valt bort                                                         |                  |
+| Hushåll      | Egen sida för en medlem med Gör till ägare                             | Knapp på medlemsraden (#107)                                             | Ett tryck i stället för två                                                           |                  |
+| Hushåll      | Koden ser ut som HEM-4821                                              | Koden ser ut som ABC234, som på skissen Hushåll skapat                   | Sex tecken utan förväxlingsbara tecken                                                |                  |
+
+Kolumnen Godkänd av David fylls i med datum när produktägaren har sett och godkänt avvikelsen.
 
 ## Arbetssätt med AI
 
