@@ -1,8 +1,9 @@
+import { AuthContext } from "@/components/auth-provider";
 import { HouseholdContext } from "@/components/household-provider";
-import { colors, radius, spacing, ui } from "@/constants/theme";
+import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
 import {
   Pressable,
@@ -20,6 +21,8 @@ type TaskInput = {
   worth: number;
 };
 
+type TaskDetails = TaskInput & { id: string };
+
 const emptyTask: TaskInput = {
   title: "",
   description: "",
@@ -36,19 +39,37 @@ type TaskFormProps = {
 const days = Array.from({ length: 31 }, (_, index) => index + 1);
 const worthOptions = [1, 2, 4, 6, 8];
 
+function closeModal(taskId?: string) {
+  if (router.canGoBack()) {
+    router.back();
+  } else if (taskId) {
+    router.replace({ pathname: "/task", params: { id: taskId } });
+  } else {
+    router.replace("/");
+  }
+}
+
 export default function TaskModal() {
-  const { id } = useLocalSearchParams<{ id?: string }>();
-  const isEdit = Boolean(id);
+  const { id: paramId } = useLocalSearchParams<{ id?: string }>();
+  const taskId = Array.isArray(paramId) ? paramId[0] : paramId;
+  const isEdit = Boolean(taskId);
   const { activeHouseholdId } = useContext(HouseholdContext);
+  const { userId, sessionId } = useContext(AuthContext);
 
   const {
     data: existingTask,
     isPending,
     isError,
-  } = useQuery<TaskInput>({
-    queryKey: ["task", activeHouseholdId, id],
-    queryFn: () => apiFetch(`/api/households/${activeHouseholdId}/tasks/${id}`),
-    enabled: isEdit && !!activeHouseholdId,
+    error,
+    refetch,
+  } = useQuery<TaskDetails>({
+    queryKey: ["task", userId, sessionId, activeHouseholdId, taskId],
+    queryFn: ({ signal }) =>
+      apiFetch<TaskDetails>(
+        `/api/households/${activeHouseholdId}/tasks/${taskId}`,
+        { signal },
+      ),
+    enabled: !!userId && !!sessionId && !!activeHouseholdId && isEdit,
   });
 
   if (!activeHouseholdId) {
@@ -59,8 +80,15 @@ export default function TaskModal() {
     return <Text>Hämtar sysslan...</Text>;
   }
 
-  if (isEdit && isError) {
-    return <Text>Kunde inte hämta sysslan.</Text>;
+  if (isEdit && isError && !existingTask) {
+    return (
+      <View style={styles.form}>
+        <Text>{error.message || "Kunde inte hämta sysslan."}</Text>
+        <Pressable style={ui.button} onPress={() => refetch()}>
+          <Text style={ui.buttonText}>Försök igen</Text>
+        </Pressable>
+      </View>
+    );
   }
 
   if (isEdit && !existingTask) {
@@ -68,12 +96,21 @@ export default function TaskModal() {
   }
 
   return (
-    <TaskForm
-      key={`${activeHouseholdId}-${id ?? "create"}`}
-      initialTask={isEdit ? existingTask! : emptyTask}
-      activeHouseholdId={activeHouseholdId}
-      taskId={id}
-    />
+    <>
+      <Stack.Screen
+        options={{
+          title: isEdit ? "Ändra syssla" : "Lägg Till",
+          headerTitleAlign: "center",
+          headerTitleStyle: typography.title,
+        }}
+      />
+      <TaskForm
+        key={`${userId}-${sessionId}-${activeHouseholdId}-${taskId ?? "create"}`}
+        initialTask={isEdit && existingTask ? existingTask : emptyTask}
+        activeHouseholdId={activeHouseholdId}
+        taskId={taskId}
+      />
+    </>
   );
 }
 
@@ -85,22 +122,15 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
   const [saveError, setSaveError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const queryClient = useQueryClient();
+  const { userId, sessionId } = useContext(AuthContext);
 
   return (
-    <View
-      style={{
-        padding: spacing.md,
-        gap: spacing.sm,
-        maxWidth: 400,
-        alignSelf: "center",
-        width: "100%",
-      }}
+    <ScrollView
+      contentContainerStyle={styles.form}
+      keyboardShouldPersistTaps="handled"
     >
       <TextInput
-        style={[
-          ui.input,
-          { backgroundColor: colors.card, borderRadius: radius.md },
-        ]}
+        style={[ui.input, ui.card, styles.input]}
         placeholder="Titel"
         placeholderTextColor={colors.textMuted}
         value={task.title}
@@ -119,9 +149,9 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
       <TextInput
         style={[
           ui.input,
+          ui.card,
+          styles.input,
           {
-            backgroundColor: colors.card,
-            borderRadius: radius.md,
             minHeight: 130,
             textAlignVertical: "top",
           },
@@ -137,6 +167,7 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
       <View
         style={[
           ui.card,
+          styles.repeatCard,
           {
             flexDirection: "row",
             alignItems: "center",
@@ -145,7 +176,7 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
           },
         ]}
       >
-        <Text>Återkommer:</Text>
+        <Text style={styles.label}>Återkommer:</Text>
 
         <View
           style={{
@@ -154,15 +185,15 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
             gap: spacing.sm,
           }}
         >
-          <Text>var</Text>
+          <Text style={styles.valueText}>var</Text>
 
           <View style={{ position: "relative" }}>
             <Pressable
               style={{
                 backgroundColor: colors.primary,
                 borderRadius: radius.pill,
-                width: 28,
-                height: 28,
+                width: 24,
+                height: 24,
                 alignItems: "center",
                 justifyContent: "center",
               }}
@@ -184,6 +215,7 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
                 <ScrollView
                   style={{ maxHeight: 200 }}
                   keyboardShouldPersistTaps="handled"
+                  nestedScrollEnabled
                 >
                   {days.map((day) => (
                     <Pressable
@@ -210,13 +242,14 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
             )}
           </View>
 
-          <Text>dag</Text>
+          <Text style={styles.valueText}>dag</Text>
         </View>
       </View>
 
       <View
         style={[
           ui.card,
+          styles.worthCard,
           {
             flexDirection: "row",
             justifyContent: "space-between",
@@ -225,9 +258,9 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
           },
         ]}
       >
-        <View style={{ gap: spacing.xs }}>
-          <Text style={{ fontWeight: "600" }}>Värde:</Text>
-          <Text style={{ color: colors.textMuted }}>
+        <View>
+          <Text style={styles.label}>Värde:</Text>
+          <Text style={{ color: colors.textMuted, fontSize: 12 }}>
             Hur energikrävande är sysslan?
           </Text>
         </View>
@@ -298,7 +331,7 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
           setIsSaving(true);
 
           try {
-            await apiFetch(
+            const savedTask = await apiFetch<TaskDetails>(
               `/api/households/${activeHouseholdId}/tasks${taskId ? `/${taskId}` : ""}`,
               {
                 method: taskId ? "PATCH" : "POST",
@@ -306,60 +339,92 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
               },
             );
 
-            await queryClient.invalidateQueries({
-              queryKey: ["tasks"],
-            });
-
             if (taskId) {
+              const taskKey = [
+                "task",
+                userId,
+                sessionId,
+                activeHouseholdId,
+                taskId,
+              ];
+              await queryClient.cancelQueries({ queryKey: taskKey });
+              queryClient.setQueryData(taskKey, savedTask);
               await queryClient.invalidateQueries({
-                queryKey: ["task"],
+                queryKey: taskKey,
               });
             }
-            router.back();
+
+            await Promise.all([
+              queryClient.invalidateQueries({
+                queryKey: ["tasks", userId, sessionId, activeHouseholdId],
+              }),
+              queryClient.invalidateQueries({
+                queryKey: [
+                  "stats-this-week",
+                  userId,
+                  sessionId,
+                  activeHouseholdId,
+                ],
+              }),
+            ]);
+
+            closeModal(taskId);
           } catch (error) {
             console.error("Kunde inte spara sysslan:", error);
-            setSaveError("Kunde inte spara sysslan. Försök igen.");
+            setSaveError(
+              error instanceof Error
+                ? error.message
+                : "Kunde inte spara sysslan. Försök igen.",
+            );
           } finally {
             setIsSaving(false);
           }
         }}
-        style={{
-          backgroundColor: colors.primary,
-          padding: spacing.md,
-          borderRadius: radius.pill,
-          alignItems: "center",
-          marginTop: spacing.sm,
-        }}
+        style={ui.button}
       >
-        <Text style={{ color: colors.onPrimary, fontWeight: "600" }}>
-          {isSaving ? "Sparar..." : "Spara"}
-        </Text>
+        <Text style={ui.buttonText}>{isSaving ? "Sparar..." : "Spara"}</Text>
       </Pressable>
 
       <Pressable
-        onPress={() => {
-          if (router.canGoBack()) {
-            router.back();
-          } else {
-            router.replace("/");
-          }
-        }}
-        style={{
-          backgroundColor: colors.card,
-          borderWidth: 1,
-          borderColor: colors.primary,
-          borderRadius: radius.pill,
-          padding: spacing.md,
-          alignItems: "center",
-        }}
+        disabled={isSaving}
+        onPress={() => closeModal(taskId)}
+        style={[ui.button, ui.buttonSecondary]}
       >
-        <Text style={{ color: colors.text, fontWeight: "600" }}>Avbryt</Text>
+        <Text style={[ui.buttonText, { color: colors.text }]}>Avbryt</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  form: {
+    padding: spacing.sm + spacing.xs,
+    gap: spacing.md,
+    maxWidth: 400,
+    alignSelf: "center",
+    width: "100%",
+  },
+  input: {
+    minHeight: 55,
+    fontSize: 18,
+  },
+  label: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  valueText: {
+    color: colors.text,
+    fontSize: 18,
+  },
+  repeatCard: {
+    minHeight: 55,
+    paddingVertical: spacing.sm + spacing.xs,
+  },
+  worthCard: {
+    minHeight: 70,
+    paddingVertical: spacing.sm + spacing.xs,
+  },
   dropdown: {
     position: "absolute",
     top: "100%",
