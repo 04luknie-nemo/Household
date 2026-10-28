@@ -122,7 +122,6 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
   const [saveError, setSaveError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const queryClient = useQueryClient();
-  const { userId, sessionId } = useContext(AuthContext);
 
   return (
     <ScrollView
@@ -331,7 +330,7 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
           setIsSaving(true);
 
           try {
-            const savedTask = await apiFetch<TaskDetails>(
+            await apiFetch(
               `/api/households/${activeHouseholdId}/tasks${taskId ? `/${taskId}` : ""}`,
               {
                 method: taskId ? "PATCH" : "POST",
@@ -339,33 +338,10 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
               },
             );
 
-            if (taskId) {
-              const taskKey = [
-                "task",
-                userId,
-                sessionId,
-                activeHouseholdId,
-                taskId,
-              ];
-              await queryClient.cancelQueries({ queryKey: taskKey });
-              queryClient.setQueryData(taskKey, savedTask);
-              await queryClient.invalidateQueries({
-                queryKey: taskKey,
-              });
-            }
-
             await Promise.all([
-              queryClient.invalidateQueries({
-                queryKey: ["tasks", userId, sessionId, activeHouseholdId],
-              }),
-              queryClient.invalidateQueries({
-                queryKey: [
-                  "stats-this-week",
-                  userId,
-                  sessionId,
-                  activeHouseholdId,
-                ],
-              }),
+              queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+              queryClient.invalidateQueries({ queryKey: ["task"] }),
+              queryClient.invalidateQueries({ queryKey: ["stats"] }),
             ]);
 
             closeModal(taskId);
@@ -390,7 +366,7 @@ function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
         onPress={() => closeModal(taskId)}
         style={[ui.button, ui.buttonSecondary]}
       >
-        <Text style={[ui.buttonText, { color: colors.text }]}>Avbryt</Text>
+        <Text style={[ui.buttonText, ui.buttonSecondaryText]}>Avbryt</Text>
       </Pressable>
     </ScrollView>
   );
