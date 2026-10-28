@@ -5,9 +5,11 @@ import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useContext, useState } from "react";
 import {
   FlatList,
+  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -40,8 +42,10 @@ export default function Household() {
 
   const [name, setName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
 
-  const { activeHouseholdId } = useContext(HouseholdContext);
+  const { activeHouseholdId, setActiveHouseholdId } =
+    useContext(HouseholdContext);
   const { userId, sessionId } = useContext(AuthContext);
 
   const {
@@ -91,6 +95,18 @@ export default function Household() {
     onSuccess: () => {
       setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ["households"] });
+    },
+  });
+  const leaveMutation = useMutation({
+    mutationFn: () =>
+      apiFetch(`/api/households/${activeHouseholdId}/leave`, {
+        method: "POST",
+      }),
+    onSuccess: async () => {
+      setShowLeaveConfirmation(false);
+      await queryClient.invalidateQueries({ queryKey: ["households"] });
+      setActiveHouseholdId(null);
+      router.replace("/select-household");
     },
   });
 
@@ -191,6 +207,59 @@ export default function Household() {
           <View style={ui.card}>
             <Text style={typography.body}>Ansökningar</Text>
           </View> */}
+
+      <View style={ui.card}>
+        <Pressable
+          style={ui.button}
+          onPress={() => setShowLeaveConfirmation(true)}
+        >
+          <Text style={ui.buttonText}>Lämna hushåll</Text>
+        </Pressable>
+      </View>
+      <Modal
+        visible={showLeaveConfirmation}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowLeaveConfirmation(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[ui.card, styles.modalCard]}>
+            <Text style={typography.title}>Lämna hushåll?</Text>
+
+            <Text style={typography.body}>
+              Vill du lämna {household?.name}? Dina gjorda sysslor finns kvar i
+              statistiken.
+            </Text>
+
+            <View style={styles.actions}>
+              <Pressable
+                style={[ui.button, ui.buttonSecondary, styles.action]}
+                onPress={() => setShowLeaveConfirmation(false)}
+              >
+                <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
+                  Avbryt
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[ui.button, styles.action]}
+                onPress={() => leaveMutation.mutate()}
+                disabled={leaveMutation.isPending}
+              >
+                <Text style={ui.buttonText}>
+                  {leaveMutation.isPending ? "Lämnar..." : "Ja, lämna"}
+                </Text>
+              </Pressable>
+            </View>
+
+            {leaveMutation.error && (
+              <Text style={[typography.caption, { color: colors.primary }]}>
+                {leaveMutation.error.message}
+              </Text>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -221,5 +290,17 @@ const styles = StyleSheet.create({
   },
   memberNickname: {
     flex: 1,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: spacing.md,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 400,
+    gap: spacing.md,
   },
 });

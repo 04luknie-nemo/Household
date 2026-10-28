@@ -55,6 +55,9 @@ join.post("/join", async (c) => {
   const existingMembers = await db.householdMember.findMany({
     where: {
       householdId: household.id,
+      status: {
+        not: "left",
+      },
     },
     select: { avatarId: true },
   });
@@ -97,17 +100,38 @@ join.post("/join", async (c) => {
   }
 
   // 5. Skapa medlemsförfrågan
+  // 5. Skapa eller återaktivera medlemsförfrågan
   try {
-    const member = await db.householdMember.create({
-      data: {
-        userId: session.user.id,
-        householdId: household.id,
-        nickname: session.user.name,
-        avatarId,
-        isOwner: false,
-        status: "pending",
+    const existingMember = await db.householdMember.findUnique({
+      where: {
+        userId_householdId: {
+          userId: session.user.id,
+          householdId: household.id,
+        },
       },
     });
+
+    const member = existingMember
+      ? await db.householdMember.update({
+          where: { id: existingMember.id },
+          data: {
+            nickname: session.user.name,
+            avatarId,
+            isOwner: false,
+            isPaused: false,
+            status: "pending",
+          },
+        })
+      : await db.householdMember.create({
+          data: {
+            userId: session.user.id,
+            householdId: household.id,
+            nickname: session.user.name,
+            avatarId,
+            isOwner: false,
+            status: "pending",
+          },
+        });
 
     return c.json(
       {
