@@ -80,7 +80,7 @@ Produktägare: David Jensen.
 
 Kravet säger att designen ska utgå från skisserna, och att undantag diskuteras med produktägaren, godkänns och dokumenteras. Tabellen visar var appen skiljer sig från Figma. Appen följer skisserna: samma skärmar, samma rosa färg (`#CC5C6E`), ljusgrå bakgrund (`#F1F1F1`) och vita kort. Fyra avvikelser märks när man använder appen: headern, statistiken, profilen och rullgardinsmenyerna i Skapa syssla. Tabellen visar alla, jämförda med Figma den 28 oktober.
 
-Mindre stilfel rättas i [#132](https://github.com/04luknie-nemo/Household/issues/132): hushållets namn i headern, den tomma dagsvyn och statistiken, hushållets kort, att bara ägaren ser anslutningskoden, en etikett i Skapa hushåll och korten i detaljvyn. Tills #132 är mergad avviker de också.
+Mindre stilfel är rättade i [#132](https://github.com/04luknie-nemo/Household/issues/132): hushållets namn i headern, den tomma dagsvyn och statistiken, hushållets kort, att bara ägaren ser anslutningskoden, en etikett i Skapa hushåll och korten i detaljvyn.
 
 | Skärm        | Skissen                                                                | Appen                                                                                  | Varför                                                                                        | Godkänd av David |
 | ------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------- |
@@ -119,9 +119,9 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 
 - [x] Ett hushåll ska ha ett namn och en genererad (enkel) kod så andra kan gå med i hushållet. Namnet ska gå att ändra. \*
 - [x] Alla användare i ett hushåll ska kunna se vilka som tillhör ett hushåll.
-- [ ] En ägare av ett hushåll ska kunna se förfrågningar om att gå med i hushållet.
-- [ ] En ägare ska kunna acceptera eller neka förfrågningar.
-- [ ] En ägare ska kunna göra andra till ägare.
+- [x] En ägare av ett hushåll ska kunna se förfrågningar om att gå med i hushållet.
+- [x] En ägare ska kunna acceptera eller neka förfrågningar.
+- [x] En ägare ska kunna göra andra till ägare.
 - [ ] En ägare ska kunna pausa en användare. Under pausade perioder tas användaren inte med i statistiken.
 - [ ] Om en användare har pausats under en del av en period i statistiken ska graferna normaliseras.
 
@@ -130,8 +130,8 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 - [x] En användare ska kunna registrera och logga in sig. \*
 - [x] En användare ska kunna skapa ett nytt hushåll. \*
 - [x] En användare ska kunna gå med i ett hushåll genom att ange hushållets kod. \*
-- [ ] När en användare har valt att gå med i ett hushåll behöver en ägare först godkänna användaren.
-- [ ] En användare ska kunna lämna ett hushåll.
+- [x] När en användare har valt att gå med i ett hushåll behöver en ägare först godkänna användaren.
+- [x] En användare ska kunna lämna ett hushåll.
 
 ### Profil
 
@@ -147,9 +147,9 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 - [x] En ägare ska kunna lägga till sysslor att göra i hemmet. \*
 - [x] En syssla ska ha ett namn, en beskrivning, hur ofta den ska göras (dagar) och en vikt som beskriver hur energikrävande den är. \*
 - [ ] En användare ska kunna lägga till en ljudinspelning och en bild för att beskriva sysslan.
-- [ ] En ägare ska kunna redigera en syssla. \*
-- [ ] En ägare ska kunna ta bort en syssla.
-- [ ] När en syssla tas bort ska användaren få en varning om att statistiken för sysslan också tas bort, och få valet att arkivera sysslan istället.
+- [x] En ägare ska kunna redigera en syssla. \*
+- [x] En ägare ska kunna ta bort en syssla.
+- [x] När en syssla tas bort ska användaren få en varning om att statistiken för sysslan också tas bort, och få valet att arkivera sysslan istället.
 
 ### Dagsvyn
 
