@@ -51,14 +51,37 @@ join.post("/join", async (c) => {
     return c.json({ error: "Hushållet hittades inte" }, 404);
   }
 
-  // 4. Hämta avatarer som används av medlemmar som inte har lämnat hushållet
-  const existingMembers = await db.householdMember.findMany({
+  // 4. Den som har lämnat får gå med igen och behåller sin avatar.
+  // Den som är aktiv eller väntar kan inte gå med en gång till.
+  const existingMember = await db.householdMember.findUnique({
     where: {
-      householdId: household.id,
-      status: {
-        not: "left",
+      userId_householdId: {
+        userId: session.user.id,
+        householdId: household.id,
       },
     },
+  });
+
+  if (existingMember && existingMember.status !== "left") {
+    return c.json(
+      { error: "Du är redan medlem eller väntar på godkännande" },
+      409,
+    );
+  }
+
+  if (existingMember) {
+    const member = await db.householdMember.update({
+      where: { id: existingMember.id },
+      data: { isOwner: false, isPaused: false, status: "pending" },
+    });
+
+    return c.json({ message: "Förfrågan om medlemskap skapad", member }, 201);
+  }
+
+  // 5. Hämta upptagna avatarer. Även de som lämnat räknas, eftersom
+  // (householdId, avatarId) är unikt för alla statusar.
+  const existingMembers = await db.householdMember.findMany({
+    where: { householdId: household.id },
     select: { avatarId: true },
   });
 
@@ -99,39 +122,18 @@ join.post("/join", async (c) => {
     avatarId = requestedAvatarId;
   }
 
-  // 5. Skapa medlemsförfrågan
-  // 5. Skapa eller återaktivera medlemsförfrågan
+  // 6. Skapa medlemsförfrågan
   try {
-    const existingMember = await db.householdMember.findUnique({
-      where: {
-        userId_householdId: {
-          userId: session.user.id,
-          householdId: household.id,
-        },
+    const member = await db.householdMember.create({
+      data: {
+        userId: session.user.id,
+        householdId: household.id,
+        nickname: session.user.name,
+        avatarId,
+        isOwner: false,
+        status: "pending",
       },
     });
-
-    const member = existingMember
-      ? await db.householdMember.update({
-          where: { id: existingMember.id },
-          data: {
-            nickname: session.user.name,
-            avatarId,
-            isOwner: false,
-            isPaused: false,
-            status: "pending",
-          },
-        })
-      : await db.householdMember.create({
-          data: {
-            userId: session.user.id,
-            householdId: household.id,
-            nickname: session.user.name,
-            avatarId,
-            isOwner: false,
-            status: "pending",
-          },
-        });
 
     return c.json(
       {
