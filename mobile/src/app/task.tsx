@@ -4,7 +4,7 @@ import { avatars } from "@/constants/avatars";
 import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useContext } from "react";
 import {
   ActivityIndicator,
@@ -38,6 +38,12 @@ type HouseholdMember = {
   isOwner: boolean;
 };
 
+type Household = {
+  id: string;
+  status: "pending" | "active" | "left";
+  isOwner: boolean;
+};
+
 function getErrorMessage(error: Error) {
   try {
     const body = JSON.parse(error.message) as {
@@ -58,6 +64,18 @@ export default function Task() {
   const { activeHouseholdId } = useContext(HouseholdContext);
   const { userId, sessionId } = useContext(AuthContext);
   const queryClient = useQueryClient();
+
+  const householdsQuery = useQuery<Household[]>({
+    queryKey: ["households", userId, sessionId],
+    enabled: !!userId && !!activeHouseholdId,
+    queryFn: ({ signal }) =>
+      apiFetch<Household[]>("/api/households", { signal }),
+  });
+  const activeHousehold = householdsQuery.data?.find(
+    (household) => household.id === activeHouseholdId,
+  );
+  const isOwner =
+    activeHousehold?.status === "active" && activeHousehold?.isOwner === true;
 
   const taskQuery = useQuery<TaskDetails>({
     queryKey: ["task", userId, sessionId, activeHouseholdId, taskId],
@@ -154,7 +172,30 @@ export default function Task() {
       >
         <View style={styles.heading}>
           <Text style={[typography.title, styles.title]}>{task.title}</Text>
+          {isOwner && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Redigera sysslan"
+              style={[ui.button, ui.buttonSecondary, styles.editButton]}
+              onPress={() =>
+                router.push({
+                  pathname: "/task-modal",
+                  params: { id: taskId },
+                })
+              }
+            >
+              <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
+                Redigera
+              </Text>
+            </Pressable>
+          )}
         </View>
+
+        {householdsQuery.isError && (
+          <Text style={typography.body}>
+            Kunde inte hämta hushållets behörigheter.
+          </Text>
+        )}
 
         <View style={ui.card}>
           <Text style={typography.label}>Beskrivning</Text>
@@ -265,6 +306,9 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
+  },
+  editButton: {
+    paddingHorizontal: spacing.md,
   },
   contributors: {
     gap: spacing.md,
