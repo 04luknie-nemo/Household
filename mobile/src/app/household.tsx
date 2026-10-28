@@ -194,7 +194,7 @@ export default function Household() {
               )}
             </View>
           ) : (
-            <View style={styles.row}>
+            <View style={styles.nameRow}>
               <Text style={typography.title}>{household?.name}</Text>
               {isOwner && (
                 <Pressable
@@ -211,15 +211,24 @@ export default function Household() {
               )}
             </View>
           )}
+          {members && (
+            <Text style={[typography.caption, styles.memberCount]}>
+              {members.length === 1
+                ? "1 medlem"
+                : `${members.length} medlemmar`}
+            </Text>
+          )}
         </View>
       </View>
-      <View style={ui.card}>
-        <Text style={typography.label}>Anslutningskod</Text>
-        <Text style={typography.title}>{household?.inviteCode}</Text>
-        <Text style={typography.caption}>
-          Dela koden för att bjuda in andra till hushållet
-        </Text>
-      </View>
+      {isOwner && (
+        <View style={ui.card}>
+          <Text style={typography.label}>Anslutningskod</Text>
+          <Text style={typography.title}>{household?.inviteCode}</Text>
+          <Text style={typography.caption}>
+            Dela koden för att bjuda in andra till hushållet
+          </Text>
+        </View>
+      )}
       <View style={ui.card}>
         <Text style={typography.label}>Medlemmar</Text>
         {memberPending && <Text>Medlemmar laddar...</Text>}
@@ -388,10 +397,14 @@ const styles = StyleSheet.create({
   center: {
     alignSelf: "center",
   },
-  row: {
+  nameRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    gap: spacing.sm,
+  },
+  memberCount: {
+    textAlign: "center",
   },
   actions: {
     flexDirection: "row",

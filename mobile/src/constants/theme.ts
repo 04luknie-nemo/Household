@@ -46,6 +46,20 @@ export const position = StyleSheet.create({
   },
 });
 
+// Text när en lista eller vy saknar innehåll, t.ex. inga sysslor.
+export const emptyText = StyleSheet.create({
+  title: {
+    ...typography.body,
+    textAlign: "center",
+    paddingTop: spacing.lg,
+  },
+  hint: {
+    ...typography.caption,
+    textAlign: "center",
+    paddingTop: spacing.xs,
+  },
+});
+
 export const statisticsStyles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { paddingVertical: spacing.lg, gap: spacing.lg },

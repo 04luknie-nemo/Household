@@ -1,8 +1,8 @@
-import { colors, spacing, typography } from "@/constants/theme";
+import { colors, emptyText, spacing, typography } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
-import { FlatList, Text } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { AuthContext } from "./auth-provider";
 import { HouseholdContext } from "./household-provider";
 import TaskRow from "./task-row";
@@ -56,7 +56,12 @@ export default function TaskList() {
       data={tasks}
       keyExtractor={(task) => task.id}
       ListEmptyComponent={
-        <Text style={typography.title}>Det finns inga sysslor ännu</Text>
+        <View>
+          <Text style={emptyText.title}>Det finns inga sysslor ännu</Text>
+          <Text style={emptyText.hint}>
+            Ägaren lägger till sysslor med Lägg till.
+          </Text>
+        </View>
       }
       renderItem={({ item }) => (
         <TaskRow
