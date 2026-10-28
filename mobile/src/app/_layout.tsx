@@ -9,7 +9,7 @@ import Toast from "react-native-toast-message";
 const client = new QueryClient();
 
 export default function RootLayout() {
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
 
   return (
     <>
@@ -21,7 +21,12 @@ export default function RootLayout() {
         </AuthProvider>
       </QueryClientProvider>
 
-      <Toast position="bottom" bottomOffset={insets.bottom + spacing.lg} visibilityTime={2000} autoHide />
+      <Toast
+        position="bottom"
+        bottomOffset={insets.bottom + spacing.lg}
+        visibilityTime={2000}
+        autoHide
+      />
     </>
   );
 }
