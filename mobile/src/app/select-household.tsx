@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type Household = {
   id: string;
@@ -61,7 +62,7 @@ export default function SelectHousehold() {
     });
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["left", "right", "bottom"]}>
       <View style={styles.section}>
         <Text style={styles.description}>
           Välj vilket hushåll du vill använda.
@@ -178,7 +179,7 @@ export default function SelectHousehold() {
           <Text style={ui.buttonText}>Fortsätt</Text>
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
