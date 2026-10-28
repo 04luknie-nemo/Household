@@ -1,8 +1,8 @@
 import { HouseholdContext } from "@/components/household-provider";
 import { colors, radius, spacing, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
-import { useQueryClient } from "@tanstack/react-query";
-import { router } from "expo-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
 import {
   Pressable,
@@ -27,19 +27,64 @@ const emptyTask: TaskInput = {
   worth: 2,
 };
 
+type TaskFormProps = {
+  initialTask: TaskInput;
+  activeHouseholdId: string;
+  taskId?: string;
+};
+
 const days = Array.from({ length: 31 }, (_, index) => index + 1);
 const worthOptions = [1, 2, 4, 6, 8];
 
 export default function TaskModal() {
-  const [task, setTask] = useState<TaskInput>(emptyTask);
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const isEdit = Boolean(id);
+  const { activeHouseholdId } = useContext(HouseholdContext);
+
+  const {
+    data: existingTask,
+    isPending,
+    isError,
+  } = useQuery<TaskInput>({
+    queryKey: ["task", activeHouseholdId, id],
+    queryFn: () => apiFetch(`/api/households/${activeHouseholdId}/tasks/${id}`),
+    enabled: isEdit && !!activeHouseholdId,
+  });
+
+  if (!activeHouseholdId) {
+    return <Text>Du måste välja ett hushåll först.</Text>;
+  }
+
+  if (isEdit && isPending) {
+    return <Text>Hämtar sysslan...</Text>;
+  }
+
+  if (isEdit && isError) {
+    return <Text>Kunde inte hämta sysslan.</Text>;
+  }
+
+  if (isEdit && !existingTask) {
+    return <Text>Sysslan kunde inte hittas.</Text>;
+  }
+
+  return (
+    <TaskForm
+      key={`${activeHouseholdId}-${id ?? "create"}`}
+      initialTask={isEdit ? existingTask! : emptyTask}
+      activeHouseholdId={activeHouseholdId}
+      taskId={id}
+    />
+  );
+}
+
+function TaskForm({ initialTask, activeHouseholdId, taskId }: TaskFormProps) {
+  const [task, setTask] = useState<TaskInput>(initialTask);
   const [showDays, setShowDays] = useState(false);
   const [showWorth, setShowWorth] = useState(false);
   const [titleError, setTitleError] = useState("");
   const [saveError, setSaveError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-
   const queryClient = useQueryClient();
-  const { activeHouseholdId } = useContext(HouseholdContext);
 
   return (
     <View
@@ -66,6 +111,7 @@ export default function TaskModal() {
           }
         }}
       />
+
       {titleError !== "" && (
         <Text style={{ color: colors.error }}>{titleError}</Text>
       )}
@@ -132,6 +178,7 @@ export default function TaskModal() {
                 {task.reoccurInDays}
               </Text>
             </Pressable>
+
             {showDays && (
               <View style={[ui.card, styles.dropdown]}>
                 <ScrollView
@@ -204,6 +251,7 @@ export default function TaskModal() {
               {task.worth}
             </Text>
           </Pressable>
+
           {showWorth && (
             <View style={[ui.card, styles.dropdown]}>
               {worthOptions.map((value) => (
@@ -240,6 +288,7 @@ export default function TaskModal() {
             setTitleError("Du måste ange en titel");
             return;
           }
+
           if (!activeHouseholdId) {
             setSaveError("Du måste välja ett hushåll först.");
             return;
@@ -249,19 +298,27 @@ export default function TaskModal() {
           setIsSaving(true);
 
           try {
-            await apiFetch(`/api/households/${activeHouseholdId}/tasks`, {
-              method: "POST",
-              body: JSON.stringify(task),
-            });
+            await apiFetch(
+              `/api/households/${activeHouseholdId}/tasks${taskId ? `/${taskId}` : ""}`,
+              {
+                method: taskId ? "PATCH" : "POST",
+                body: JSON.stringify(task),
+              },
+            );
 
             await queryClient.invalidateQueries({
               queryKey: ["tasks"],
             });
 
+            if (taskId) {
+              await queryClient.invalidateQueries({
+                queryKey: ["task"],
+              });
+            }
             router.back();
           } catch (error) {
-            console.error("Kunde inte skapa sysslan:", error);
-            setSaveError("Kunde inte skapa sysslan. Försök igen.");
+            console.error("Kunde inte spara sysslan:", error);
+            setSaveError("Kunde inte spara sysslan. Försök igen.");
           } finally {
             setIsSaving(false);
           }
