@@ -34,6 +34,12 @@ type HouseholdMember = {
   avatarId: number;
   isOwner: boolean;
 };
+type HouseholdRequest = {
+  id: string;
+  nickname: string;
+  avatarId: number;
+  createdAt: string;
+};
 
 export default function Household() {
   const queryClient = useQueryClient();
@@ -77,6 +83,47 @@ export default function Household() {
 
   const isOwner =
     households?.find((h) => h.id === activeHouseholdId)?.isOwner ?? false;
+
+  const {
+    data: requests,
+    isPending: requestsPending,
+    error: requestsError,
+  } = useQuery({
+    queryKey: ["requests", activeHouseholdId],
+    queryFn: ({ signal }) =>
+      apiFetch<HouseholdRequest[]>(
+        `/api/households/${activeHouseholdId}/requests`,
+        { signal },
+      ),
+    enabled: activeHouseholdId !== null && isOwner,
+  });
+  const approveMutation = useMutation({
+    mutationFn: (memberId: string) =>
+      apiFetch(
+        `/api/households/${activeHouseholdId}/requests/${memberId}/approve`,
+        { method: "POST" },
+      ),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["requests", activeHouseholdId],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["members"] });
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (memberId: string) =>
+      apiFetch<void>(
+        `/api/households/${activeHouseholdId}/requests/${memberId}`,
+        { method: "DELETE" },
+      ),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["requests", activeHouseholdId],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["members"] });
+    },
+  });
 
   function startEdit() {
     setName(household?.name ?? "");
@@ -187,10 +234,61 @@ export default function Household() {
           />
         )}
       </View>
-      {/* VG Krav finns i issue #95
-          <View style={ui.card}>
-            <Text style={typography.body}>Ansökningar</Text>
-          </View> */}
+      {isOwner && requests && requests.length > 0 && (
+        <View style={ui.card}>
+          <Text style={typography.label}>Ansökningar</Text>
+
+          {requests.map((request) => (
+            <View key={request.id} style={styles.memberCard}>
+              <Avatar avatarId={request.avatarId} />
+
+              <Text style={[typography.body, styles.memberNickname]}>
+                {request.nickname}
+              </Text>
+
+              <Text style={[ui.badge, ui.badgePending]}>Väntar</Text>
+
+              <View style={styles.actions}>
+                <Pressable
+                  style={[ui.button, styles.action]}
+                  onPress={() => approveMutation.mutate(request.id)}
+                  disabled={
+                    approveMutation.isPending || rejectMutation.isPending
+                  }
+                >
+                  <Text style={ui.buttonText}>Godkänn</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[ui.button, ui.buttonSecondary, styles.action]}
+                  onPress={() => rejectMutation.mutate(request.id)}
+                  disabled={
+                    approveMutation.isPending || rejectMutation.isPending
+                  }
+                >
+                  <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
+                    Neka
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          ))}
+
+          {requestsPending && <Text>Laddar ansökningar...</Text>}
+
+          {requestsError && (
+            <Text style={[typography.caption, { color: colors.primary }]}>
+              {requestsError.message}
+            </Text>
+          )}
+
+          {(approveMutation.error || rejectMutation.error) && (
+            <Text style={[typography.caption, { color: colors.primary }]}>
+              {(approveMutation.error || rejectMutation.error)?.message}
+            </Text>
+          )}
+        </View>
+      )}
     </View>
   );
 }
