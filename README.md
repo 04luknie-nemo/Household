@@ -6,13 +6,49 @@ Målgrupp: familjer, sambos och släktingar. Produktägare: David Jensen.
 
 Byggd med React Native, Expo och TypeScript.
 
-## Kom igång
+## Snabbstart
 
-Se [setup/README.md](setup/README.md) för installation, miljövariabler och GitHub-inloggning.
+Kräver Node.js 22 och två terminaler. Kör aldrig `npm install` i rotmappen. GitHub-inloggning behövs inte, testkontona räcker.
+
+Terminal 1, servern:
+
+```bash
+cp setup/server.env.example server/.env
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+Klistra in strängen efter `BETTER_AUTH_SECRET=` i `server/.env`. Låt `GITHUB_CLIENT_ID` och `GITHUB_CLIENT_SECRET` vara tomma. Servern varnar för dem men startar ändå.
+
+```bash
+cd server
+npm install
+npm run db:generate
+npm run db:push
+npm run db:seed
+npm run dev
+```
+
+Servern svarar på `http://localhost:3000/api/auth/ok`.
+
+Terminal 2, appen:
+
+```bash
+cd mobile
+npm install
+npx expo start
+```
+
+Tryck `w` för webben, eller skanna QR-koden med Expo Go (SDK 58). Telefonen och datorn måste vara på samma nätverk.
+
+Logga in med `anna@test.se` och lösenordet `test1234`. Välj Familjen. Fler konton finns under [Testkonton](setup/README.md#testkonton).
+
+## Kom igång på djupet
+
+Se [setup/README.md](setup/README.md) för miljövariabler, Android, iPhone och GitHub-inloggning.
 
 ## Inlämning
 
-1. Starta servern och appen enligt [setup/README.md](setup/README.md). `npm run db:seed` fyller databasen med testdata.
+1. Starta servern och appen enligt [Snabbstart](#snabbstart). `npm run db:seed` fyller databasen med testdata.
 2. Logga in med ett testkonto från [Testkonton](setup/README.md#testkonton). Alla har lösenordet `test1234`.
 3. Anna, Erik, Sara och Johan är aktiva i två hushåll var och väljer hushåll vid första inloggningen. Maja väntar på godkännande i Kompisar.
 
