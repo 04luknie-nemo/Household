@@ -1,8 +1,8 @@
-import { colors } from "@/constants/theme";
+import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { Link, router, Stack } from "expo-router";
+import { Link, Redirect, router, Stack } from "expo-router";
 import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
 import { AuthContext } from "./auth-provider";
@@ -17,6 +17,7 @@ export default function RootStack() {
   const { isLoggedIn, isPending, userId, sessionId } = useContext(AuthContext);
   const { activeHouseholdId, isLoading, error, retry } =
     useContext(HouseholdContext);
+
   const hasActiveHousehold = activeHouseholdId !== null;
 
   const { data: households } = useQuery<Household[]>({
@@ -31,17 +32,28 @@ export default function RootStack() {
     (household) => household.id === activeHouseholdId,
   )?.name;
 
-  if (isPending || isLoading) return <Text>Laddar...</Text>;
+  if (isPending || isLoading) {
+    return (
+      <View style={styles.message}>
+        <Text style={typography.body}>Laddar...</Text>
+      </View>
+    );
+  }
 
   if (isLoggedIn && error) {
     return (
-      <View>
-        <Text>{error}</Text>
-        <Pressable onPress={retry}>
-          <Text>Försök igen</Text>
+      <View style={styles.message}>
+        <Text style={typography.body}>{error}</Text>
+
+        <Pressable onPress={retry} style={ui.button}>
+          <Text style={ui.buttonText}>Försök igen</Text>
         </Pressable>
       </View>
     );
+  }
+
+  if (isLoggedIn && !hasActiveHousehold) {
+    return <Redirect href="/select-household" />;
   }
 
   return (
@@ -54,10 +66,18 @@ export default function RootStack() {
         contentStyle: { backgroundColor: colors.background },
         headerRight: () =>
           isLoggedIn ? (
-            <View style={{ flexDirection: "row", gap: 8 }}>
+            <View style={styles.headerActions}>
               <Link href="/select-household" asChild>
-                <Pressable style={{ padding: 12 }}>
-                  <Text>H</Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Byt hushåll"
+                  style={styles.headerButton}
+                >
+                  <MaterialCommunityIcons
+                    name="swap-horizontal"
+                    size={24}
+                    color={colors.primary}
+                  />
                 </Pressable>
               </Link>
             </View>
@@ -70,7 +90,7 @@ export default function RootStack() {
           options={{
             headerTitle: () => (
               <Link href="/household">
-                <Text style={{ padding: 16 }}>
+                <Text style={styles.householdTitle}>
                   {activeHouseholdName ?? "Hushållet"}
                 </Text>
               </Link>
@@ -78,16 +98,27 @@ export default function RootStack() {
             headerLeft: () => (
               <View>
                 <Link href="/profile" asChild>
-                  <Pressable style={{ padding: 12 }}>
-                    <Text>P</Text>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Profil"
+                    style={styles.headerButton}
+                  >
+                    <MaterialCommunityIcons
+                      name="account-circle-outline"
+                      size={24}
+                      color={colors.primary}
+                    />
                   </Pressable>
                 </Link>
               </View>
             ),
           }}
         />
+
         <Stack.Screen name="household" options={{ title: "Hushåll" }} />
+
         <Stack.Screen name="profile" options={{ title: "Profil" }} />
+
         <Stack.Screen
           name="task-modal"
           options={{
@@ -96,15 +127,9 @@ export default function RootStack() {
             headerLeft: () => (
               <Pressable
                 onPress={() => router.back()}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
-                  backgroundColor: colors.background,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginLeft: 12,
-                }}
+                style={styles.modalCloseButton}
+                accessibilityRole="button"
+                accessibilityLabel="Stäng"
               >
                 <MaterialCommunityIcons
                   name="close-circle-outline"
@@ -116,17 +141,33 @@ export default function RootStack() {
             headerRight: () => null,
           }}
         />
-        <Stack.Screen name="task" options={{ headerRight: () => null }} />
+
+        <Stack.Screen
+          name="task"
+          options={{
+            title: "Syssla",
+            headerRight: () => null,
+          }}
+        />
       </Stack.Protected>
+
       <Stack.Protected guard={isLoggedIn}>
         <Stack.Screen
           name="select-household"
-          options={{ headerRight: () => null }}
+          options={{
+            title: "Välj hushåll",
+            headerRight: () => null,
+          }}
         />
+
         <Stack.Screen
           name="create-household"
-          options={{ headerRight: () => null }}
+          options={{
+            title: "Skapa hushåll",
+            headerRight: () => null,
+          }}
         />
+
         <Stack.Screen
           name="join-household"
           options={{
@@ -135,10 +176,55 @@ export default function RootStack() {
           }}
         />
       </Stack.Protected>
+
       <Stack.Protected guard={!isLoggedIn}>
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="register" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="login"
+          options={{ title: "Logga in", headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="register"
+          options={{ title: "Registrera", headerShown: false }}
+        />
       </Stack.Protected>
     </Stack>
   );
 }
+
+const styles = {
+  message: {
+    flex: 1,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+    padding: spacing.md,
+    gap: spacing.md,
+    backgroundColor: colors.background,
+  },
+
+  headerActions: {
+    flexDirection: "row" as const,
+    gap: spacing.sm,
+  },
+
+  headerButton: {
+    padding: spacing.sm,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+  },
+
+  householdTitle: {
+    ...typography.label,
+    padding: spacing.md,
+  },
+
+  modalCloseButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.background,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+    marginLeft: spacing.sm,
+  },
+};

@@ -2,11 +2,7 @@ import { avatars } from "@/constants/avatars";
 import { colors, statisticsStyles as styles } from "@/constants/theme";
 import { Text, View } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
-
-export type MemberPoints = {
-  avatarId: number;
-  points: number;
-};
+import type { MemberPoints } from "@/lib/stats";
 
 type Props = {
   members: MemberPoints[];

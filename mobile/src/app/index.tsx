@@ -1,25 +1,51 @@
+import { AuthContext } from "@/components/auth-provider";
 import DayView from "@/components/day-view";
+import { HouseholdContext } from "@/components/household-provider";
 import StatisticsView from "@/components/statistics";
-import { periods } from "@/constants/periods";
+import { apiPeriods, periods } from "@/constants/periods";
+import { statsQueryOptions } from "@/lib/stats";
+import { useQueries } from "@tanstack/react-query";
+import { useContext, useState } from "react";
 import { colors, spacing, typography } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [period, setPeriod] = useState<number>(0);
 
+  const { activeHouseholdId } = useContext(HouseholdContext);
+  const { userId, sessionId } = useContext(AuthContext);
+
+  const statsQueries = useQueries({
+    queries: apiPeriods
+      .filter((apiPeriod) => apiPeriod !== null)
+      .map((apiPeriod) =>
+        statsQueryOptions(userId, sessionId, activeHouseholdId, apiPeriod),
+      ),
+  });
+
+  const hasStatsError = statsQueries.some((query) => query.isError);
+
+  const visiblePeriods = [
+    0,
+    ...statsQueries.flatMap((query, index) =>
+      (query.data?.total.length ?? 0) > 0 ? [index + 1] : [],
+    ),
+  ];
+
+  const selectedPeriod = visiblePeriods.includes(period) ? period : 0;
+  const selectedIndex = visiblePeriods.indexOf(selectedPeriod);
   const canGoBack = period < periods.length - 1;
   const canGoForward = period > 0;
 
   function handleBack() {
-    if (period === periods.length - 1) return;
-    setPeriod((prev) => prev + 1);
+    if (selectedIndex >= visiblePeriods.length - 1) return;
+    setPeriod(visiblePeriods[selectedIndex + 1]);
   }
   function handleForward() {
-    if (period === 0) return;
-    setPeriod((prev) => prev - 1);
+    if (selectedIndex <= 0) return;
+    setPeriod(visiblePeriods[selectedIndex - 1]);
   }
 
   return (
@@ -40,7 +66,7 @@ export default function Index() {
         </Pressable>
 
         <Text style={[typography.title, styles.periodTitle]}>
-          {periods[period]}
+          {periods[selectedPeriod]}
         </Text>
 
         <Pressable
@@ -57,9 +83,18 @@ export default function Index() {
           />
         </Pressable>
       </View>
+      {hasStatsError && (
+        <Text style={typography.body}>
+          Kunde inte hämta statistik för alla perioder. Försök igen senare...
+        </Text>
+      )}
 
       <View style={styles.stretch}>
-        {period === 0 ? <DayView /> : <StatisticsView period={period} />}
+        {selectedPeriod === 0 ? (
+          <DayView />
+        ) : (
+          <StatisticsView period={selectedPeriod} />
+        )}
       </View>
     </SafeAreaView>
   );
