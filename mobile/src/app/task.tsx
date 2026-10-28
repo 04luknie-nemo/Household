@@ -8,6 +8,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
 import {
   ActivityIndicator,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -216,7 +217,7 @@ export default function Task() {
           </Text>
         </View>
 
-        {isOwner && !warningOpen && (
+        {isOwner && (
           <Pressable
             style={styles.removeLink}
             onPress={() => setWarningOpen(true)}
@@ -227,49 +228,56 @@ export default function Task() {
           </Pressable>
         )}
 
-        {isOwner && warningOpen && (
-          <View style={[ui.card, styles.warning]}>
-            <Text style={typography.label}>Ta bort {task.title}?</Text>
-            <Text style={typography.body}>
-              Om du tar bort sysslan försvinner också statistiken för den. Du
-              kan arkivera den i stället, så att statistiken finns kvar.
-            </Text>
-
-            <Pressable
-              style={ui.button}
-              onPress={() => archiveTaskMutation.mutate()}
-              disabled={isRemoving}
-            >
-              <Text style={ui.buttonText}>
-                {archiveTaskMutation.isPending ? "Arkiverar..." : "Arkivera"}
+        <Modal
+          visible={isOwner && warningOpen}
+          transparent
+          animationType="fade"
+          onRequestClose={closeWarning}
+        >
+          <View style={styles.overlay}>
+            <View style={[ui.card, styles.dialog]}>
+              <Text style={typography.label}>Ta bort {task.title}?</Text>
+              <Text style={typography.body}>
+                Om du tar bort sysslan försvinner också statistiken för den. Du
+                kan arkivera den i stället, så att statistiken finns kvar.
               </Text>
-            </Pressable>
 
-            <Pressable
-              style={[ui.button, ui.buttonSecondary]}
-              onPress={() => deleteTaskMutation.mutate()}
-              disabled={isRemoving}
-            >
-              <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
-                {deleteTaskMutation.isPending ? "Tar bort..." : "Ta bort"}
-              </Text>
-            </Pressable>
+              <Pressable
+                style={ui.button}
+                onPress={() => archiveTaskMutation.mutate()}
+                disabled={isRemoving}
+              >
+                <Text style={ui.buttonText}>
+                  {archiveTaskMutation.isPending ? "Arkiverar..." : "Arkivera"}
+                </Text>
+              </Pressable>
 
-            <Pressable
-              style={styles.cancel}
-              onPress={closeWarning}
-              disabled={isRemoving}
-            >
-              <Text style={typography.body}>Avbryt</Text>
-            </Pressable>
+              <Pressable
+                style={[ui.button, ui.buttonSecondary]}
+                onPress={() => deleteTaskMutation.mutate()}
+                disabled={isRemoving}
+              >
+                <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
+                  {deleteTaskMutation.isPending ? "Tar bort..." : "Ta bort"}
+                </Text>
+              </Pressable>
 
-            {removeError && (
-              <Text accessibilityRole="alert" style={styles.error}>
-                {getErrorMessage(removeError)}
-              </Text>
-            )}
+              <Pressable
+                style={styles.cancel}
+                onPress={closeWarning}
+                disabled={isRemoving}
+              >
+                <Text style={typography.body}>Avbryt</Text>
+              </Pressable>
+
+              {removeError && (
+                <Text accessibilityRole="alert" style={styles.error}>
+                  {getErrorMessage(removeError)}
+                </Text>
+              )}
+            </View>
           </View>
-        )}
+        </Modal>
         <View style={styles.contributors}>
           <Text style={typography.label}>Medverkande</Text>
 
@@ -403,9 +411,14 @@ const styles = StyleSheet.create({
     ...typography.label,
     color: colors.primary,
   },
-  warning: {
-    borderWidth: 1,
-    borderColor: colors.primary,
+  overlay: {
+    flex: 1,
+    backgroundColor: colors.overlay,
+    justifyContent: "center",
+    padding: spacing.lg,
+  },
+  dialog: {
+    gap: spacing.md,
   },
   cancel: {
     alignSelf: "center",

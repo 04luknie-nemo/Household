@@ -18,6 +18,7 @@ export const colors = {
   memberBackground: "#E7F3FD",
   pending: "#F4AFBF",
   pendingBackground: "#FCF1F4",
+  overlay: "rgba(0, 0, 0, 0.4)",
 };
 
 export const spacing = {
