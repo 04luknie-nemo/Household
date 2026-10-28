@@ -30,7 +30,7 @@ npm install
 Fyll i `server/.env`:
 
 - `BETTER_AUTH_SECRET` – minst 32 tecken, generera med `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`
-- `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` – från din egen GitHub OAuth App (se nedan)
+- `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` – valfria, bara för GitHub-inloggning. Skapas i din egen GitHub OAuth App (se nedan). Lämna dem tomma om du loggar in med e-post och lösenord.
 
 Skapa databasen och starta:
 
@@ -85,7 +85,9 @@ I **Kompisar** (Erik och Johan) finns två sysslor med en markering var:
 
 Servern kör på `http://localhost:3000`. Testa med `http://localhost:3000/api/auth/ok`.
 
-## 2. GitHub OAuth App
+## 2. GitHub OAuth App (valfritt)
+
+Behövs bara för knappen Logga in med GitHub. Testkontona fungerar utan.
 
 Varje person skapar en egen app, eftersom callback-adressen skiljer sig mellan datorer.
 

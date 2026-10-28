@@ -6,19 +6,65 @@ Målgrupp: familjer, sambos och släktingar. Produktägare: David Jensen.
 
 Byggd med React Native, Expo och TypeScript.
 
-## Kom igång
+## Snabbstart
 
-Se [setup/README.md](setup/README.md) för installation, miljövariabler och GitHub-inloggning.
+Kräver Node.js 22 och två terminaler. Kör aldrig `npm install` i rotmappen. GitHub-inloggning behövs inte, testkontona räcker.
+
+Terminal 1, servern:
+
+```bash
+cp setup/server.env.example server/.env
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+Klistra in strängen efter `BETTER_AUTH_SECRET=` i `server/.env`. Låt `GITHUB_CLIENT_ID` och `GITHUB_CLIENT_SECRET` vara tomma. Servern varnar för dem men startar ändå.
+
+```bash
+cd server
+npm install
+npm run db:generate
+npm run db:push
+npm run db:seed
+npm run dev
+```
+
+Servern svarar på `http://localhost:3000/api/auth/ok`.
+
+Terminal 2, appen:
+
+```bash
+cd mobile
+npm install
+npx expo start
+```
+
+Tryck `w` för webben, eller skanna QR-koden med Expo Go (SDK 58). Telefonen och datorn måste vara på samma nätverk.
+
+Logga in med `anna@test.se` och lösenordet `test1234`. Välj Familjen. Fler konton finns under [Testkonton](setup/README.md#testkonton).
+
+## Kom igång på djupet
+
+Se [setup/README.md](setup/README.md) för miljövariabler, Android, iPhone och GitHub-inloggning.
 
 ## Inlämning
 
-1. Starta servern och appen enligt [setup/README.md](setup/README.md). `npm run db:seed` fyller databasen med testdata.
+1. Starta servern och appen enligt [Snabbstart](#snabbstart). `npm run db:seed` fyller databasen med testdata.
 2. Logga in med ett testkonto från [Testkonton](setup/README.md#testkonton). Alla har lösenordet `test1234`.
 3. Anna, Erik, Sara och Johan är aktiva i två hushåll var och väljer hushåll vid första inloggningen. Maja väntar på godkännande i Kompisar.
 
-Kryssrutorna i kravlistan nedan visar vad som är klart i main. Avvikelser från skisserna dokumenteras i [#73](https://github.com/04luknie-nemo/Household/issues/73).
+Kryssrutorna i kravlistan nedan visar vad som är klart i main. Avvikelser från skisserna står under [Avvikelser från skisserna](#avvikelser-från-skisserna).
 
-Appikonen och splashen syns bara i en dev build (`npx expo run:android`), inte i Expo Go.
+### Appikon och splash
+
+Appikonen och splashen syns bara i en riktig build (`npx expo run:android`), inte i Expo Go. Så här ser de ut:
+
+<p>
+  <img src="mobile/assets/images/icon.png" alt="Appikonen: ett vitt hus på rosa bakgrund" width="160" />
+  &nbsp;&nbsp;
+  <img src="docs/bilder/splash.png" alt="Splashen: rosa cirkel med ett vitt hus mitt på en ljusgrå skärm" width="160" />
+</p>
+
+Ikonen är `mobile/assets/images/icon.png`. Splashen visar `splash-icon.png` på bakgrunden `#F1F1F1`, enligt `app.json`.
 
 ## Medverkande
 
@@ -29,6 +75,30 @@ Appikonen och splashen syns bara i en dev build (`npx expo run:android`), inte i
 - Shahad ([shahadAlroomi](https://github.com/shahadAlroomi))
 
 Produktägare: David Jensen.
+
+## Avvikelser från skisserna
+
+Kravet säger att designen ska utgå från skisserna, och att undantag diskuteras med produktägaren, godkänns och dokumenteras. Tabellen visar var appen skiljer sig från Figma. Appen följer skisserna: samma skärmar, samma rosa färg (`#CC5C6E`), ljusgrå bakgrund (`#F1F1F1`) och vita kort. Fyra avvikelser märks när man använder appen: headern, statistiken, profilen och rullgardinsmenyerna i Skapa syssla. Tabellen visar alla, jämförda med Figma den 28 oktober.
+
+Mindre stilfel rättas i [#132](https://github.com/04luknie-nemo/Household/issues/132): hushållets namn i headern, den tomma dagsvyn och statistiken, hushållets kort, att bara ägaren ser anslutningskoden, en etikett i Skapa hushåll och korten i detaljvyn. Tills #132 är mergad avviker de också.
+
+| Skärm        | Skissen                                                                | Appen                                                                                  | Varför                                                                                        | Godkänd av David |
+| ------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------- |
+| Header       | Bokstaven P för profil och ett hus i en rosa ruta för att byta hushåll | Ikoner för profil och byt hushåll                                                      | Ikonerna förklarar sig själva och kommer från samma ikonbibliotek som resten av appen         |                  |
+| Splash       | Huset i en rosa cirkel med texten Hushållet under                      | Bara huset i en rosa cirkel. Syns inte i Expo Go, bara i en riktig build               | Expo Go visar sin egen. Se bilderna under [Appikon och splash](#appikon-och-splash)           |                  |
+| Statistik    | Emoji inne i varje tårtbit                                             | Emoji och poäng under varje diagram                                                    | Smala bitar blev oläsliga, och poängen visar vikten                                           |                  |
+| Statistik    | Även perioderna oktober och 2020                                       | Denna vecka, förra veckan och förra månaden. Tomma perioder visas inte                 | Följer kravlistan                                                                             |                  |
+| Skapa syssla | En rad med siffror för återkommer och värde                            | Rullgardinsmenyer                                                                      | Får plats på smala skärmar                                                                    |                  |
+| Profil       | Kortet Kontaktuppgifter med namn och e-post, båda med penna            | Kortet Hushåll med smeknamn och penna, och kortet Konto med namn och e-post utan penna | Smeknamn och avatar gäller per hushåll. Namn och e-post kommer från kontot vid registreringen |                  |
+| Profil       | Avatarerna, Spara och Avbryt visas hela tiden                          | Avatarerna, Spara och Avbryt visas när man trycker på pennan                           | Sidan blir kortare när man bara vill se profilen                                              |                  |
+| Profil       | Ingen knapp för att logga ut                                           | Knappen Logga ut längst ner                                                            | Användaren behöver kunna logga ut, och profilen är kontots sida                               |                  |
+| Profil       | Knapp för mörkt läge                                                   | Inget mörkt läge                                                                       | VG-krav som gruppen valt bort                                                                 |                  |
+| Hushåll      | E-post eller smeknamn under varje medlem                               | Bara smeknamnet                                                                        | Servern skickar inte e-post till andra medlemmar                                              |                  |
+| Hushåll      | Knapparna Pausa och Återuppta på en medlem                             | Finns inte                                                                             | VG-krav som gruppen valt bort                                                                 |                  |
+| Hushåll      | Egen sida för en medlem med Gör till ägare                             | Knapp på medlemsraden (#107)                                                           | Ett tryck i stället för två                                                                   |                  |
+| Hushåll      | Koden ser ut som HEM-4821                                              | Koden ser ut som ABC234, som på skissen Hushåll skapat                                 | Sex tecken utan förväxlingsbara tecken                                                        |                  |
+
+Kolumnen Godkänd av David fylls i med datum när produktägaren har sett och godkänt avvikelsen.
 
 ## Arbetssätt med AI
 
@@ -42,7 +112,7 @@ Krav markerade med \* är obligatoriska (20 st). G: 20 krav. VG: 32 krav samt CI
 
 - [x] En logga, splashscreen och appikon ska designas och användas. \*
 - [x] Applikationen ska byggas med RN, Expo och TS. \*
-- [x] Designen av appen ska utgå ifrån befintliga skisser. Undantag diskuteras med produktägaren, godkänns och dokumenteras. \*
+- [x] Designen av appen ska utgå ifrån befintliga skisser. Undantag diskuteras med produktägaren, godkänns och dokumenteras. \* Se [Avvikelser från skisserna](#avvikelser-från-skisserna).
 - [x] Information ska kommuniceras till och från en server.
 
 ### Hushåll
