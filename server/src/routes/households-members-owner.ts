@@ -2,9 +2,9 @@ import { Hono } from "hono";
 import { db } from "../../prisma/db.ts";
 import { auth } from "../lib/auth.ts";
 
-const handleSetOwner = new Hono();
+const membersOwner = new Hono();
 
-handleSetOwner.patch("/:id/members/:memberId/owner", async (c) => {
+membersOwner.post("/:id/members/:memberId/owner", async (c) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   if (!session) {
     return c.text("Inte inloggad", 401);
@@ -41,19 +41,14 @@ handleSetOwner.patch("/:id/members/:memberId/owner", async (c) => {
     return c.text("Medlemmen finns inte på det hushållet!", 404);
   }
   if (member.status !== "active") {
-    return c.text("Medlemmen är inte aktiv!", 403);
-  }
-  const ownerCount = await db.householdMember.count({
-    where: { householdId: household.id, isOwner: true, status: "active" },
-  });
-  if (member.isOwner && ownerCount <= 1) {
-    return c.text("Någon annan behöver bli ägare först!", 409);
+    return c.text("Medlemmen är inte aktiv!", 404);
   }
   const memberData = await db.householdMember.update({
     where: { id: member.id },
-    data: { isOwner: !member.isOwner },
+    select: { id: true, nickname: true, avatarId: true, isOwner: true },
+    data: { isOwner: true },
   });
   return c.json(memberData, 200);
 });
 
-export default handleSetOwner;
+export default membersOwner;
