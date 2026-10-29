@@ -123,7 +123,7 @@ export default function RootStack() {
           name="task-modal"
           options={{
             presentation: "modal",
-            title: "Lägg Till",
+            title: "Lägg till",
             headerLeft: () => (
               <Pressable
                 onPress={() => router.back()}
