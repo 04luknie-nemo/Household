@@ -17,6 +17,8 @@ Gemensam guide för testfilerna i den här mappen. Här finns inloggning, testda
 | [households-members.md](households-members.md)               | #76       | `GET /api/households/:id/members`                                                                             |
 | [households-requests.md](households-requests.md)             | #94       | `GET /api/households/:id/requests`, `POST .../requests/:memberId/approve` och `DELETE .../requests/:memberId` |
 | [households-leave.md](households-leave.md)                   | #104      | `POST /api/households/:id/leave`                                                                              |
+| [households-members-owner.md](households-members-owner.md)   | #103      | `POST /api/households/:id/members/:memberId/owner`                                                            |
+| [households-tasks-disable.md](households-tasks-disable.md)   | #102      | `POST /api/households/:id/tasks/:taskId/archive` och `DELETE /api/households/:id/tasks/:taskId`               |
 
 ## Starta servern
 
@@ -138,6 +140,9 @@ Gäller alla routes under `/api/households`. Utan cookie ska varje route svara `
 | `POST /api/households/<id>/requests/<memberId>/approve` (#94) | `401`          |
 | `DELETE /api/households/<id>/requests/<memberId>` (#94)       | `401`          |
 | `POST /api/households/<id>/leave` (#104)                      | `401`          |
+| `POST /api/households/<id>/members/<memberId>/owner` (#103)   | `401`          |
+| `POST /api/households/<id>/tasks/<taskId>/archive` (#102)     | `401`          |
+| `DELETE /api/households/<id>/tasks/<taskId>` (#102)           | `401`          |
 
 ```bash
 curl -i "localhost:3000/api/households/<id>/stats?period=week"
@@ -185,6 +190,12 @@ curl -i -X POST localhost:3000/api/households/<id>/requests/<memberId>/approve
 curl -i -X DELETE localhost:3000/api/households/<id>/requests/<memberId>
 
 curl -i -X POST localhost:3000/api/households/<id>/leave
+
+curl -i -X POST localhost:3000/api/households/<id>/members/<memberId>/owner
+
+curl -i -X POST localhost:3000/api/households/<id>/tasks/<taskId>/archive
+
+curl -i -X DELETE localhost:3000/api/households/<id>/tasks/<taskId>
 ```
 
 Bodyn till sysslor måste vara giltig. Annars svarar valideringen `400` innan sessionen kontrolleras.

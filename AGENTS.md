@@ -18,5 +18,5 @@ Läs docs/AI-ARBETSSATT.md. Den beskriver hur vi arbetar tillsammans och gäller
 
 - Hushållet: nativ app byggd med React Native, Expo och TypeScript.
 - Expo-appen ligger i mobile/. Läs mobile/AGENTS.md innan du ändrar där.
-- Uppgiftsbeskrivning och kravlista finns i README.md.
+- Appen beskrivs i README.md. Kravlistan och allt om inlämningen finns i docs/INLAMNING.md.
 - Grupp på fem personer. Produktägare: David Jensen.

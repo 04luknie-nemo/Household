@@ -51,7 +51,7 @@ export default function CreateHousehold() {
         </Text>
       </View>
       <View style={ui.card}>
-        <Text style={typography.label}>Hushållets namn här</Text>
+        <Text style={typography.label}>Hushållets namn</Text>
         <TextInput
           style={ui.input}
           placeholder="T.ex. Familjen Andersson"

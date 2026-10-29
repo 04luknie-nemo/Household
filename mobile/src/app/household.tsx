@@ -2,13 +2,15 @@ import { AuthContext } from "@/components/auth-provider";
 import Avatar from "@/components/avatar";
 import CopyCodeButton from "@/components/copy-code-button";
 import { HouseholdContext } from "@/components/household-provider";
-import { colors, spacing, typography, ui } from "@/constants/theme";
+import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useContext, useState } from "react";
 import {
   FlatList,
+  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -35,15 +37,25 @@ type HouseholdMember = {
   avatarId: number;
   isOwner: boolean;
 };
+type HouseholdRequest = {
+  id: string;
+  nickname: string;
+  avatarId: number;
+  createdAt: string;
+};
 
 export default function Household() {
   const queryClient = useQueryClient();
 
   const [name, setName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
 
-  const { activeHouseholdId } = useContext(HouseholdContext);
+  const { activeHouseholdId, setActiveHouseholdId } =
+    useContext(HouseholdContext);
   const { userId, sessionId } = useContext(AuthContext);
+  const [memberToBeOwner, setMemberToBeOwner] =
+    useState<HouseholdMember | null>(null);
 
   const {
     data: household,
@@ -79,6 +91,47 @@ export default function Household() {
   const isOwner =
     households?.find((h) => h.id === activeHouseholdId)?.isOwner ?? false;
 
+  const {
+    data: requests,
+    isPending: requestsPending,
+    error: requestsError,
+  } = useQuery({
+    queryKey: ["requests", activeHouseholdId],
+    queryFn: ({ signal }) =>
+      apiFetch<HouseholdRequest[]>(
+        `/api/households/${activeHouseholdId}/requests`,
+        { signal },
+      ),
+    enabled: activeHouseholdId !== null && isOwner,
+  });
+  const approveMutation = useMutation({
+    mutationFn: (memberId: string) =>
+      apiFetch(
+        `/api/households/${activeHouseholdId}/requests/${memberId}/approve`,
+        { method: "POST" },
+      ),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["requests", activeHouseholdId],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["members"] });
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (memberId: string) =>
+      apiFetch<void>(
+        `/api/households/${activeHouseholdId}/requests/${memberId}`,
+        { method: "DELETE" },
+      ),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["requests", activeHouseholdId],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["members"] });
+    },
+  });
+
   function startEdit() {
     setName(household?.name ?? "");
     setIsEditing(true);
@@ -92,6 +145,34 @@ export default function Household() {
     onSuccess: () => {
       setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ["households"] });
+    },
+  });
+  const leaveMutation = useMutation({
+    mutationFn: () =>
+      apiFetch(`/api/households/${activeHouseholdId}/leave`, {
+        method: "POST",
+      }),
+    onSuccess: async () => {
+      setShowLeaveConfirmation(false);
+      await queryClient.invalidateQueries({ queryKey: ["households"] });
+      setActiveHouseholdId(null);
+      router.replace("/select-household");
+    },
+  });
+
+  const updateMemberToOwner = useMutation({
+    mutationFn: (memberId: string) =>
+      apiFetch(
+        `/api/households/${activeHouseholdId}/members/${memberId}/owner`,
+        {
+          method: "POST",
+        },
+      ),
+    onSuccess: () => {
+      setMemberToBeOwner(null);
+      queryClient.invalidateQueries({
+        queryKey: ["members"],
+      });
     },
   });
 
@@ -132,7 +213,7 @@ export default function Household() {
               )}
             </View>
           ) : (
-            <View style={styles.row}>
+            <View style={styles.nameRow}>
               <Text style={typography.title}>{household?.name}</Text>
               {isOwner && (
                 <Pressable
@@ -149,9 +230,17 @@ export default function Household() {
               )}
             </View>
           )}
+          {members && (
+            <Text style={[typography.caption, styles.memberCount]}>
+              {members.length === 1
+                ? "1 medlem"
+                : `${members.length} medlemmar`}
+            </Text>
+          )}
         </View>
       </View>
 
+      {isOwner && (
       <View style={ui.card}>
         <Text style={typography.label}>Anslutningskod</Text>
         <View style={ui.householdInviteCode}>
@@ -162,6 +251,7 @@ export default function Household() {
           Dela koden för att bjuda in andra till hushållet
         </Text>
       </View>
+      )}
 
       <View style={ui.card}>
         <Text style={typography.label}>Medlemmar</Text>
@@ -188,27 +278,204 @@ export default function Household() {
                 >
                   {member.isOwner ? "Ägare" : "Medlem"}
                 </Text>
+                {isOwner && !member.isOwner && (
+                  <Pressable
+                    onPress={() => {
+                      updateMemberToOwner.reset();
+                      setMemberToBeOwner(member);
+                    }}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Gör ${member.nickname} till ägare`}
+                  >
+                    <Text style={styles.ownerLink}>Gör till ägare</Text>
+                  </Pressable>
+                )}
               </View>
             )}
           />
         )}
+        {memberToBeOwner !== null && (
+          <View style={styles.confirm}>
+            <Text style={typography.body}>
+              Gör {memberToBeOwner.nickname} till ägare?
+            </Text>
+            <View style={styles.actions}>
+              <Pressable
+                style={[ui.button, styles.action]}
+                onPress={() => updateMemberToOwner.mutate(memberToBeOwner.id)}
+                disabled={updateMemberToOwner.isPending}
+              >
+                <Text style={ui.buttonText}>
+                  {updateMemberToOwner.isPending ? "Sparar..." : "Ja"}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[ui.button, ui.buttonSecondary, styles.action]}
+                onPress={() => {
+                  updateMemberToOwner.reset();
+                  setMemberToBeOwner(null);
+                }}
+              >
+                <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
+                  Avbryt
+                </Text>
+              </Pressable>
+            </View>
+            {updateMemberToOwner.error && (
+              <Text style={[typography.caption, { color: colors.primary }]}>
+                {updateMemberToOwner.error.message}
+              </Text>
+            )}
+          </View>
+        )}
       </View>
-      {/* VG Krav finns i issue #95
+
+      {isOwner &&
+        (requestsPending || requestsError || (requests?.length ?? 0) > 0) && (
           <View style={ui.card}>
-            <Text style={typography.body}>Ansökningar</Text>
-          </View> */}
+            <Text style={typography.label}>Ansökningar</Text>
+
+            {requests?.map((request) => (
+              <View key={request.id} style={styles.memberCard}>
+                <Avatar avatarId={request.avatarId} />
+
+                <Text style={[typography.body, styles.memberNickname]}>
+                  {request.nickname}
+                </Text>
+
+                <Text style={[ui.badge, ui.badgePending]}>Väntar</Text>
+
+                <View style={styles.actions}>
+                  <Pressable
+                    style={[styles.iconButton, styles.rejectButton]}
+                    onPress={() => rejectMutation.mutate(request.id)}
+                    disabled={
+                      approveMutation.isPending || rejectMutation.isPending
+                    }
+                    accessibilityRole="button"
+                    accessibilityLabel={`Neka ${request.nickname}`}
+                  >
+                    <Ionicons name="close" size={18} color={colors.textMuted} />
+                  </Pressable>
+
+                  <Pressable
+                    style={[styles.iconButton, styles.approveButton]}
+                    onPress={() => approveMutation.mutate(request.id)}
+                    disabled={
+                      approveMutation.isPending || rejectMutation.isPending
+                    }
+                    accessibilityRole="button"
+                    accessibilityLabel={`Godkänn ${request.nickname}`}
+                  >
+                    <Ionicons
+                      name="checkmark"
+                      size={18}
+                      color={colors.onPrimary}
+                    />
+                  </Pressable>
+                </View>
+              </View>
+            ))}
+
+            {requestsPending && <Text>Laddar ansökningar...</Text>}
+
+            {requestsError && (
+              <Text style={[typography.caption, { color: colors.primary }]}>
+                {requestsError.message}
+              </Text>
+            )}
+
+            {(approveMutation.error || rejectMutation.error) && (
+              <Text style={[typography.caption, { color: colors.primary }]}>
+                {(approveMutation.error || rejectMutation.error)?.message}
+              </Text>
+            )}
+          </View>
+        )}
+
+      <View style={ui.card}>
+        <Pressable
+          style={ui.button}
+          onPress={() => setShowLeaveConfirmation(true)}
+        >
+          <Text style={ui.buttonText}>Lämna hushåll</Text>
+        </Pressable>
+      </View>
+
+      <Modal
+        visible={showLeaveConfirmation}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowLeaveConfirmation(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[ui.card, styles.modalCard]}>
+            <Text style={typography.title}>Lämna hushåll?</Text>
+
+            <Text style={typography.body}>
+              Vill du lämna {household?.name}? Dina gjorda sysslor finns kvar i
+              statistiken.
+            </Text>
+
+            <View style={styles.actions}>
+              <Pressable
+                style={[ui.button, ui.buttonSecondary, styles.action]}
+                onPress={() => setShowLeaveConfirmation(false)}
+              >
+                <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
+                  Avbryt
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[ui.button, styles.action]}
+                onPress={() => leaveMutation.mutate()}
+                disabled={leaveMutation.isPending}
+              >
+                <Text style={ui.buttonText}>
+                  {leaveMutation.isPending ? "Lämnar..." : "Ja, lämna"}
+                </Text>
+              </Pressable>
+            </View>
+
+            {leaveMutation.error && (
+              <Text style={[typography.caption, { color: colors.primary }]}>
+                {leaveMutation.error.message}
+              </Text>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  iconButton: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  rejectButton: {
+    backgroundColor: colors.input,
+  },
+  approveButton: {
+    backgroundColor: colors.primary,
+  },
   center: {
     alignSelf: "center",
   },
-  row: {
+  nameRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    gap: spacing.sm,
+  },
+  memberCount: {
+    textAlign: "center",
   },
   actions: {
     flexDirection: "row",
@@ -227,5 +494,28 @@ const styles = StyleSheet.create({
   },
   memberNickname: {
     flex: 1,
+  },
+  ownerLink: {
+    ...typography.caption,
+    color: colors.primary,
+    fontWeight: "600",
+  },
+  confirm: {
+    gap: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: spacing.md,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 400,
+    gap: spacing.md,
   },
 });
