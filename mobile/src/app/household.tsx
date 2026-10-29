@@ -156,9 +156,16 @@ export default function Household() {
       setShowLeaveConfirmation(false);
       setActiveHouseholdId(null);
       router.replace("/select-household");
-      queryClient.invalidateQueries({ queryKey: ["households"] });
+      queryClient.invalidateQueries({
+        queryKey: ["households", userId, sessionId],
+      });
     },
   });
+
+  function closeLeaveConfirmation() {
+    leaveMutation.reset();
+    setShowLeaveConfirmation(false);
+  }
 
   const updateMemberToOwner = useMutation({
     mutationFn: (memberId: string) =>
@@ -392,7 +399,10 @@ export default function Household() {
       <View style={ui.card}>
         <Pressable
           style={ui.button}
-          onPress={() => setShowLeaveConfirmation(true)}
+          onPress={() => {
+            leaveMutation.reset();
+            setShowLeaveConfirmation(true);
+          }}
         >
           <Text style={ui.buttonText}>Lämna hushåll</Text>
         </Pressable>
@@ -402,7 +412,7 @@ export default function Household() {
         visible={showLeaveConfirmation}
         transparent
         animationType="fade"
-        onRequestClose={() => setShowLeaveConfirmation(false)}
+        onRequestClose={closeLeaveConfirmation}
       >
         <View style={styles.modalOverlay}>
           <View style={[ui.card, styles.modalCard]}>
@@ -416,7 +426,7 @@ export default function Household() {
             <View style={styles.actions}>
               <Pressable
                 style={[ui.button, ui.buttonSecondary, styles.action]}
-                onPress={() => setShowLeaveConfirmation(false)}
+                onPress={closeLeaveConfirmation}
               >
                 <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
                   Avbryt
