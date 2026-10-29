@@ -18,6 +18,7 @@ export const colors = {
   memberBackground: "#E7F3FD",
   pending: "#F4AFBF",
   pendingBackground: "#FCF1F4",
+  overlay: "rgba(0, 0, 0, 0.4)",
 };
 
 export const spacing = {
@@ -43,6 +44,20 @@ export const typography = {
 export const position = StyleSheet.create({
   horizontalCenter: {
     textAlign: "center",
+  },
+});
+
+// Text när en lista eller vy saknar innehåll, t.ex. inga sysslor.
+export const emptyText = StyleSheet.create({
+  title: {
+    ...typography.body,
+    textAlign: "center",
+    paddingTop: spacing.lg,
+  },
+  hint: {
+    ...typography.caption,
+    textAlign: "center",
+    paddingTop: spacing.xs,
   },
 });
 
