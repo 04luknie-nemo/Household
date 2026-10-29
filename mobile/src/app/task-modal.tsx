@@ -101,7 +101,7 @@ export default function TaskModal() {
     <>
       <Stack.Screen
         options={{
-          title: isEdit ? "Ändra syssla" : "Lägg Till",
+          title: isEdit ? "Ändra syssla" : "Lägg till",
           headerTitleAlign: "center",
           headerTitleStyle: typography.title,
         }}

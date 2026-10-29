@@ -36,8 +36,8 @@ export default function Index() {
 
   const selectedPeriod = visiblePeriods.includes(period) ? period : 0;
   const selectedIndex = visiblePeriods.indexOf(selectedPeriod);
-  const canGoBack = period < periods.length - 1;
-  const canGoForward = period > 0;
+  const canGoBack = selectedIndex < visiblePeriods.length - 1;
+  const canGoForward = selectedIndex > 0;
 
   function handleBack() {
     if (selectedIndex >= visiblePeriods.length - 1) return;
