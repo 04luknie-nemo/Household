@@ -241,16 +241,16 @@ export default function Household() {
       </View>
 
       {isOwner && (
-      <View style={ui.card}>
-        <Text style={typography.label}>Anslutningskod</Text>
-        <View style={ui.householdInviteCode}>
-          <Text style={typography.title}>{household?.inviteCode}</Text>
-          <CopyCodeButton code={household.inviteCode} />
+        <View style={ui.card}>
+          <Text style={typography.label}>Anslutningskod</Text>
+          <View style={ui.householdInviteCode}>
+            <Text style={typography.title}>{household?.inviteCode}</Text>
+            <CopyCodeButton code={household.inviteCode} />
+          </View>
+          <Text style={typography.caption}>
+            Dela koden för att bjuda in andra till hushållet
+          </Text>
         </View>
-        <Text style={typography.caption}>
-          Dela koden för att bjuda in andra till hushållet
-        </Text>
-      </View>
       )}
 
       <View style={ui.card}>
