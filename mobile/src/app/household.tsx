@@ -52,6 +52,7 @@ export default function Household() {
 
   const { activeHouseholdId, setActiveHouseholdId } =
     useContext(HouseholdContext);
+
   const { userId, sessionId } = useContext(AuthContext);
   const [memberToBeOwner, setMemberToBeOwner] =
     useState<HouseholdMember | null>(null);
@@ -151,11 +152,11 @@ export default function Household() {
       apiFetch(`/api/households/${activeHouseholdId}/leave`, {
         method: "POST",
       }),
-    onSuccess: async () => {
+    onSuccess: () => {
       setShowLeaveConfirmation(false);
-      await queryClient.invalidateQueries({ queryKey: ["households"] });
       setActiveHouseholdId(null);
       router.replace("/select-household");
+      queryClient.invalidateQueries({ queryKey: ["households"] });
     },
   });
 
