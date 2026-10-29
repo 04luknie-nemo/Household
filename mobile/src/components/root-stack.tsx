@@ -87,6 +87,7 @@ export default function RootStack() {
         <Stack.Screen
           name="index"
           options={{
+            headerTitleAlign: "center",
             headerTitle: () => (
               <Link href="/household">
                 <Text style={styles.householdTitle}>
@@ -216,7 +217,8 @@ const styles = {
   },
 
   householdTitle: {
-    ...typography.label,
+    ...typography.title,
+    fontSize: 20,
     padding: spacing.md,
   },
 

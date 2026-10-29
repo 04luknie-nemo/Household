@@ -5,9 +5,11 @@ import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useContext, useState } from "react";
 import {
   FlatList,
+  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -46,8 +48,10 @@ export default function Household() {
 
   const [name, setName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
 
-  const { activeHouseholdId } = useContext(HouseholdContext);
+  const { activeHouseholdId, setActiveHouseholdId } =
+    useContext(HouseholdContext);
   const { userId, sessionId } = useContext(AuthContext);
   const [memberToBeOwner, setMemberToBeOwner] =
     useState<HouseholdMember | null>(null);
@@ -142,6 +146,18 @@ export default function Household() {
       queryClient.invalidateQueries({ queryKey: ["households"] });
     },
   });
+  const leaveMutation = useMutation({
+    mutationFn: () =>
+      apiFetch(`/api/households/${activeHouseholdId}/leave`, {
+        method: "POST",
+      }),
+    onSuccess: async () => {
+      setShowLeaveConfirmation(false);
+      await queryClient.invalidateQueries({ queryKey: ["households"] });
+      setActiveHouseholdId(null);
+      router.replace("/select-household");
+    },
+  });
 
   const updateMemberToOwner = useMutation({
     mutationFn: (memberId: string) =>
@@ -196,7 +212,7 @@ export default function Household() {
               )}
             </View>
           ) : (
-            <View style={styles.row}>
+            <View style={styles.nameRow}>
               <Text style={typography.title}>{household?.name}</Text>
               {isOwner && (
                 <Pressable
@@ -213,15 +229,24 @@ export default function Household() {
               )}
             </View>
           )}
+          {members && (
+            <Text style={[typography.caption, styles.memberCount]}>
+              {members.length === 1
+                ? "1 medlem"
+                : `${members.length} medlemmar`}
+            </Text>
+          )}
         </View>
       </View>
-      <View style={ui.card}>
-        <Text style={typography.label}>Anslutningskod</Text>
-        <Text style={typography.title}>{household?.inviteCode}</Text>
-        <Text style={typography.caption}>
-          Dela koden för att bjuda in andra till hushållet
-        </Text>
-      </View>
+      {isOwner && (
+        <View style={ui.card}>
+          <Text style={typography.label}>Anslutningskod</Text>
+          <Text style={typography.title}>{household?.inviteCode}</Text>
+          <Text style={typography.caption}>
+            Dela koden för att bjuda in andra till hushållet
+          </Text>
+        </View>
+      )}
       <View style={ui.card}>
         <Text style={typography.label}>Medlemmar</Text>
         {memberPending && <Text>Medlemmar laddar...</Text>}
@@ -299,6 +324,7 @@ export default function Household() {
           </View>
         )}
       </View>
+
       {isOwner &&
         (requestsPending || requestsError || (requests?.length ?? 0) > 0) && (
           <View style={ui.card}>
@@ -361,6 +387,60 @@ export default function Household() {
             )}
           </View>
         )}
+
+      <View style={ui.card}>
+        <Pressable
+          style={ui.button}
+          onPress={() => setShowLeaveConfirmation(true)}
+        >
+          <Text style={ui.buttonText}>Lämna hushåll</Text>
+        </Pressable>
+      </View>
+
+      <Modal
+        visible={showLeaveConfirmation}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowLeaveConfirmation(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[ui.card, styles.modalCard]}>
+            <Text style={typography.title}>Lämna hushåll?</Text>
+
+            <Text style={typography.body}>
+              Vill du lämna {household?.name}? Dina gjorda sysslor finns kvar i
+              statistiken.
+            </Text>
+
+            <View style={styles.actions}>
+              <Pressable
+                style={[ui.button, ui.buttonSecondary, styles.action]}
+                onPress={() => setShowLeaveConfirmation(false)}
+              >
+                <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
+                  Avbryt
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[ui.button, styles.action]}
+                onPress={() => leaveMutation.mutate()}
+                disabled={leaveMutation.isPending}
+              >
+                <Text style={ui.buttonText}>
+                  {leaveMutation.isPending ? "Lämnar..." : "Ja, lämna"}
+                </Text>
+              </Pressable>
+            </View>
+
+            {leaveMutation.error && (
+              <Text style={[typography.caption, { color: colors.primary }]}>
+                {leaveMutation.error.message}
+              </Text>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -382,10 +462,14 @@ const styles = StyleSheet.create({
   center: {
     alignSelf: "center",
   },
-  row: {
+  nameRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    gap: spacing.sm,
+  },
+  memberCount: {
+    textAlign: "center",
   },
   actions: {
     flexDirection: "row",
@@ -415,5 +499,17 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     borderTopWidth: 1,
     borderTopColor: colors.border,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: spacing.md,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 400,
+    gap: spacing.md,
   },
 });
