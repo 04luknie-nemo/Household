@@ -4,10 +4,12 @@ import { HouseholdContext } from "@/components/household-provider";
 import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
-import { useContext } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { router, Stack, useLocalSearchParams } from "expo-router";
+import { useContext, useState } from "react";
 import {
   ActivityIndicator,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -39,9 +41,10 @@ type HouseholdMember = {
   isOwner: boolean;
 };
 
-type Household = {
+type HouseholdListItem = {
   id: string;
-  status: "pending" | "active" | "left";
+  name: string;
+  status: string;
   isOwner: boolean;
 };
 
@@ -65,18 +68,6 @@ export default function Task() {
   const { activeHouseholdId } = useContext(HouseholdContext);
   const { userId, sessionId } = useContext(AuthContext);
   const queryClient = useQueryClient();
-
-  const householdsQuery = useQuery<Household[]>({
-    queryKey: ["households", userId, sessionId],
-    enabled: !!userId && !!activeHouseholdId,
-    queryFn: ({ signal }) =>
-      apiFetch<Household[]>("/api/households", { signal }),
-  });
-  const activeHousehold = householdsQuery.data?.find(
-    (household) => household.id === activeHouseholdId,
-  );
-  const isOwner =
-    activeHousehold?.status === "active" && activeHousehold?.isOwner === true;
 
   const taskQuery = useQuery<TaskDetails>({
     queryKey: ["task", userId, sessionId, activeHouseholdId, taskId],
@@ -132,6 +123,51 @@ export default function Task() {
     },
   });
 
+  const { data: households } = useQuery({
+    queryKey: ["households", userId, sessionId],
+    queryFn: ({ signal }) =>
+      apiFetch<HouseholdListItem[]>("/api/households", { signal }),
+  });
+
+  const isOwner =
+    households?.find((h) => h.id === activeHouseholdId)?.isOwner ?? false;
+  const [warningOpen, setWarningOpen] = useState(false);
+
+  async function onTaskRemoved() {
+    setWarningOpen(false);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+      queryClient.invalidateQueries({ queryKey: ["stats"] }),
+    ]);
+    router.back();
+  }
+
+  const archiveTaskMutation = useMutation({
+    mutationFn: () =>
+      apiFetch(`/api/households/${activeHouseholdId}/tasks/${taskId}/archive`, {
+        method: "POST",
+      }),
+    onSuccess: onTaskRemoved,
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: () =>
+      apiFetch(`/api/households/${activeHouseholdId}/tasks/${taskId}`, {
+        method: "DELETE",
+      }),
+    onSuccess: onTaskRemoved,
+  });
+
+  const isRemoving =
+    archiveTaskMutation.isPending || deleteTaskMutation.isPending;
+  const removeError = archiveTaskMutation.error ?? deleteTaskMutation.error;
+
+  function closeWarning() {
+    archiveTaskMutation.reset();
+    deleteTaskMutation.reset();
+    setWarningOpen(false);
+  }
+
   if (!activeHouseholdId) {
     return (
       <View style={styles.messageContainer}>
@@ -171,32 +207,31 @@ export default function Task() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.heading}>
-          <Text style={[typography.title, styles.title]}>{task.title}</Text>
-          {isOwner && (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Redigera sysslan"
-              style={[ui.button, ui.buttonSecondary, styles.editButton]}
-              onPress={() =>
-                router.push({
-                  pathname: "/task-modal",
-                  params: { id: taskId },
-                })
-              }
-            >
-              <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
-                Redigera
-              </Text>
-            </Pressable>
-          )}
-        </View>
-
-        {householdsQuery.isError && (
-          <Text style={typography.body}>
-            Kunde inte hämta hushållets behörigheter.
-          </Text>
-        )}
+        <Stack.Screen
+          options={{
+            title: task.title,
+            headerRight: () =>
+              isOwner ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Redigera sysslan"
+                  hitSlop={12}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/task-modal",
+                      params: { id: taskId },
+                    })
+                  }
+                >
+                  <Ionicons
+                    name="pencil-outline"
+                    size={22}
+                    color={colors.primary}
+                  />
+                </Pressable>
+              ) : null,
+          }}
+        />
 
         <View style={ui.card}>
           <Text style={typography.label}>Beskrivning</Text>
@@ -205,7 +240,68 @@ export default function Task() {
           </Text>
         </View>
 
-        <View style={styles.contributors}>
+        {isOwner && (
+          <Pressable
+            style={styles.removeLink}
+            onPress={() => setWarningOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={`Ta bort ${task.title}`}
+          >
+            <Text style={styles.removeLinkText}>Ta bort syssla</Text>
+          </Pressable>
+        )}
+
+        <Modal
+          visible={isOwner && warningOpen}
+          transparent
+          animationType="fade"
+          onRequestClose={closeWarning}
+        >
+          <View style={styles.overlay}>
+            <View style={[ui.card, styles.dialog]}>
+              <Text style={typography.label}>Ta bort {task.title}?</Text>
+              <Text style={typography.body}>
+                Om du tar bort sysslan försvinner också statistiken för den. Du
+                kan arkivera den i stället, så att statistiken finns kvar.
+              </Text>
+
+              <Pressable
+                style={ui.button}
+                onPress={() => archiveTaskMutation.mutate()}
+                disabled={isRemoving}
+              >
+                <Text style={ui.buttonText}>
+                  {archiveTaskMutation.isPending ? "Arkiverar..." : "Arkivera"}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[ui.button, ui.buttonSecondary]}
+                onPress={() => deleteTaskMutation.mutate()}
+                disabled={isRemoving}
+              >
+                <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
+                  {deleteTaskMutation.isPending ? "Tar bort..." : "Ta bort"}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.cancel}
+                onPress={closeWarning}
+                disabled={isRemoving}
+              >
+                <Text style={typography.body}>Avbryt</Text>
+              </Pressable>
+
+              {removeError && (
+                <Text accessibilityRole="alert" style={styles.error}>
+                  {getErrorMessage(removeError)}
+                </Text>
+              )}
+            </View>
+          </View>
+        </Modal>
+        <View style={ui.card}>
           <Text style={typography.label}>Medverkande</Text>
 
           {tasksQuery.isPending || membersQuery.isPending ? (
@@ -292,21 +388,6 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     backgroundColor: colors.background,
   },
-  heading: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: spacing.md,
-  },
-  title: {
-    flex: 1,
-  },
-  editButton: {
-    paddingHorizontal: spacing.md,
-  },
-  contributors: {
-    gap: spacing.md,
-  },
   avatarList: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -332,5 +413,26 @@ const styles = StyleSheet.create({
   success: {
     ...typography.body,
     color: colors.text,
+  },
+  removeLink: {
+    alignSelf: "center",
+    padding: spacing.sm,
+  },
+  removeLinkText: {
+    ...typography.label,
+    color: colors.primary,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: colors.overlay,
+    justifyContent: "center",
+    padding: spacing.lg,
+  },
+  dialog: {
+    gap: spacing.md,
+  },
+  cancel: {
+    alignSelf: "center",
+    padding: spacing.sm,
   },
 });
