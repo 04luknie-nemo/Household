@@ -1,5 +1,6 @@
 import { AuthContext } from "@/components/auth-provider";
 import { HouseholdContext } from "@/components/household-provider";
+import LogOutButton from "@/components/log-out-button";
 import { avatars } from "@/constants/avatars";
 import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
@@ -24,9 +25,7 @@ type UserProfile = {
 
 export default function Profile() {
   const queryClient = useQueryClient();
-  const handleLogout = async () => {
-    await authClient.signOut();
-  };
+
   const { data: session } = authClient.useSession();
 
   const [error, setError] = useState<string | null>(null);
@@ -222,15 +221,7 @@ export default function Profile() {
               </View>
             </View>
           </View>
-
-          <Pressable
-            onPress={handleLogout}
-            style={[ui.button, ui.buttonSecondary]}
-          >
-            <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
-              Logga ut
-            </Text>
-          </Pressable>
+          <LogOutButton />
         </>
       )}
     </View>
