@@ -200,4 +200,9 @@ export const ui = StyleSheet.create({
   avatarEmojiSm: {
     fontSize: 13,
   },
+  householdInviteCode: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
 });

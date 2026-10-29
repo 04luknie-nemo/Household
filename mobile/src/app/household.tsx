@@ -1,5 +1,6 @@
 import { AuthContext } from "@/components/auth-provider";
 import Avatar from "@/components/avatar";
+import CopyCodeButton from "@/components/copy-code-button";
 import { HouseholdContext } from "@/components/household-provider";
 import { colors, radius, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
@@ -246,15 +247,20 @@ export default function Household() {
           )}
         </View>
       </View>
+
       {isOwner && (
         <View style={ui.card}>
           <Text style={typography.label}>Anslutningskod</Text>
-          <Text style={typography.title}>{household?.inviteCode}</Text>
+          <View style={ui.householdInviteCode}>
+            <Text style={typography.title}>{household?.inviteCode}</Text>
+            <CopyCodeButton code={household.inviteCode} />
+          </View>
           <Text style={typography.caption}>
             Dela koden för att bjuda in andra till hushållet
           </Text>
         </View>
       )}
+
       <View style={ui.card}>
         <Text style={typography.label}>Medlemmar</Text>
         {memberPending && <Text>Medlemmar laddar...</Text>}

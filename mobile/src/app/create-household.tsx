@@ -1,3 +1,4 @@
+import CopyCodeButton from "@/components/copy-code-button";
 import { HouseholdContext } from "@/components/household-provider";
 import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
@@ -34,9 +35,6 @@ export default function CreateHousehold() {
     },
   });
 
-  function handleCopy() {
-    console.log("Copied!");
-  }
   return (
     <View
       style={{
@@ -98,21 +96,7 @@ export default function CreateHousehold() {
               }}
             >
               <Text style={typography.title}>{code}</Text>
-              <Pressable
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: spacing.xs,
-                }}
-                onPress={handleCopy}
-              >
-                <Ionicons
-                  name="copy-outline"
-                  size={16}
-                  color={colors.primary}
-                />
-                <Text style={{ color: colors.primary }}>Kopiera</Text>
-              </Pressable>
+              <CopyCodeButton code={code} />
             </View>
           </View>
           <Link href="/select-household" asChild dismissTo>
