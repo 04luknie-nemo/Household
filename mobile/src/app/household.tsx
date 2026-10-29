@@ -53,6 +53,8 @@ export default function Household() {
   const { activeHouseholdId, setActiveHouseholdId } =
     useContext(HouseholdContext);
   const { userId, sessionId } = useContext(AuthContext);
+  const [memberToBeOwner, setMemberToBeOwner] =
+    useState<HouseholdMember | null>(null);
 
   const {
     data: household,
@@ -157,6 +159,22 @@ export default function Household() {
     },
   });
 
+  const updateMemberToOwner = useMutation({
+    mutationFn: (memberId: string) =>
+      apiFetch(
+        `/api/households/${activeHouseholdId}/members/${memberId}/owner`,
+        {
+          method: "POST",
+        },
+      ),
+    onSuccess: () => {
+      setMemberToBeOwner(null);
+      queryClient.invalidateQueries({
+        queryKey: ["members"],
+      });
+    },
+  });
+
   if (householdPending) return <Text>Laddar...</Text>;
   if (householdError) return <Text>{householdError.message}</Text>;
 
@@ -254,9 +272,56 @@ export default function Household() {
                 >
                   {member.isOwner ? "Ägare" : "Medlem"}
                 </Text>
+                {isOwner && !member.isOwner && (
+                  <Pressable
+                    onPress={() => {
+                      updateMemberToOwner.reset();
+                      setMemberToBeOwner(member);
+                    }}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Gör ${member.nickname} till ägare`}
+                  >
+                    <Text style={styles.ownerLink}>Gör till ägare</Text>
+                  </Pressable>
+                )}
               </View>
             )}
           />
+        )}
+        {memberToBeOwner !== null && (
+          <View style={styles.confirm}>
+            <Text style={typography.body}>
+              Gör {memberToBeOwner.nickname} till ägare?
+            </Text>
+            <View style={styles.actions}>
+              <Pressable
+                style={[ui.button, styles.action]}
+                onPress={() => updateMemberToOwner.mutate(memberToBeOwner.id)}
+                disabled={updateMemberToOwner.isPending}
+              >
+                <Text style={ui.buttonText}>
+                  {updateMemberToOwner.isPending ? "Sparar..." : "Ja"}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[ui.button, ui.buttonSecondary, styles.action]}
+                onPress={() => {
+                  updateMemberToOwner.reset();
+                  setMemberToBeOwner(null);
+                }}
+              >
+                <Text style={[ui.buttonText, ui.buttonSecondaryText]}>
+                  Avbryt
+                </Text>
+              </Pressable>
+            </View>
+            {updateMemberToOwner.error && (
+              <Text style={[typography.caption, { color: colors.primary }]}>
+                {updateMemberToOwner.error.message}
+              </Text>
+            )}
+          </View>
         )}
       </View>
 
@@ -423,6 +488,17 @@ const styles = StyleSheet.create({
   },
   memberNickname: {
     flex: 1,
+  },
+  ownerLink: {
+    ...typography.caption,
+    color: colors.primary,
+    fontWeight: "600",
+  },
+  confirm: {
+    gap: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
   },
   modalOverlay: {
     flex: 1,
