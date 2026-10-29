@@ -1,8 +1,7 @@
-import { colors } from "@/constants/theme";
-import { Feather } from "@expo/vector-icons";
+import { colors, spacing } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
-import { useEffect, useState } from "react";
-import { Pressable } from "react-native";
+import { Pressable, Text } from "react-native";
 import Toast from "react-native-toast-message";
 
 type Props = {
@@ -10,18 +9,6 @@ type Props = {
 };
 
 export default function CopyCodeButton({ code }: Props) {
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (!copied) return;
-
-    const timeout = setTimeout(() => {
-      setCopied(false);
-    }, 2000);
-
-    return () => clearTimeout(timeout);
-  }, [copied]);
-
   async function copyInviteCode() {
     if (!code) return;
 
@@ -41,12 +28,15 @@ export default function CopyCodeButton({ code }: Props) {
 
   return (
     <Pressable
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing.xs,
+      }}
       onPress={copyInviteCode}
-      disabled={!code}
-      accessibilityRole="button"
-      accessibilityLabel="Kopiera anslutningskoden"
     >
-      <Feather name="copy" size={24} color={colors.text} />
+      <Ionicons name="copy-outline" size={24} color={colors.primary} />
+      <Text style={{ color: colors.primary }}>Kopiera</Text>
     </Pressable>
   );
 }
