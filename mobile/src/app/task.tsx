@@ -4,6 +4,7 @@ import { HouseholdContext } from "@/components/household-provider";
 import { colors, spacing, typography, ui } from "@/constants/theme";
 import { apiFetch } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Ionicons } from "@expo/vector-icons";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useContext, useState } from "react";
 import {
@@ -206,7 +207,31 @@ export default function Task() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <Stack.Screen options={{ title: task.title }} />
+        <Stack.Screen
+          options={{
+            title: task.title,
+            headerRight: () =>
+              isOwner ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Redigera sysslan"
+                  hitSlop={12}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/task-modal",
+                      params: { id: taskId },
+                    })
+                  }
+                >
+                  <Ionicons
+                    name="pencil-outline"
+                    size={22}
+                    color={colors.primary}
+                  />
+                </Pressable>
+              ) : null,
+          }}
+        />
 
         <View style={ui.card}>
           <Text style={typography.label}>Beskrivning</Text>
