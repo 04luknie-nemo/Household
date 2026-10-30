@@ -50,8 +50,9 @@ Mindre stilfel är rättade i [#132](https://github.com/04luknie-nemo/Household/
 | Hushåll      | Knapparna Pausa och Återuppta på en medlem                             | Finns inte                                                                             | VG-krav som gruppen valt bort                                                                 | 2026-10-29       |
 | Hushåll      | Egen sida för en medlem med Gör till ägare                             | Knapp på medlemsraden (#107)                                                           | Ett tryck i stället för två                                                                   | 2026-10-29       |
 | Hushåll      | Koden ser ut som HEM-4821                                              | Koden ser ut som ABC234, som på skissen Hushåll skapat                                 | Sex tecken utan förväxlingsbara tecken                                                        | 2026-10-29       |
+| Välj hushåll | Ingen knapp för att logga ut                                           | Knappen Logga ut uppe till höger i headern                                             | Den som väntar på godkännande kommer inte till profilen och måste kunna logga ut (#160)       | Väntar           |
 
-Produktägaren David Jensen har gått igenom och godkänt alla avvikelser. Sista genomgången före inlämningen gjordes samma dag.
+Produktägaren David Jensen har gått igenom och godkänt avvikelserna den 29 oktober. Sista genomgången före inlämningen gjordes samma dag. Raden för Välj hushåll lades till den 30 oktober och väntar på Davids godkännande.
 
 ## Krav
 
