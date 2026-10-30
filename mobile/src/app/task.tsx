@@ -30,7 +30,7 @@ type TaskSummary = {
   id: string;
   title: string;
   doneTodayBy: number[];
-  daysSinceLast: number;
+  daysSinceLast: number | null;
   isOverdue: boolean;
 };
 

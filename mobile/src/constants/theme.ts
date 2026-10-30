@@ -165,6 +165,7 @@ export const ui = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     lineHeight: 24,
+    paddingHorizontal: spacing.sm,
     overflow: "hidden",
   },
   dayCountOverdue: {

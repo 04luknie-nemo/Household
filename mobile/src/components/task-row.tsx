@@ -5,10 +5,17 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 type Props = {
   title: string;
   doneTodayBy: number[];
-  daysSinceLast: number;
+  daysSinceLast: number | null;
   isOverdue: boolean;
   onPress: () => void;
 };
+
+function daysLabel(days: number | null) {
+  if (days === null) return "Aldrig gjord";
+  if (days === 0) return "Idag";
+  if (days === 1) return "1 dag sedan";
+  return `${days} dagar sedan`;
+}
 
 export default function TaskRow({
   title,
@@ -25,19 +32,21 @@ export default function TaskRow({
         </Text>
       </View>
 
-      {doneTodayBy.length > 0 ? (
+      <View style={s.status}>
+        {doneTodayBy.length > 0 && (
+          <View style={s.row}>
+            {doneTodayBy.map((avatarId) => (
+              <Avatar key={avatarId} avatarId={avatarId} size="sm" />
+            ))}
+          </View>
+        )}
         <View style={s.row}>
-          {doneTodayBy.map((avatarId) => (
-            <Avatar key={avatarId} avatarId={avatarId} size="sm" />
-          ))}
+          <Text style={ui.dayCount}>{daysLabel(daysSinceLast)}</Text>
+          {isOverdue && (
+            <Text style={[ui.dayCount, ui.dayCountOverdue]}>Försenad</Text>
+          )}
         </View>
-      ) : (
-        <View>
-          <Text style={[ui.dayCount, isOverdue && ui.dayCountOverdue]}>
-            {daysSinceLast}
-          </Text>
-        </View>
-      )}
+      </View>
     </Pressable>
   );
 }
@@ -45,6 +54,10 @@ export default function TaskRow({
 const s = StyleSheet.create({
   row: {
     flexDirection: "row",
+    gap: spacing.xs,
+  },
+  status: {
+    alignItems: "flex-end",
     gap: spacing.xs,
   },
   titleContainer: {
