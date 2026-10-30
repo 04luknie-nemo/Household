@@ -7,6 +7,7 @@ import { useContext } from "react";
 import { Pressable, Text, View } from "react-native";
 import { AuthContext } from "./auth-provider";
 import { HouseholdContext } from "./household-provider";
+import LogOutButton from "./log-out-button";
 
 type Household = {
   id: string;
@@ -156,7 +157,7 @@ export default function RootStack() {
           name="select-household"
           options={{
             title: "Välj hushåll",
-            headerRight: () => null,
+            headerRight: () => <LogOutButton />,
           }}
         />
 
