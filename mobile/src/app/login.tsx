@@ -6,8 +6,10 @@ import {
   typography,
   ui,
 } from "@/constants/theme";
+import { apiFetch } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
 import { Link, Stack } from "expo-router";
 import { useState } from "react";
 import {
@@ -25,6 +27,12 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  // GitHub-knappen visas bara när servern har GitHub-nycklar
+  const { data: providers } = useQuery({
+    queryKey: ["auth-providers"],
+    queryFn: () => apiFetch<{ github: boolean }>("/api/auth-providers"),
+  });
+
   const handleLogin = async () => {
     setError(null);
 
@@ -38,7 +46,8 @@ export default function Login() {
       password,
     });
     if (response.error) {
-      setError(response.error.message || "Fel e-post eller lösenord");
+      // Better Auth skickar engelska texter, så vi visar alltid vår egen
+      setError("Fel e-post eller lösenord");
       return;
     }
   };
@@ -51,7 +60,7 @@ export default function Login() {
     });
 
     if (signInError) {
-      setError(signInError.message || "Kunde inte logga in med GitHub");
+      setError("Kunde inte logga in med GitHub");
       return;
     }
   };
@@ -175,61 +184,69 @@ export default function Login() {
             </Text>
           </Pressable>
 
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginVertical: spacing.xs,
-            }}
-          >
-            <View
-              style={{ flex: 1, height: 1, backgroundColor: colors.border }}
-            />
-            <Text
-              style={[
-                typography.caption,
-                { marginHorizontal: spacing.md, color: colors.textMuted },
-              ]}
-            >
-              eller
-            </Text>
-            <View
-              style={{ flex: 1, height: 1, backgroundColor: colors.border }}
-            />
-          </View>
-
-          <View style={{ gap: spacing.xs }}>
-            <Text
-              style={[
-                typography.caption,
-                { textAlign: "center", color: colors.textMuted, fontSize: 14 },
-              ]}
-            >
-              Logga in med
-            </Text>
-            <Pressable
-              style={[
-                ui.button,
-                ui.buttonSecondary,
-                {
-                  paddingVertical: 14,
-                  borderRadius: radius.md,
-                  backgroundColor: colors.card,
-                },
-              ]}
-              onPress={handleGitHubLogin}
-            >
-              <Text
+          {providers?.github && (
+            <>
+              <View
                 style={{
-                  color: colors.text,
-                  fontSize: 16,
-                  fontWeight: "700",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginVertical: spacing.xs,
                 }}
               >
-                Github
-              </Text>
-            </Pressable>
-          </View>
+                <View
+                  style={{ flex: 1, height: 1, backgroundColor: colors.border }}
+                />
+                <Text
+                  style={[
+                    typography.caption,
+                    { marginHorizontal: spacing.md, color: colors.textMuted },
+                  ]}
+                >
+                  eller
+                </Text>
+                <View
+                  style={{ flex: 1, height: 1, backgroundColor: colors.border }}
+                />
+              </View>
+
+              <View style={{ gap: spacing.xs }}>
+                <Text
+                  style={[
+                    typography.caption,
+                    {
+                      textAlign: "center",
+                      color: colors.textMuted,
+                      fontSize: 14,
+                    },
+                  ]}
+                >
+                  Logga in med
+                </Text>
+                <Pressable
+                  style={[
+                    ui.button,
+                    ui.buttonSecondary,
+                    {
+                      paddingVertical: 14,
+                      borderRadius: radius.md,
+                      backgroundColor: colors.card,
+                    },
+                  ]}
+                  onPress={handleGitHubLogin}
+                >
+                  <Text
+                    style={{
+                      color: colors.text,
+                      fontSize: 16,
+                      fontWeight: "700",
+                    }}
+                  >
+                    GitHub
+                  </Text>
+                </Pressable>
+              </View>
+            </>
+          )}
 
           <Link
             href="/register"

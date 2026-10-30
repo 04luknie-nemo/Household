@@ -3,12 +3,21 @@ import "dotenv/config";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { auth } from "./lib/auth.ts";
+import authProviders from "./routes/auth-providers.ts";
 import households from "./routes/households.ts";
 
 const app = new Hono();
 
 app.use(
   "/api/auth/*",
+  cors({
+    origin: ["http://localhost:3001", "http://localhost:8081"],
+    credentials: true,
+  }),
+);
+
+app.use(
+  "/api/auth-providers",
   cors({
     origin: ["http://localhost:3001", "http://localhost:8081"],
     credentials: true,
@@ -24,6 +33,8 @@ app.use(
 );
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+
+app.route("/api/auth-providers", authProviders);
 
 app.route("/api/households", households);
 
