@@ -157,7 +157,7 @@ export default function RootStack() {
           name="select-household"
           options={{
             title: "Välj hushåll",
-            headerRight: () => <LogOutButton />,
+            headerRight: () => <LogOutButton compact />,
           }}
         />
 
