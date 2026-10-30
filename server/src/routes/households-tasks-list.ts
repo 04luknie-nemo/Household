@@ -67,14 +67,19 @@ taskList.get("/:id/tasks", async (c) => {
     const listOfAvatars = doneToday.map((ct) => ct.member.avatarId);
     const refinedAvatarList = [...new Set(listOfAvatars)];
 
-    // datum för när den gjordes, annars när den skapades
-    const last = t.completedTasks[0]?.createdAt ?? t.createdAt;
-    // dagar sen senast gjord
-    const daysSinceLast = Math.round(
-      (today.getTime() - startOfDay(last).getTime()) / msPerDag,
-    );
+    const lastDone = t.completedTasks[0]?.createdAt;
+    // null när sysslan aldrig gjorts
+    const daysSinceLast = lastDone
+      ? Math.round(
+          (today.getTime() - startOfDay(lastDone).getTime()) / msPerDag,
+        )
+      : null;
 
-    const isOverdue = daysSinceLast > t.reoccurInDays;
+    // aldrig gjord räknas som försenad först när den varit skapad längre än intervallet
+    const daysSinceCreated = Math.round(
+      (today.getTime() - startOfDay(t.createdAt).getTime()) / msPerDag,
+    );
+    const isOverdue = (daysSinceLast ?? daysSinceCreated) > t.reoccurInDays;
 
     return {
       id: t.id,

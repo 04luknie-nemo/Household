@@ -32,16 +32,16 @@ curl -i -b cookies.txt localhost:3000/api/households/<id>/tasks
 
 Kör i ordning.
 
-| Fall                           | Vem | Förväntat svar                                                   |
-| ------------------------------ | --- | ---------------------------------------------------------------- |
-| 1. Hushållet finns inte        | A   | `404`                                                            |
-| 2. Inte medlem                 | C   | `403`                                                            |
-| 3. Pending-medlem              | B   | `403`                                                            |
-| 4. Syssla aldrig gjord         | A   | `200`, `doneTodayBy: []`, `daysSinceLast: 0`, `isOverdue: false` |
-| 5. Gjord idag av två medlemmar | A   | `200`, `doneTodayBy` innehåller 1 och 2, en gång var             |
-| 6. Gjord för 3 dagar sedan     | A   | `200`, `doneTodayBy: []`, `daysSinceLast: 3`, `isOverdue: false` |
-| 7. Försenad                    | A   | `200`, `daysSinceLast: 8`, `isOverdue: true`                     |
-| 8. Arkiverad syssla            | A   | `200` med tom lista                                              |
+| Fall                           | Vem | Förväntat svar                                                      |
+| ------------------------------ | --- | ------------------------------------------------------------------- |
+| 1. Hushållet finns inte        | A   | `404`                                                               |
+| 2. Inte medlem                 | C   | `403`                                                               |
+| 3. Pending-medlem              | B   | `403`                                                               |
+| 4. Syssla aldrig gjord         | A   | `200`, `doneTodayBy: []`, `daysSinceLast: null`, `isOverdue: false` |
+| 5. Gjord idag av två medlemmar | A   | `200`, `doneTodayBy` innehåller 1 och 2, en gång var                |
+| 6. Gjord för 3 dagar sedan     | A   | `200`, `doneTodayBy: []`, `daysSinceLast: 3`, `isOverdue: false`    |
+| 7. Försenad                    | A   | `200`, `daysSinceLast: 8`, `isOverdue: true`                        |
+| 8. Arkiverad syssla            | A   | `200` med tom lista                                                 |
 
 **1. Hushållet finns inte**: byt `<id>` mot `finns-inte`.
 
