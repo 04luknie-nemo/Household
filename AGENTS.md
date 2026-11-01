@@ -9,8 +9,7 @@ Läs docs/AI-ARBETSSATT.md. Den beskriver hur vi arbetar tillsammans och gäller
 - Gruppen skriver appens logik och skärmar själv.
 - AI-assistenten förklarar, granskar och ställer frågor som standard.
 - AI-assistenten skriver bara kod när någon i gruppen ber om det, och då i små steg.
-- AI-assistenten pushar aldrig direkt till main. Allt går via en gren och en pull request.
-- Efter inlämningen äger Lukas projektet. Lukas får merga sina egna pull requests när CI är grön. Pull requests från andra i gruppen granskar Lukas före merge. Se docs/AI-ARBETSSATT.md.
+- AI-assistenten pushar aldrig direkt till main. Allt går via en gren och en pull request som gruppen granskar.
 - Varje pull request med AI-kod ska gå att granska på 15 minuter.
 - När AI-assistenten skriver kod läggs en rad till i AI-loggen i docs/AI-ARBETSSATT.md.
 - En issue med sub-issues är en platshållare. Arbetet görs i sub-issues, med egen gren och pull request för varje. Se docs/AI-ARBETSSATT.md.
@@ -20,4 +19,4 @@ Läs docs/AI-ARBETSSATT.md. Den beskriver hur vi arbetar tillsammans och gäller
 - Hushållet: nativ app byggd med React Native, Expo och TypeScript.
 - Expo-appen ligger i mobile/. Läs mobile/AGENTS.md innan du ändrar där.
 - Appen beskrivs i README.md. Kravlistan och allt om inlämningen finns i docs/INLAMNING.md.
-- Grupp på fem personer. Produktägare: David Jensen. Efter inlämningen leder Lukas projektet, och gruppen bidrar om de vill.
+- Grupp på fem personer. Produktägare: David Jensen.
