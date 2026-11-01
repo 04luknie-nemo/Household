@@ -29,7 +29,7 @@ En etapp är en sak, till exempel "ägare kan godkänna en förfrågan". Varje e
 2. AI:n ställer frågor om regler och kantfall.
 3. Koden skrivs, av oss eller av AI:n beroende på nivå.
 4. Koden hamnar på en egen gren och i en pull request.
-5. Granskning av minst en annan person i gruppen.
+5. Granskning av minst en annan person i gruppen. Efter inlämningen gäller reglerna under Efter inlämningen.
 6. Lint, typecheck och tester går igenom i GitHub Actions.
 7. Merge till main.
 
@@ -48,8 +48,18 @@ När en issue blir för stor delar vi upp den i sub-issues, oftast en för serve
 
 - Koden hamnar på en egen gren, aldrig direkt mot main.
 - Pull requesten beskriver vad som ändrats och varför, och att AI skrev koden.
-- Någon i gruppen granskar varje fil innan merge.
+- Någon i gruppen granskar varje fil innan merge. Efter inlämningen granskar Lukas själv sina egna pull requests, även när AI skrev koden.
 - En rad läggs till i AI-loggen nedan, med PR-numret. Kan verktyget inte skriva i repot, lägger personen till raden själv.
+
+## Efter inlämningen
+
+Skoluppgiften lämnades in 2026-10-30. Därefter fortsätter Lukas att utveckla appen, och gruppen bidrar om de vill.
+
+- Lukas äger projektet och bestämmer vad som byggs. Backloggen är issues med etiketten Efter inlämning.
+- Lukas får merga sina egna pull requests utan granskning från någon annan, men först när CI är grön.
+- Pull requests från andra i gruppen granskar Lukas före merge.
+- Allt går fortfarande via en egen gren och en pull request, aldrig direkt mot main.
+- Reglerna för AI gäller som förut: små etapper och en rad i AI-loggen när AI skriver kod.
 
 ## Verktyg och instruktionsfiler
 
@@ -163,3 +173,4 @@ Här loggas varje gång en AI-assistent skriver kod som hamnar i repot. Kolumnen
 | 2026-10-30 | Inloggning: felmeddelande på svenska och GitHub-knappen (#166) | Claude Code i VS Code | Ta över | På Christians begäran: login.tsx visar alltid "Fel e-post eller lösenord" vid misslyckad inloggning och alltid "Kunde inte logga in med GitHub" vid GitHub-fel, och knappen stavas GitHub. Ny route auth-providers.ts (GET /api/auth-providers) svarar { github: true/false } beroende på om GITHUB_CLIENT_ID och GITHUB_CLIENT_SECRET är satta, med CORS i index.ts. Inloggningssidan hämtar svaret med useQuery och visar eller döljer hela GitHub-blocket (eller-linjen, texten och knappen). Körde tsc och prettier. Testade på webben mot en separat testdatabas: utan nycklar syns ingen GitHub-knapp, med nycklar syns den som "GitHub", och fel lösenord ger den svenska texten i båda fallen. Inte testat på Android eller iOS och inte en riktig GitHub-inloggning. Christian granskade diffen före commit. | – |
 | 2026-10-30 | Dagsvyn: visa vem, dagar sedan och Försenad (#165) | Claude Code i VS Code | Ta över | På Christians begäran att lösa #165: AI:n skrev koden utan att en nivå var vald i förväg. Servern skickar daysSinceLast: null när en syssla aldrig gjorts. task-row.tsx visar avatarer och dagar samtidigt ("Aldrig gjord", "Idag", "1 dag sedan", "N dagar sedan") och ett chip med texten "Försenad". Typerna i task-list.tsx och task.tsx tillåter null, dayCount i theme.ts fick sidopadding och testfall 4 i server/tests/households-tasks-list.md förväntar null. Körde tsc, prettier och lint. Testade med curl mot en lokal server med seed-datan i en separat testdatabas och på webben som Anna: Aldrig gjord, avatarer och dagar tillsammans och Försenad som text. Christian granskade diffen före commit. Inte testat på Android eller iOS. | – |
 | 2026-10-30 | Inlämning: Välj hushåll är en egen skärm (#164) | Claude Code | Ta över | På Lukas begäran: Välj hushåll finns inte i lärarens skisser, så raden för Logga ut flyttades från avvikelsetabellen till ett eget stycke om skärmar gruppen designat själva. Meningen under tabellen säger åter att alla avvikelser är godkända. | #164 |
+| 2026-11-01 | Arbetssätt efter inlämningen | Claude Code | Ta över | På Lukas begäran: AGENTS.md och AI-ARBETSSATT.md säger nu att Lukas äger projektet efter inlämningen, får merga sina egna pull requests när CI är grön och granskar pull requests från gruppen. Reglerna för AI är oförändrade. | – |
