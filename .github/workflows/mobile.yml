@@ -2,7 +2,7 @@ name: Mobile
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, efter-inlamning]
     paths:
       - mobile/**
       - .prettierrc.json
