@@ -2,7 +2,7 @@ name: Server
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, efter-inlamning]
     paths:
       - server/**
       - .prettierrc.json
